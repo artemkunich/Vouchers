@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Vouchers.Core\Vouchers.Core.csproj" />
+    <ProjectReference Include="..\Vouchers.Domains\Vouchers.Domains.csproj" />
+    <ProjectReference Include="..\Vouchers.Identities\Vouchers.Identities.csproj" />
+    <ProjectReference Include="..\Vouchers.Values\Vouchers.Values.csproj" />
+  </ItemGroup>
+
+</Project>

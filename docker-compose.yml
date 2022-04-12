@@ -1,0 +1,23 @@
+version: '3.4'
+
+services:
+  db:
+    image: "mcr.microsoft.com/mssql/server:2019-latest"
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Sa_123456789!
+    ports:
+      - "1450:1433"
+  vouchers.api:
+    image: ${DOCKER_REGISTRY-}vouchersapi
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5000
+    ports:
+      - "8080:80"
+      - "8443:443"
+    build:
+      context: .
+      dockerfile: Vouchers.API/Dockerfile
+    depends_on:
+      - db

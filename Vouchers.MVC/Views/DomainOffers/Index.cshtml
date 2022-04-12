@@ -1,0 +1,109 @@
+﻿@model DomainOffersViewModel
+
+@{
+    ViewData["Title"] = "Domain offers";
+}
+
+<div class="row">
+    <div class="col-md-2">
+        <section>
+            <h4>Filters</h4>
+            <form asp-action="Index" method="get">
+                <div class="form-group">
+                    <label>Login name</label>
+                    <input class="form-control form-control-sm" name="LoginName" value="@Model.LoginNameFilter" />
+                </div>
+
+                <div class="form-group">
+                    <label>Identity name</label>
+                    <input class="form-control form-control-sm" name="IdentityName" value="@Model.IdentityNameFilter" />
+                </div>
+
+                <div class="form-group">
+                    <label>First name</label>
+                    <input class="form-control form-control-sm" name="FirstName" value="@Model.FirstNameFilter" />
+                </div>
+
+                <div class="form-group">
+                    <label>Last name</label>
+                    <input class="form-control form-control-sm" name="LastName" value="@Model.LastNameFilter" />
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+            </form>
+        </section>
+    </div>
+    <div class="col-md-10">
+        <section>
+            <h4>@ViewData["Title"]</h4>
+            <table id="loginsTable" class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>
+                            <a asp-action="Index"
+                               asp-route-orderBy="LoginName@(Model.LoginNameOrder)"
+                               asp-route-loginName="@Model.LoginNameFilter"
+                               asp-route-identityName="@Model.IdentityNameFilter"
+                               asp-route-firstName="@Model.FirstNameFilter"
+                               asp-route-lastName="@Model.LastNameFilter">Domain name</a>
+                        </th>
+                        <th>
+                            <a asp-action="Index"
+                               asp-route-orderBy="IdentityName@(Model.IdentityNameOrder)"
+                               asp-route-loginName="@Model.LoginNameFilter"
+                               asp-route-identityName="@Model.IdentityNameFilter"
+                               asp-route-firstName="@Model.FirstNameFilter"
+                               asp-route-lastName="@Model.LastNameFilter">Price</a>
+                        </th>
+                        <th>
+                            <a asp-action="Index"
+                               asp-route-orderBy="FirstName@(Model.FirstNameOrder)"
+                               asp-route-loginName="@Model.LoginNameFilter"
+                               asp-route-identityName="@Model.IdentityNameFilter"
+                               asp-route-firstName="@Model.FirstNameFilter"
+                               asp-route-lastName="@Model.LastNameFilter">Max subscribers count</a>
+                        </th>
+                </thead>
+
+                <tbody>
+
+                    @foreach (var offer in Model.Items)
+                    {
+                    <tr>
+                        <td>@offer.Id</td>
+                        <td>@offer.Name</td>
+                        <td>@offer.Amount @offer.Currency / offer.InvoicePeriod</td>
+                        <td>@offer.MaxSubscribersCount</td>
+                    </tr>
+                    }
+                </tbody>
+
+            </table>
+
+            @{
+                var prevDisabled = !(Model.Items.PageIndex > 1) ? "disabled" : "";
+                var nextDisabled = !(Model.Items.PageIndex < Model.Items.TotalPages) ? "disabled" : "";
+
+            }
+
+            <a asp-action="Index"
+               asp-route-orderBy="@Model.OrderBy"
+               asp-route-pageIndex="@(Model.Items.PageIndex - 1)"
+               asp-route-loginName="@Model.LoginNameFilter"
+               asp-route-identityName="@Model.IdentityNameFilter"
+               asp-route-firstName="@Model.FirstNameFilter"
+               asp-route-lastName="@Model.LastNameFilter"
+               class="btn btn-default @prevDisabled">Previous</a>
+            <a asp-action="Index"
+               asp-route-orderBy="@Model.OrderBy"
+               asp-route-pageIndex="@(Model.Items.PageIndex + 1)"
+               asp-route-loginName="@Model.LoginNameFilter"
+               asp-route-identityName="@Model.IdentityNameFilter"
+               asp-route-firstName="@Model.FirstNameFilter"
+               asp-route-lastName="@Model.LastNameFilter"
+               class="btn btn-default @nextDisabled">Next</a>
+        </section>
+    </div>
+</div>
