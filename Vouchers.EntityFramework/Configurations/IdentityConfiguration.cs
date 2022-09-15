@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 
 using Vouchers.Core;
+using Vouchers.Identities;
 
 namespace Vouchers.EntityFramework.Configurations
 {
@@ -15,6 +16,8 @@ namespace Vouchers.EntityFramework.Configurations
             builder.ToTable(nameof(Identity));
 
             builder.HasKey(identity => identity.Id);
+
+            builder.Property<byte[]>("RowVersion").IsRowVersion();
         }
             
     }

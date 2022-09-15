@@ -1,34 +1,52 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Core;
+using Vouchers.Files;
 using Vouchers.Identities;
 
 namespace Vouchers.Application.UseCases
 {
     public class CreateIdentityCommandHandler : IHandler<CreateIdentityCommand>
     {
-        private readonly ILoginRepository loginRepository;
+        private readonly IRepository<Login> _loginRepository;
+        private readonly IRepository<AppImage> _appImageRepository;
+        private readonly IImageService _imageService;
 
-        public CreateIdentityCommandHandler(ILoginRepository loginRepository)
+        public CreateIdentityCommandHandler(IRepository<Login> loginRepository, IRepository<AppImage> appImageRepository, IImageService imageService)
         {
-            this.loginRepository = loginRepository;
+            _loginRepository = loginRepository;
+            _imageService = imageService;
+            _appImageRepository = appImageRepository;
         }
 
         public async Task HandleAsync(CreateIdentityCommand command, CancellationToken cancellation)
         {
-            var identity = Identity.Create();
+            var identityDetailDto = command.IdentityDetail;
+            
 
-            var login = Login.Create(command.LoginName, identity);     
-            var identityDetail = IdentityDetail.Create(login.Identity, command.IdentityDetailDto.IdentityName, command.IdentityDetailDto.Email);
-            identityDetail.FirstName = command.IdentityDetailDto?.FirstName;
-            identityDetail.LastName = command.IdentityDetailDto?.LastName;
+            AppImage image = null;
+            if (identityDetailDto.CropParameters is not null)
+            {
+                var cropParametersDto = identityDetailDto.CropParameters;
 
-            await loginRepository.AddAsync(login, identityDetail);
-            await loginRepository.SaveAsync();
+                var croppedContent = await _imageService.CropImageAsync(identityDetailDto.Image.OpenReadStream(), cropParametersDto);
+                var cropParameters = CropParameters.Create(cropParametersDto.X, cropParametersDto.Y, cropParametersDto.Width, cropParametersDto.Height);
+                image = AppImage.Create(croppedContent, cropParameters);
+                await _appImageRepository.AddAsync(image);
+
+                await _imageService.SaveImageAsync(identityDetailDto.Image.OpenReadStream(), image.Id);
+            }
+
+            var identity = Identity.Create(identityDetailDto.Email, identityDetailDto.FirstName, identityDetailDto.LastName);
+            var login = Login.Create(command.LoginName, identity);
+            identity.ImageId = image?.Id;
+
+            await _loginRepository.AddAsync(login);
         }
     }
 }

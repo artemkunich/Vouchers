@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Queries;
 using Vouchers.Application.UseCases;
+using Vouchers.Core;
 
 namespace Vouchers.EntityFramework.QueryHandlers
 {
@@ -22,17 +23,16 @@ namespace Vouchers.EntityFramework.QueryHandlers
 
         public async Task<DomainDto> HandleAsync(DomainQuery query, Guid authIdentityId, CancellationToken cancellation)
         {
-            var domainDetail = await dbContext.DomainDetails
-            .Include(domainDetail => domainDetail.Contract).ThenInclude(contract => contract.Domain)
-            .Where(domainDetail => domainDetail.Contract.Domain.Id == query.DomainId)
-            .FirstOrDefaultAsync();
-
-            return new DomainDto
-            {
-                Id = domainDetail.Contract.Domain.Id,
-                Name = domainDetail.Contract.DomainName,
-                Description = domainDetail.Description
-            };
+            return await dbContext.Domains
+                .Include(domain => domain.Contract)
+                .Where(domain => domain.Id == query.DomainId)
+                .Select(domain => new DomainDto
+                {
+                    Id = domain.Id,
+                    Name = domain.Contract.DomainName,
+                    Description = domain.Description
+                })
+                .FirstOrDefaultAsync();
         }
     }
 }

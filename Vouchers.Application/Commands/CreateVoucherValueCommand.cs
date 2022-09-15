@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
@@ -9,12 +10,11 @@ namespace Vouchers.Application.Commands
     public class CreateVoucherValueCommand
     {
         [Required]
-        public Guid IssuerDomainAccountId { get; }
+        public Guid IssuerDomainAccountId { get; set; }
 
         [Required]
-        public string Ticker { get; }
+        public VoucherValueDetailDto VoucherValueDetail { get; set; }
 
-        [Required]
-        public VoucherValueDetailDto VoucherValueDetailDto { get; }
+        public IFormFile Image { get; set; }
     }
 }

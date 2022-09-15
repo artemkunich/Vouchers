@@ -1,0 +1,62 @@
+﻿<Window x:Class="Vouchers.WPF.Views.HolderTransactionDetailWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Vouchers.WPF.Views"
+        mc:Ignorable="d"
+        Title="HolderTransactionDetailWindow" Height="450" Width="800">
+    <Grid Margin="5">
+        <Border Background="LightGray" BorderBrush="Gray" BorderThickness="2">
+            <StackPanel Background="White">
+                <TextBlock Margin="20 20 20 0" Text="{Binding Header}" FontSize="20" HorizontalAlignment="Center"/>
+
+
+                <Grid Margin="20,20,20,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Row="0" Grid.Column="0">
+                        <TextBlock  FontSize="15" >
+                            Issuer: <Run Text="{Binding Transaction.UnitIssuerId, Mode=OneWay}" FontWeight="Bold"/>
+                        </TextBlock>
+                        <TextBlock  FontSize="15">
+                            Value: 
+                            <Run Text="{Binding Transaction.UnitCategory, Mode=OneWay}" FontWeight="Bold"/><Run Text="/" FontWeight="Bold"/><Run Text="{Binding Transaction.UnitName, Mode=OneWay}" FontWeight="Bold"/>
+                        </TextBlock>
+                        <TextBlock  FontSize="15">
+                            Creditor: <Run Text="{Binding Transaction.CreditorId, Mode=OneWay}" FontWeight="Bold"/>
+                        </TextBlock>
+                        <TextBlock  FontSize="15">
+                            Debtor: <Run Text="{Binding Transaction.DebtorId, Mode=OneWay}" FontWeight="Bold"/>
+                        </TextBlock>
+
+                    </StackPanel>
+                    <TextBlock Grid.Row="0" Grid.Column="1" FontSize="15" HorizontalAlignment="Right">
+                        Total amount: <Run FontWeight="Bold" Text="{Binding Transaction.Amount, Mode=OneWay}"/>
+                    </TextBlock>
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Items:" FontSize="15" Margin="0 10 0 0"/>
+                    <DataGrid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" ItemsSource="{Binding Transaction.Items}" Margin="0 0 0 20" AutoGenerateColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Valid from" Binding="{Binding Unit.ValidFrom}" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Valid to" Binding="{Binding Unit.ValidTo}" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Exchangeable" Binding="{Binding Unit.CanBeExchanged}" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Amount" Binding="{Binding Amount}" IsReadOnly="True" FontWeight="Bold"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <Button Grid.Row="3" Grid.Column="0" IsCancel="True" Margin="0 3 10 3" Padding="3" Height="30" Content="Cancel" />
+                </Grid>
+
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

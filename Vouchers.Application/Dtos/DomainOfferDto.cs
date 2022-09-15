@@ -7,7 +7,6 @@ namespace Vouchers.Application.Dtos
 {
     public class DomainOfferDto
     {
-        [Required]
         public Guid Id { get; set; }
 
         public string Name { get; set; }
@@ -21,5 +20,13 @@ namespace Vouchers.Application.Dtos
         public string Currency { get; set; }
 
         public string InvoicePeriod { get; set; }
+
+        public DateTime ValidFrom { get; set; }
+
+        public DateTime ValidTo { get; set; }
+
+        public int? MaxContractsPerIdentity { get; set; }
+
+        public int? ContractsPerIdentity { get; set; }
     }
 }

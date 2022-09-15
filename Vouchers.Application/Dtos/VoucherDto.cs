@@ -12,7 +12,7 @@ namespace Vouchers.Application.Dtos
 
         public DateTime ValidFrom { get; set; }
 
-        public DateTime ValidTo { get; set; }
+        public DateTime? ValidTo { get; set; }
 
         public bool CanBeExchanged { get; set; }
 

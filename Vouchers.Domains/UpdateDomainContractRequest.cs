@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Vouchers.Core;
 
 namespace Vouchers.Domains
 {
@@ -9,7 +8,10 @@ namespace Vouchers.Domains
     {
         public Guid Id { get; }
 
+        public Guid DomainId { get; }
         public Domain Domain { get; }
+
+        public Guid OfferId { get; }
         public DomainOffer Offer { get; }
 
         public DateTime CreatedDateTime { get; }
@@ -33,8 +35,13 @@ namespace Vouchers.Domains
         public UpdateDomainContractRequest(Guid id, Domain domain, DomainOffer offer, DateTime createdDateTime)
         {
             Id = id;
+
+            DomainId = domain.Id;
             Domain = domain;
+
+            OfferId = offer.Id;
             Offer = offer;
+            
             CreatedDateTime = createdDateTime;
         }
     }

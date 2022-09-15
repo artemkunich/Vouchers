@@ -17,21 +17,32 @@ using System.Threading;
 
 namespace Vouchers.EntityFramework.QueryHandlers
 {
-    public class DomainOffersQueryHandler : IHandler<DomainOffersQuery,IPaginatedEnumerable<DomainOfferDto>>
+    public class DomainOffersQueryHandler : IHandler<DomainOffersQuery, IEnumerable<DomainOfferDto>>
     {
-        VouchersDbContext dbContext;
+        VouchersDbContext _dbContext;
 
         public DomainOffersQueryHandler(VouchersDbContext dbContext)
         {           
-            this.dbContext = dbContext;
+            this._dbContext = dbContext;
         }
 
-        public async Task<IPaginatedEnumerable<DomainOfferDto>> HandleAsync(DomainOffersQuery query, CancellationToken cancellation) =>
-            await PaginatedList<DomainOfferDto>.CreateAsync(GetQuery(query), query.PageIndex, query.PageSize);
+        public async Task<IEnumerable<DomainOfferDto>> HandleAsync(DomainOffersQuery query, CancellationToken cancellation) =>
+            await GetQuery(query).Skip(query.PageIndex * query.PageSize).Take(query.PageSize).ToListAsync();
 
         IQueryable<DomainOfferDto> GetQuery(DomainOffersQuery query)
         {
-            var domainOffersQuery = dbContext.DomainOffers.Where(domain => domain.Recipient == null && domain.ValidFrom <= DateTime.Now && domain.ValidTo >= DateTime.Now);
+            IQueryable<DomainOffer> domainOffersQuery = _dbContext.DomainOffers.Where(offer => offer.RecipientId == null /*&& domain.ValidFrom <= DateTime.Now && domain.ValidTo >= DateTime.Now*/);
+
+            if (query.RecipientId is null)
+                domainOffersQuery = _dbContext.DomainOffers.Where(offer => offer.RecipientId == null);
+            else
+                domainOffersQuery = _dbContext.DomainOffers.Where(offer => offer.RecipientId == query.RecipientId);
+
+            if (query.IncludePlanned != true)
+                domainOffersQuery = domainOffersQuery.Where(offer => offer.ValidFrom <= DateTime.Now);
+
+            if (query.IncludeExpired != true)
+                domainOffersQuery = domainOffersQuery.Where(offer => offer.ValidTo > DateTime.Now);
 
             if (query.Name != null)
                 domainOffersQuery = domainOffersQuery.Where(offer => offer.Name.Contains(query.Name));
@@ -63,7 +74,10 @@ namespace Vouchers.EntityFramework.QueryHandlers
                     Amount = domainOffer.Amount.Amount,
                     Currency = domainOffer.Amount.Currency.ToString(),
                     MaxSubscribersCount = domainOffer.MaxSubscribersCount,
-                    InvoicePeriod = domainOffer.InvoicePeriod.ToString()
+                    InvoicePeriod = domainOffer.InvoicePeriod.ToString(),
+                    ValidFrom = domainOffer.ValidFrom,
+                    ValidTo = domainOffer.ValidTo,
+                    MaxContractsPerIdentity = domainOffer.MaxContractsPerIdentity,
                 }
             );
         }

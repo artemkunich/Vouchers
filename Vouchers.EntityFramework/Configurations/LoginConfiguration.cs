@@ -19,12 +19,12 @@ namespace Vouchers.EntityFramework.Configurations
 
             builder.Property(login => login.LoginName).IsRequired();
 
-            builder.Property<Guid>("IdentityId").HasColumnName("IdentityId").IsRequired();
-            builder.HasIndex("IdentityId").IsUnique();
+            builder.Property(login => login.IdentityId).IsRequired();
+            builder.HasIndex(login => login.IdentityId).IsUnique();
             builder
                 .HasOne(login => login.Identity)
                 .WithMany()
-                .HasForeignKey("IdentityId")
+                .HasForeignKey(login => login.IdentityId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Property<byte[]>("RowVersion").IsRowVersion();

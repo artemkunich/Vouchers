@@ -1,0 +1,32 @@
+.listElement {
+    box-shadow: 0 2px 5px 0 rgb(0 0 0 / 5%), 0 2px 10px 0 rgb(0 0 0 / 5%);
+    margin-bottom: 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    border-style: solid;
+    border-width: 0.2px;
+    border-color: lightgrey;
+    overflow: hidden
+}
+
+.listElementHead {
+    padding: 5px;
+    cursor: pointer;
+    background-color: #59a8fc;
+    color: white;
+}
+
+
+
+.listElementHead p {
+    margin: 0px;
+}
+
+.listElementBody {
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    background-color: white;
+    overflow: hidden;
+}

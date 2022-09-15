@@ -1,42 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Vouchers.Entities;
 
 namespace Vouchers.Core
 {
-    public class HolderTransactionItem
-    {        
-        public Guid Id { get; }
+    public class HolderTransactionItem : Entity
+    {
+        public UnitQuantity Quantity { get; }
 
-        public VoucherQuantity Quantity { get; }
+        public Guid CreditAccountItemId { get; }
+        public AccountItem CreditAccountItem { get; }
 
-        public VoucherAccount CreditAccount { get; }
+        public Guid DebitAccountItemId { get; }
+        public AccountItem DebitAccountItem { get; }
 
-        public VoucherAccount DebitAccount { get; }
-
-        public static HolderTransactionItem Create(VoucherQuantity quantity, VoucherAccount creditAccount, VoucherAccount debitAccount) =>
+        public static HolderTransactionItem Create(UnitQuantity quantity, AccountItem creditAccount, AccountItem debitAccount) =>
             new HolderTransactionItem(Guid.NewGuid(), quantity, creditAccount, debitAccount);
 
-        internal HolderTransactionItem(Guid id, VoucherQuantity quantity, VoucherAccount creditAccount, VoucherAccount debitAccount) : this(quantity, creditAccount, debitAccount) =>
-            Id = id;
-
-        internal HolderTransactionItem(VoucherQuantity quantity, VoucherAccount creditAccount, VoucherAccount debitAccount)
+        internal HolderTransactionItem(Guid id, UnitQuantity quantity, AccountItem creditAccountItem, AccountItem debitAccountItem) : base(id)
         {
-            if (creditAccount.Equals(debitAccount))
-                throw new CoreException("Credit and debit accounts are the same");
+            if (creditAccountItem.Equals(debitAccountItem))
+                throw new CoreException("Credit and debit accounts equal");
 
-            if (creditAccount.Unit.NotEquals(quantity.Unit))
+            if (creditAccountItem.Unit.NotEquals(quantity.Unit))
                 throw new CoreException("Credit account and item have different units");
 
-            if (debitAccount.Unit.NotEquals(quantity.Unit))
+            if (debitAccountItem.Unit.NotEquals(quantity.Unit))
                 throw new CoreException("Debit account and item have different units");
 
-            if(!quantity.Unit.CanBeExchanged && creditAccount.Holder.NotEquals(quantity.Unit.Value.Issuer) && debitAccount.Holder.NotEquals(quantity.Unit.Value.Issuer))
+            if(!quantity.Unit.CanBeExchanged && creditAccountItem.Holder.NotEquals(quantity.Unit.UnitType.Issuer) && debitAccountItem.Holder.NotEquals(quantity.Unit.UnitType.Issuer))
                 throw new CoreException("Item's unit cannot be exchanged");
 
             Quantity = quantity;
-            CreditAccount = creditAccount;
-            DebitAccount = debitAccount;
+
+            CreditAccountItemId = creditAccountItem.Id;
+            CreditAccountItem = creditAccountItem;
+
+            DebitAccountItemId = debitAccountItem.Id;
+            DebitAccountItem = debitAccountItem;
+
         }
 
         private HolderTransactionItem() { }

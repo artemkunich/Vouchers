@@ -1,0 +1,8 @@
+.mainContainer {
+  padding-top: 58px; /* Height of navbar */
+  /* transition: padding-left .5s; */
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  overflow:auto;
+}

@@ -11,6 +11,7 @@ using Vouchers.Application.Dtos;
 using Vouchers.Application.Queries;
 using Vouchers.Application.UseCases;
 using System.Threading;
+using Vouchers.Core;
 
 namespace Vouchers.EntityFramework.QueryHandlers
 {
@@ -35,12 +36,10 @@ namespace Vouchers.EntityFramework.QueryHandlers
         private IQueryable<SubscriberDto> GetQuery(SubscribersQuery query, Guid authIdentityId)
         {
             var subscriptionQuery = dbContext.DomainAccounts
-                .Include(a => a.Identity)
                 .Include(a => a.Domain)
-                .Where(a => a.Identity.Id == authIdentityId && a.Domain.Id == query.DomainId);
+                .Where(a => a.IdentityId == authIdentityId && a.Domain.Id == query.DomainId);
 
             var subscribersQuery = dbContext.DomainAccounts
-                .Include(a => a.Identity)
                 .Include(a => a.Domain)
                 .Where(a => a.Domain.Id == query.DomainId);
 
@@ -54,13 +53,13 @@ namespace Vouchers.EntityFramework.QueryHandlers
 
             return subscribersQuery
                 .Join(
-                    dbContext.IdentityDetails.Include(d => d.Identity),
-                    subscription => subscription.Identity.Id,
-                    identityDetail => identityDetail.Identity.Id,
+                    dbContext.Identities,
+                    subscription => subscription.IdentityId,
+                    identity => identity.Id,
                     (domainAccount, identityDetail) => new SubscriberDto
                     {
                         DomainAccountId = domainAccount.Id,
-                        IdentityName = identityDetail.IdentityName,
+                        Email = identityDetail.Email,
                         FirstName = identityDetail.FirstName,
                         LastName = identityDetail.LastName
                     }

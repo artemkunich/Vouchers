@@ -8,7 +8,7 @@ namespace Vouchers.Application.Dtos
     {
         public Guid DomainAccountId { get; set; }
 
-        public string IdentityName { get; set; }
+        public string Email { get; set; }
 
         public string FirstName { get; set; }
 

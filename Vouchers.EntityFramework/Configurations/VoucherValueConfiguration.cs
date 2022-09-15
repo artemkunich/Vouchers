@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
+using Vouchers.Values;
 using Vouchers.Core;
 
 namespace Vouchers.EntityFramework.Configurations
@@ -14,23 +15,15 @@ namespace Vouchers.EntityFramework.Configurations
         {
             builder.ToTable(nameof(VoucherValue));
 
-            builder.HasKey(value => value.Id);
+            builder.HasKey(valueDetail => valueDetail.Id);
 
-            builder.Property<Guid>("IssuerId").IsRequired().HasColumnName("IssuerId");
+            builder.Property(value => value.DomainId).IsRequired();
+
+            builder.HasIndex(value => new {value.Ticker, value.DomainId}).IsUnique();
+            
+            builder.Property(value => value.Ticker).IsRequired();
 
             builder.Property<byte[]>("RowVersion").IsRowVersion();
-
-            builder.Property(value => value.Supply)
-                    .IsRequired()
-                    .HasPrecision(18, 2)
-                    .HasColumnName("Supply");
-
-            builder
-                .HasOne(value => value.Issuer)
-                .WithMany()
-                .IsRequired()
-                .HasForeignKey("IssuerId")
-                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

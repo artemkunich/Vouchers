@@ -1,6 +1,6 @@
 ﻿using Vouchers.Application.Infrastructure;
 
-namespace Vouchers.MVC.Services
+namespace Vouchers.API.Services
 {
     public class Mapper<T,TResult> : IMapper<T,TResult>
     {

@@ -19,50 +19,11 @@ namespace Vouchers.EntityFramework.Migrations
                 .HasAnnotation("ProductVersion", "5.0.12")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("Vouchers.Core.Domain", b =>
+            modelBuilder.Entity("Vouchers.Core.Account", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal>("Credit")
-                        .ValueGeneratedOnAdd()
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)")
-                        .HasDefaultValue(0m);
-
-                    b.Property<int>("MembersCount")
-                        .HasColumnType("int");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Domain");
-                });
-
-            modelBuilder.Entity("Vouchers.Core.DomainAccount", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("DomainId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("DomainId");
-
-                    b.Property<Guid>("IdentityId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("IdentityId");
-
-                    b.Property<bool>("IsAdmin")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsIssuer")
-                        .HasColumnType("bit");
 
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
@@ -77,141 +38,10 @@ namespace Vouchers.EntityFramework.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IdentityId");
-
-                    b.HasIndex("DomainId", "IdentityId")
-                        .IsUnique();
-
-                    b.ToTable("DomainAccount");
+                    b.ToTable("Account");
                 });
 
-            modelBuilder.Entity("Vouchers.Core.HolderTransaction", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("CreditorId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("DebtorId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsPerformed")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreditorId");
-
-                    b.HasIndex("DebtorId");
-
-                    b.ToTable("HolderTransaction");
-                });
-
-            modelBuilder.Entity("Vouchers.Core.HolderTransactionItem", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("CreditAccountId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("DebitAccountId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("HolderTransactionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreditAccountId");
-
-                    b.HasIndex("DebitAccountId");
-
-                    b.HasIndex("HolderTransactionId");
-
-                    b.ToTable("HolderTransactionItem");
-                });
-
-            modelBuilder.Entity("Vouchers.Core.Identity", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Identity");
-                });
-
-            modelBuilder.Entity("Vouchers.Core.IssuerTransaction", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("IssuerAccountId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IssuerAccountId");
-
-                    b.ToTable("IssuerTransaction");
-                });
-
-            modelBuilder.Entity("Vouchers.Core.Voucher", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("CanBeExchanged")
-                        .IsConcurrencyToken()
-                        .HasColumnType("bit")
-                        .HasColumnName("CanBeExchanged");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
-                    b.Property<decimal>("Supply")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnName("Supply");
-
-                    b.Property<DateTime>("ValidFrom")
-                        .IsConcurrencyToken()
-                        .HasColumnType("datetime2")
-                        .HasColumnName("ValidFrom");
-
-                    b.Property<DateTime>("ValidTo")
-                        .IsConcurrencyToken()
-                        .HasColumnType("datetime2")
-                        .HasColumnName("ValidTo");
-
-                    b.Property<Guid>("ValueId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("ValueId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ValueId", "ValidFrom", "ValidTo", "CanBeExchanged")
-                        .IsUnique();
-
-                    b.ToTable("Voucher");
-                });
-
-            modelBuilder.Entity("Vouchers.Core.VoucherAccount", b =>
+            modelBuilder.Entity("Vouchers.Core.AccountItem", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -238,18 +68,89 @@ namespace Vouchers.EntityFramework.Migrations
 
                     b.HasIndex("HolderId", "UnitId");
 
-                    b.ToTable("VoucherAccount");
+                    b.ToTable("AccountItem");
                 });
 
-            modelBuilder.Entity("Vouchers.Core.VoucherValue", b =>
+            modelBuilder.Entity("Vouchers.Core.HolderTransaction", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("IssuerId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("IssuerId");
+                    b.Property<Guid>("CreditorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("DebtorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsPerformed")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreditorId");
+
+                    b.HasIndex("DebtorId");
+
+                    b.ToTable("HolderTransaction");
+                });
+
+            modelBuilder.Entity("Vouchers.Core.HolderTransactionItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CreditAccountItemId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("DebitAccountItemId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("HolderTransactionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreditAccountItemId");
+
+                    b.HasIndex("DebitAccountItemId");
+
+                    b.HasIndex("HolderTransactionId");
+
+                    b.ToTable("HolderTransactionItem");
+                });
+
+            modelBuilder.Entity("Vouchers.Core.IssuerTransaction", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("IssuerAccountId1")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IssuerAccountId1");
+
+                    b.ToTable("IssuerTransaction");
+                });
+
+            modelBuilder.Entity("Vouchers.Core.Unit", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("CanBeExchanged")
+                        .HasColumnType("bit");
 
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
@@ -258,42 +159,73 @@ namespace Vouchers.EntityFramework.Migrations
 
                     b.Property<decimal>("Supply")
                         .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnName("Supply");
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid>("UnitTypeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ValidFrom")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ValidTo")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IssuerId");
+                    b.HasIndex("UnitTypeId", "ValidFrom", "ValidTo", "CanBeExchanged")
+                        .IsUnique();
 
-                    b.ToTable("VoucherValue");
+                    b.ToTable("Unit");
                 });
 
-            modelBuilder.Entity("Vouchers.Domains.DomainContract", b =>
+            modelBuilder.Entity("Vouchers.Core.UnitType", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("ContractNumber")
+                    b.Property<Guid>("IssuerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<decimal>("Supply")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IssuerId");
+
+                    b.ToTable("UnitType");
+                });
+
+            modelBuilder.Entity("Vouchers.Domains.Domain", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ContractId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Credit")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0m);
+
+                    b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("bit");
 
-                    b.Property<Guid>("DomainId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("DomainId");
-
-                    b.Property<string>("DomainName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("OfferId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("OfferId");
-
-                    b.Property<Guid>("PartyId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("PartyId");
+                    b.Property<int>("MembersCount")
+                        .HasColumnType("int");
 
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
@@ -302,35 +234,31 @@ namespace Vouchers.EntityFramework.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DomainId")
+                    b.HasIndex("ContractId")
                         .IsUnique();
 
-                    b.HasIndex("OfferId")
-                        .IsUnique();
-
-                    b.HasIndex("PartyId")
-                        .IsUnique();
-
-                    b.ToTable("DomainContract");
+                    b.ToTable("Domain");
                 });
 
-            modelBuilder.Entity("Vouchers.Domains.DomainDetail", b =>
+            modelBuilder.Entity("Vouchers.Domains.DomainAccount", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("ContractId")
+                    b.Property<Guid>("DomainId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid>("IdentityId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("DomainId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("DomainId");
+                    b.Property<bool>("IsAdmin")
+                        .HasColumnType("bit");
 
-                    b.Property<bool>("IsPublic")
+                    b.Property<bool>("IsConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsIssuer")
                         .HasColumnType("bit");
 
                     b.Property<byte[]>("RowVersion")
@@ -340,12 +268,46 @@ namespace Vouchers.EntityFramework.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ContractId");
-
-                    b.HasIndex("DomainId")
+                    b.HasIndex("DomainId", "IdentityId")
                         .IsUnique();
 
-                    b.ToTable("DomainDetail");
+                    b.ToTable("DomainAccount");
+                });
+
+            modelBuilder.Entity("Vouchers.Domains.DomainContract", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DomainName")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<Guid>("OfferId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PartyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DomainName")
+                        .IsUnique()
+                        .HasFilter("[DomainName] IS NOT NULL");
+
+                    b.HasIndex("OfferId");
+
+                    b.HasIndex("PartyId");
+
+                    b.ToTable("DomainContract");
                 });
 
             modelBuilder.Entity("Vouchers.Domains.DomainOffer", b =>
@@ -360,15 +322,14 @@ namespace Vouchers.EntityFramework.Migrations
                     b.Property<int>("InvoicePeriod")
                         .HasColumnType("int");
 
+                    b.Property<int?>("MaxContractsPerIdentity")
+                        .HasColumnType("int");
+
                     b.Property<int>("MaxSubscribersCount")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("RecipientId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("RecipientId");
 
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
@@ -383,12 +344,60 @@ namespace Vouchers.EntityFramework.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RecipientId");
-
                     b.ToTable("DomainOffer");
                 });
 
-            modelBuilder.Entity("Vouchers.Identities.IdentityDetail", b =>
+            modelBuilder.Entity("Vouchers.Domains.DomainOffersPerIdentityCounter", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Counter")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("IdentityId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("OfferId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdentityId");
+
+                    b.HasIndex("OfferId");
+
+                    b.HasIndex("OfferId", "IdentityId");
+
+                    b.ToTable("DomainOffersPerIdentityCounter");
+                });
+
+            modelBuilder.Entity("Vouchers.Files.AppImage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte[]>("CroppedContent")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AppImage");
+                });
+
+            modelBuilder.Entity("Vouchers.Identities.Identity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -400,12 +409,8 @@ namespace Vouchers.EntityFramework.Migrations
                     b.Property<string>("FirstName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("IdentityId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("IdentityId");
-
-                    b.Property<string>("IdentityName")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid?>("ImageId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("LastName")
                         .HasColumnType("nvarchar(max)");
@@ -417,10 +422,7 @@ namespace Vouchers.EntityFramework.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IdentityId")
-                        .IsUnique();
-
-                    b.ToTable("IdentityDetail");
+                    b.ToTable("Identity");
                 });
 
             modelBuilder.Entity("Vouchers.Identities.Login", b =>
@@ -430,8 +432,7 @@ namespace Vouchers.EntityFramework.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("IdentityId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("IdentityId");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("LoginName")
                         .IsRequired()
@@ -450,7 +451,7 @@ namespace Vouchers.EntityFramework.Migrations
                     b.ToTable("Login");
                 });
 
-            modelBuilder.Entity("Vouchers.Values.VoucherValueDetail", b =>
+            modelBuilder.Entity("Vouchers.Values.VoucherValue", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -462,6 +463,9 @@ namespace Vouchers.EntityFramework.Migrations
                     b.Property<Guid>("DomainId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("ImageId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
                         .ValueGeneratedOnAddOrUpdate()
@@ -471,55 +475,48 @@ namespace Vouchers.EntityFramework.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<Guid>("ValueId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("ValueId");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("DomainId");
-
-                    b.HasIndex("ValueId")
-                        .IsUnique();
 
                     b.HasIndex("Ticker", "DomainId")
                         .IsUnique();
 
-                    b.ToTable("VoucherValueDetail");
+                    b.ToTable("VoucherValue");
                 });
 
-            modelBuilder.Entity("Vouchers.Core.DomainAccount", b =>
+            modelBuilder.Entity("Vouchers.Core.AccountItem", b =>
                 {
-                    b.HasOne("Vouchers.Core.Domain", "Domain")
+                    b.HasOne("Vouchers.Core.Account", "Holder")
                         .WithMany()
-                        .HasForeignKey("DomainId")
+                        .HasForeignKey("HolderId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Vouchers.Core.Identity", "Identity")
+                    b.HasOne("Vouchers.Core.Unit", "Unit")
                         .WithMany()
-                        .HasForeignKey("IdentityId")
+                        .HasForeignKey("UnitId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Domain");
+                    b.Navigation("Holder");
 
-                    b.Navigation("Identity");
+                    b.Navigation("Unit");
                 });
 
             modelBuilder.Entity("Vouchers.Core.HolderTransaction", b =>
                 {
-                    b.HasOne("Vouchers.Core.DomainAccount", "Creditor")
+                    b.HasOne("Vouchers.Core.Account", "Creditor")
                         .WithMany()
                         .HasForeignKey("CreditorId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                    b.HasOne("Vouchers.Core.DomainAccount", "Debtor")
+                    b.HasOne("Vouchers.Core.Account", "Debtor")
                         .WithMany()
                         .HasForeignKey("DebtorId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                    b.OwnsOne("Vouchers.Core.VoucherValueQuantity", "Quantity", b1 =>
+                    b.OwnsOne("Vouchers.Core.UnitTypeQuantity", "Quantity", b1 =>
                         {
                             b1.Property<Guid>("HolderTransactionId")
                                 .HasColumnType("uniqueidentifier");
@@ -528,24 +525,24 @@ namespace Vouchers.EntityFramework.Migrations
                                 .HasPrecision(18, 2)
                                 .HasColumnType("decimal(18,2)");
 
-                            b1.Property<Guid?>("UnitId")
+                            b1.Property<Guid?>("UnitTypeId1")
                                 .HasColumnType("uniqueidentifier");
 
                             b1.HasKey("HolderTransactionId");
 
-                            b1.HasIndex("UnitId");
+                            b1.HasIndex("UnitTypeId1");
 
                             b1.ToTable("HolderTransaction");
 
                             b1.WithOwner()
                                 .HasForeignKey("HolderTransactionId");
 
-                            b1.HasOne("Vouchers.Core.VoucherValue", "Unit")
+                            b1.HasOne("Vouchers.Core.UnitType", "UnitType")
                                 .WithMany()
-                                .HasForeignKey("UnitId")
+                                .HasForeignKey("UnitTypeId1")
                                 .OnDelete(DeleteBehavior.Restrict);
 
-                            b1.Navigation("Unit");
+                            b1.Navigation("UnitType");
                         });
 
                     b.Navigation("Creditor");
@@ -557,22 +554,24 @@ namespace Vouchers.EntityFramework.Migrations
 
             modelBuilder.Entity("Vouchers.Core.HolderTransactionItem", b =>
                 {
-                    b.HasOne("Vouchers.Core.VoucherAccount", "CreditAccount")
+                    b.HasOne("Vouchers.Core.AccountItem", "CreditAccountItem")
                         .WithMany()
-                        .HasForeignKey("CreditAccountId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("CreditAccountItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                    b.HasOne("Vouchers.Core.VoucherAccount", "DebitAccount")
+                    b.HasOne("Vouchers.Core.AccountItem", "DebitAccountItem")
                         .WithMany()
-                        .HasForeignKey("DebitAccountId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("DebitAccountItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("Vouchers.Core.HolderTransaction", null)
                         .WithMany("TransactionItems")
                         .HasForeignKey("HolderTransactionId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.OwnsOne("Vouchers.Core.VoucherQuantity", "Quantity", b1 =>
+                    b.OwnsOne("Vouchers.Core.UnitQuantity", "Quantity", b1 =>
                         {
                             b1.Property<Guid>("HolderTransactionItemId")
                                 .HasColumnType("uniqueidentifier");
@@ -581,41 +580,41 @@ namespace Vouchers.EntityFramework.Migrations
                                 .HasPrecision(18, 2)
                                 .HasColumnType("decimal(18,2)");
 
-                            b1.Property<Guid?>("UnitId")
+                            b1.Property<Guid?>("UnitId1")
                                 .HasColumnType("uniqueidentifier");
 
                             b1.HasKey("HolderTransactionItemId");
 
-                            b1.HasIndex("UnitId");
+                            b1.HasIndex("UnitId1");
 
                             b1.ToTable("HolderTransactionItem");
 
                             b1.WithOwner()
                                 .HasForeignKey("HolderTransactionItemId");
 
-                            b1.HasOne("Vouchers.Core.Voucher", "Unit")
+                            b1.HasOne("Vouchers.Core.Unit", "Unit")
                                 .WithMany()
-                                .HasForeignKey("UnitId")
+                                .HasForeignKey("UnitId1")
                                 .OnDelete(DeleteBehavior.Restrict);
 
                             b1.Navigation("Unit");
                         });
 
-                    b.Navigation("CreditAccount");
+                    b.Navigation("CreditAccountItem");
 
-                    b.Navigation("DebitAccount");
+                    b.Navigation("DebitAccountItem");
 
                     b.Navigation("Quantity");
                 });
 
             modelBuilder.Entity("Vouchers.Core.IssuerTransaction", b =>
                 {
-                    b.HasOne("Vouchers.Core.VoucherAccount", "IssuerAccount")
+                    b.HasOne("Vouchers.Core.AccountItem", "IssuerAccount")
                         .WithMany()
-                        .HasForeignKey("IssuerAccountId")
+                        .HasForeignKey("IssuerAccountId1")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.OwnsOne("Vouchers.Core.VoucherQuantity", "Quantity", b1 =>
+                    b.OwnsOne("Vouchers.Core.UnitQuantity", "Quantity", b1 =>
                         {
                             b1.Property<Guid>("IssuerTransactionId")
                                 .HasColumnType("uniqueidentifier");
@@ -624,21 +623,21 @@ namespace Vouchers.EntityFramework.Migrations
                                 .HasPrecision(18, 2)
                                 .HasColumnType("decimal(18,2)");
 
-                            b1.Property<Guid?>("UnitId")
+                            b1.Property<Guid?>("UnitId1")
                                 .HasColumnType("uniqueidentifier");
 
                             b1.HasKey("IssuerTransactionId");
 
-                            b1.HasIndex("UnitId");
+                            b1.HasIndex("UnitId1");
 
                             b1.ToTable("IssuerTransaction");
 
                             b1.WithOwner()
                                 .HasForeignKey("IssuerTransactionId");
 
-                            b1.HasOne("Vouchers.Core.Voucher", "Unit")
+                            b1.HasOne("Vouchers.Core.Unit", "Unit")
                                 .WithMany()
-                                .HasForeignKey("UnitId")
+                                .HasForeignKey("UnitId1")
                                 .OnDelete(DeleteBehavior.Restrict);
 
                             b1.Navigation("Unit");
@@ -649,39 +648,20 @@ namespace Vouchers.EntityFramework.Migrations
                     b.Navigation("Quantity");
                 });
 
-            modelBuilder.Entity("Vouchers.Core.Voucher", b =>
+            modelBuilder.Entity("Vouchers.Core.Unit", b =>
                 {
-                    b.HasOne("Vouchers.Core.VoucherValue", "Value")
+                    b.HasOne("Vouchers.Core.UnitType", "UnitType")
                         .WithMany()
-                        .HasForeignKey("ValueId")
+                        .HasForeignKey("UnitTypeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Value");
+                    b.Navigation("UnitType");
                 });
 
-            modelBuilder.Entity("Vouchers.Core.VoucherAccount", b =>
+            modelBuilder.Entity("Vouchers.Core.UnitType", b =>
                 {
-                    b.HasOne("Vouchers.Core.DomainAccount", "Holder")
-                        .WithMany()
-                        .HasForeignKey("HolderId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Vouchers.Core.Voucher", "Unit")
-                        .WithMany()
-                        .HasForeignKey("UnitId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Holder");
-
-                    b.Navigation("Unit");
-                });
-
-            modelBuilder.Entity("Vouchers.Core.VoucherValue", b =>
-                {
-                    b.HasOne("Vouchers.Core.DomainAccount", "Issuer")
+                    b.HasOne("Vouchers.Core.Account", "Issuer")
                         .WithMany()
                         .HasForeignKey("IssuerId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -690,51 +670,41 @@ namespace Vouchers.EntityFramework.Migrations
                     b.Navigation("Issuer");
                 });
 
-            modelBuilder.Entity("Vouchers.Domains.DomainContract", b =>
+            modelBuilder.Entity("Vouchers.Domains.Domain", b =>
                 {
-                    b.HasOne("Vouchers.Core.Domain", "Domain")
+                    b.HasOne("Vouchers.Domains.DomainContract", "Contract")
+                        .WithMany()
+                        .HasForeignKey("ContractId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Contract");
+                });
+
+            modelBuilder.Entity("Vouchers.Domains.DomainAccount", b =>
+                {
+                    b.HasOne("Vouchers.Domains.Domain", "Domain")
                         .WithMany()
                         .HasForeignKey("DomainId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.Navigation("Domain");
+                });
+
+            modelBuilder.Entity("Vouchers.Domains.DomainContract", b =>
+                {
                     b.HasOne("Vouchers.Domains.DomainOffer", "Offer")
                         .WithMany()
                         .HasForeignKey("OfferId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Vouchers.Core.Identity", "Party")
-                        .WithMany()
-                        .HasForeignKey("PartyId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Domain");
-
                     b.Navigation("Offer");
-
-                    b.Navigation("Party");
-                });
-
-            modelBuilder.Entity("Vouchers.Domains.DomainDetail", b =>
-                {
-                    b.HasOne("Vouchers.Domains.DomainContract", "Contract")
-                        .WithMany()
-                        .HasForeignKey("ContractId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Contract");
                 });
 
             modelBuilder.Entity("Vouchers.Domains.DomainOffer", b =>
                 {
-                    b.HasOne("Vouchers.Core.Identity", "Recipient")
-                        .WithMany()
-                        .HasForeignKey("RecipientId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.OwnsOne("Vouchers.Domains.CurrencyAmount", "Amount", b1 =>
                         {
                             b1.Property<Guid>("DomainOfferId")
@@ -758,49 +728,63 @@ namespace Vouchers.EntityFramework.Migrations
                         });
 
                     b.Navigation("Amount");
-
-                    b.Navigation("Recipient");
                 });
 
-            modelBuilder.Entity("Vouchers.Identities.IdentityDetail", b =>
+            modelBuilder.Entity("Vouchers.Domains.DomainOffersPerIdentityCounter", b =>
                 {
-                    b.HasOne("Vouchers.Core.Identity", "Identity")
+                    b.HasOne("Vouchers.Domains.DomainOffer", "Offer")
                         .WithMany()
-                        .HasForeignKey("IdentityId")
+                        .HasForeignKey("OfferId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Identity");
+                    b.Navigation("Offer");
+                });
+
+            modelBuilder.Entity("Vouchers.Files.AppImage", b =>
+                {
+                    b.OwnsOne("Vouchers.Files.CropParameters", "CropParameters", b1 =>
+                        {
+                            b1.Property<Guid>("AppImageId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<decimal>("Height")
+                                .HasPrecision(18, 15)
+                                .HasColumnType("decimal(18,15)");
+
+                            b1.Property<decimal>("Width")
+                                .HasPrecision(18, 15)
+                                .HasColumnType("decimal(18,15)");
+
+                            b1.Property<decimal>("X")
+                                .HasPrecision(18, 15)
+                                .HasColumnType("decimal(18,15)");
+
+                            b1.Property<decimal>("Y")
+                                .HasPrecision(18, 15)
+                                .HasColumnType("decimal(18,15)");
+
+                            b1.HasKey("AppImageId");
+
+                            b1.ToTable("AppImage");
+
+                            b1.WithOwner()
+                                .HasForeignKey("AppImageId");
+                        });
+
+                    b.Navigation("CropParameters")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Vouchers.Identities.Login", b =>
                 {
-                    b.HasOne("Vouchers.Core.Identity", "Identity")
+                    b.HasOne("Vouchers.Identities.Identity", "Identity")
                         .WithMany()
                         .HasForeignKey("IdentityId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Identity");
-                });
-
-            modelBuilder.Entity("Vouchers.Values.VoucherValueDetail", b =>
-                {
-                    b.HasOne("Vouchers.Core.Domain", "Domain")
-                        .WithMany()
-                        .HasForeignKey("DomainId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Vouchers.Core.VoucherValue", "Value")
-                        .WithMany()
-                        .HasForeignKey("ValueId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Domain");
-
-                    b.Navigation("Value");
                 });
 
             modelBuilder.Entity("Vouchers.Core.HolderTransaction", b =>

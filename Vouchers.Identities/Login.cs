@@ -1,25 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Vouchers.Core;
+using Vouchers.Entities;
 
 namespace Vouchers.Identities
 {
-    public class Login
+    public class Login : Entity
     {
-        public Guid Id { get; }
         public string LoginName { get; }
+
+        public Guid IdentityId { get; }
         public Identity Identity { get; }
 
-        public static Login Create(string loginName, Identity identity)
-        {
-            return new Login(Guid.NewGuid(), loginName, identity);
-        }
+        public static Login Create(string loginName, Identity identity) =>
+            new Login(Guid.NewGuid(), loginName, identity);
 
-        internal Login(Guid id, string loginName, Identity identity)
+        internal Login(Guid id, string loginName, Identity identity) : base(id)
         {
-            Id = id;
             LoginName = loginName;
+            IdentityId = identity.Id;
             Identity = identity;
         }
 

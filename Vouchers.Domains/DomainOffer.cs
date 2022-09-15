@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Vouchers.Core;
+using Vouchers.Entities;
 
 namespace Vouchers.Domains
 {
-    public class DomainOffer
+    public class DomainOffer : Entity
     {
-        public Guid Id { get; }
-
         public string Name { get; }
         public string Description { get; set; }
 
@@ -17,20 +15,21 @@ namespace Vouchers.Domains
         public InvoicePeriod InvoicePeriod { get; }
 
         public bool IsPublic { get; }
-        public Identity Recipient { get; }
+        public Guid? RecipientId { get; }
 
         public DateTime ValidFrom { get; set; }
         public DateTime ValidTo { get; set; }
 
-        public static DomainOffer Create(string name, string description, int maxMembersCount, CurrencyAmount amount, InvoicePeriod period, DateTime validFrom, DateTime validTo) =>
-            new DomainOffer(Guid.NewGuid(), name, description, maxMembersCount, amount, period, validFrom, validTo);
+        public int? MaxContractsPerIdentity { get; }
 
-        public static DomainOffer Create(string name, string description, int maxMembersCount, CurrencyAmount amount, InvoicePeriod period, DateTime validFrom, DateTime validTo, Identity recipient) =>
-            new DomainOffer(Guid.NewGuid(), name, description, maxMembersCount, amount, period, validFrom, validTo, recipient);
+        public static DomainOffer Create(string name, string description, int maxMembersCount, CurrencyAmount amount, InvoicePeriod period, DateTime validFrom, DateTime validTo, int? maxContractsPerIdentity) =>
+            new DomainOffer(Guid.NewGuid(), name, description, maxMembersCount, amount, period, validFrom, validTo, maxContractsPerIdentity);
 
-        public DomainOffer(Guid id, string name, string description, int maxSubscribersCount, CurrencyAmount amount, InvoicePeriod period, DateTime validFrom, DateTime validTo)
+        public static DomainOffer Create(string name, string description, int maxMembersCount, CurrencyAmount amount, InvoicePeriod period, DateTime validFrom, DateTime validTo, Guid recipientId, int? maxContractsPerIdentity) =>
+            new DomainOffer(Guid.NewGuid(), name, description, maxMembersCount, amount, period, validFrom, validTo, recipientId, maxContractsPerIdentity);
+
+        public DomainOffer(Guid id, string name, string description, int maxSubscribersCount, CurrencyAmount amount, InvoicePeriod period, DateTime validFrom, DateTime validTo, int? maxContractsPerIdentity) : base(id)
         {
-            Id = id;
             Name = name;
             Description = description;
             MaxSubscribersCount = maxSubscribersCount;
@@ -38,11 +37,12 @@ namespace Vouchers.Domains
             InvoicePeriod = period;
             ValidFrom = validFrom;
             ValidTo = validTo;
+            MaxContractsPerIdentity = maxContractsPerIdentity;
         }
 
-        public DomainOffer(Guid id, string name, string description, int maxSubscribersCount, CurrencyAmount amount, InvoicePeriod period, DateTime validFrom, DateTime validTo, Identity recipient)
-            : this(id, name, description, maxSubscribersCount, amount, period, validFrom, validTo) =>
-            Recipient = recipient;
+        public DomainOffer(Guid id, string name, string description, int maxSubscribersCount, CurrencyAmount amount, InvoicePeriod period, DateTime validFrom, DateTime validTo, Guid recipientId, int? maxContractsPerIdentity)
+            : this(id, name, description, maxSubscribersCount, amount, period, validFrom, validTo, maxContractsPerIdentity) =>
+            RecipientId = recipientId;
 
 
         private DomainOffer()
@@ -77,6 +77,7 @@ namespace Vouchers.Domains
     public enum InvoicePeriod
     {
         MONTH,
+        QUARTER,
         YEAR
     }
 }

@@ -1,0 +1,106 @@
+﻿@model UsersViewModel
+
+@{
+    ViewData["Title"] = "Logins";
+}
+
+
+
+<div class="row">
+    <div class="col-md-2">
+        <section>
+            <h4>Filters</h4>
+            <form asp-action="Users" method="get">
+                <div class="form-group">
+                    <label>Login name</label>
+                    <input class="form-control form-control-sm" name="LoginName" value="@Model.LoginNameFilter" />
+                </div>
+                <div class="form-group">                   
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+            </form>
+        </section>      
+    </div>
+    <div class="col-md-10">
+        <script>
+        
+         const handleChange = (role,loginName, checkbox) => {
+            console.log('tteesstt')
+            const action = checkbox.checked === true ? 'Add' : 'Remove'
+            $.ajax({
+                type: "GET",
+                url: `/Admin/${action}${role}Role?loginName=${loginName}`,
+                error: () => {
+                    alert("Failed to receive the Data");
+                    console.log("Failed");
+                    checkbox.checked = !checkbox.checked
+                }
+            })
+        }
+
+        </script>
+        <section>
+            <h4>@ViewData["Title"]</h4>
+            <table id="loginsTable" class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Login name</th>
+                        <th>Roles</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model.Users)
+                    {
+                        <tr>
+                            <td>@user.LoginName</td>
+                            <td>
+                                <fieldset>
+                                    <div class="form-check form-check-inline">
+                                        <input 
+                                            class="form-check-input userCheckBox" 
+                                            type="checkbox" 
+                                            name="isUser"
+                                            checked=@user.IsUser
+                                            onclick="handleChange('User', '@user.LoginName', this)"
+                                        />
+                                        <label class="form-check-label" for="isUserCheckBox">User</label>
+                                    </div>
+
+                                    <div class="form-check form-check-inline">
+                                        <input 
+                                            class="form-check-input managerCheckBox" 
+                                            type="checkbox" 
+                                            name="isManager"
+                                            checked=@user.IsManager
+                                            onclick="handleChange('Manager', '@user.LoginName', this)"
+                                            />
+                                        <label class="form-check-label" for="isManagerCheckBox">Manager</label>
+                                    </div>
+
+                                    <div class="form-check form-check-inline">
+                                        <input 
+                                            class="form-check-input adminCheckBox" 
+                                            type="checkbox" 
+                                            name="isAdmin"
+                                            checked=@user.IsAdmin
+                                            onclick="handleChange('Admin', '@user.LoginName', this)"
+                                        />
+                                        <label class="form-check-label" for="isAdminCheckBox">Admin</label>
+                                    </div>
+
+                                    <input class="invisible" type="text" id="rolesLoginName" name="loginName">
+
+                                </fieldset>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+}

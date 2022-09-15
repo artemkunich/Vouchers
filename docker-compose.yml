@@ -1,6 +1,6 @@
 version: '3.4'
 
-services:
+services: 
   db:
     image: "mcr.microsoft.com/mssql/server:2019-latest"
     environment:
@@ -8,16 +8,37 @@ services:
       - SA_PASSWORD=Sa_123456789!
     ports:
       - "1450:1433"
+    volumes:
+      - C:/SQL2019/Docker/data:/var/opt/mssql/data
+      - C:/SQL2019/Docker/log:/var/opt/mssql/log
+      - C:/SQL2019/Docker/secrets:/var/opt/mssql/secrets
+  vouchers.identityserver:
+    image: ${DOCKER_REGISTRY-}vouchersidentityserver
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      #- ASPNETCORE_URLS=http://+:5000
+    ports:
+      - "5000:80"
+      - "5001:443"
+    build:
+      context: .
+      dockerfile: Vouchers.IdentityServer/Dockerfile
+    depends_on:
+      - db
   vouchers.api:
     image: ${DOCKER_REGISTRY-}vouchersapi
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:5000
+      #- ASPNETCORE_URLS=http://+:5000
+    volumes:
+      - C:/vouchers/images:/app/images
+      - /etc/localtime:/etc/localtime:ro
     ports:
-      - "8080:80"
-      - "8443:443"
+      - "6000:80"
+      - "6001:443"
     build:
       context: .
       dockerfile: Vouchers.API/Dockerfile
     depends_on:
       - db
+      - vouchers.identityserver

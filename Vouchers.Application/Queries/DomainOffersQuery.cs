@@ -15,5 +15,10 @@ namespace Vouchers.Application.Queries
         public int? Currency { get; set; }
         public decimal? MaxAmount { get; set; }
         public decimal? MinAmount { get; set; }
+
+        public Guid? RecipientId { get; set; }
+
+        public bool? IncludeExpired { get; set; }
+        public bool? IncludePlanned { get; set; }
     }
 }

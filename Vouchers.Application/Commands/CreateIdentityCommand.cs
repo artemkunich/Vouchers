@@ -12,6 +12,6 @@ namespace Vouchers.Application.UseCases
         public string LoginName { get; set; }
 
         [Required]
-        public IdentityDetailDto IdentityDetailDto { get; set; }
+        public IdentityDetailDto IdentityDetail { get; set; }
     }
 }

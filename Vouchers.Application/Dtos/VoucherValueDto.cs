@@ -10,15 +10,17 @@ namespace Vouchers.Application.Dtos
     {
         public Guid Id { get; set; }
 
-        public string Ticker { get; set; }
-
-        public string Description { get; set; }
-
         public Guid IssuerId { get; set; }
 
         public decimal Supply { get; set; }
 
         public decimal Balance { get; set; }
+
+        public string Ticker { get; set; }
+
+        public string Description { get; set; }
+
+        public string ImageBase64 { get; set; }
 
         public ICollection<VoucherDto> Vouchers { get; set; }
     }

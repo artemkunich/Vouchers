@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using Vouchers.Application.Infrastructure;
@@ -10,41 +11,27 @@ using Vouchers.Identities;
 
 namespace Vouchers.EntityFramework.Repositories
 {
-    public class LoginRepository : ILoginRepository
+    public class LoginRepository : Repository<Login>
     {
-        private readonly VouchersDbContext dbContext;
-
-        public LoginRepository(VouchersDbContext dbContext) =>
-            this.dbContext = dbContext;
-
-        public async Task AddAsync(Login login, IdentityDetail identityDetail)
+        public LoginRepository(VouchersDbContext dbContext) : base(dbContext)
         {
-            await dbContext.Logins.AddAsync(login);
-            await dbContext.IdentityDetails.AddAsync(identityDetail);
         }
 
-        public void Add(Login login, IdentityDetail identityDetail)
-        {
-            dbContext.Logins.Add(login);
-            dbContext.IdentityDetails.Add(identityDetail);
-        }
+        public override async Task<Login> GetByIdAsync(Guid id) => await DbContext.Logins
+            .Include(login => login.Identity)
+            .Where(login => login.Id == id).FirstOrDefaultAsync();
 
-        public async Task<Login> GetByLoginNameAsync(string loginName) =>
-            await dbContext.Logins.Where(login => login.LoginName == loginName).Include(login => login.Identity).FirstOrDefaultAsync();
+        public override Login GetById(Guid id) => DbContext.Logins
+            .Include(login => login.Identity)
+            .Where(login => login.Id == id).FirstOrDefault();
 
-        public Login GetByLoginName(string loginName) =>
-            dbContext.Logins.Where(login => login.LoginName == loginName).Include(login=>login.Identity).FirstOrDefault();
+        public override async Task<IEnumerable<Login>> GetByExpressionAsync(Expression<Func<Login,bool>> expression) => await DbContext.Logins
+            .Include(login => login.Identity)
+            .Where(expression).ToListAsync();
 
-        public void Update(Login login) =>
-            dbContext.Logins.Update(login);
+        public override IEnumerable<Login> GetByExpression(Expression<Func<Login, bool>> expression) => DbContext.Logins
+            .Include(login => login.Identity)
+            .Where(expression).ToList();
 
-        public void Remove(Login login) =>
-            dbContext.Logins.Remove(login);
-
-        public async Task SaveAsync() =>
-           await dbContext.SaveChangesAsync();
-
-        public void Save() =>
-            dbContext.SaveChanges();
     }
 }

@@ -7,41 +7,10 @@ using Vouchers.Core;
 
 namespace Vouchers.EntityFramework.Repositories
 {
-    public class CollectionRequestRepository : ICollectionRequestRepository
+    public class CollectionRequestRepository : Repository<CollectionRequest>
     {
-        public async Task<CollectionRequest> GetByIdAsync(Guid collectionRequestId)
+        public CollectionRequestRepository(VouchersDbContext dbContext) : base(dbContext)
         {
-            throw new NotImplementedException();
-        }
-
-        public CollectionRequest GetById(Guid id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Add(CollectionRequest collection)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task AddAsync(CollectionRequest collectionRequest)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Update(CollectionRequest collection)
-        {
-            throw new NotImplementedException();
-        } 
-
-        public void Save()
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task SaveAsync()
-        {
-            throw new NotImplementedException();
         }
     }
 }

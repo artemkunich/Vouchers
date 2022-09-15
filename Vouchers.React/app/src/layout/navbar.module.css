@@ -1,0 +1,43 @@
+.loginMenu {
+  margin-right: 25px;
+}
+
+.loginMenu:hover div {
+  display: block;
+}
+
+.loginMenu div {
+  margin-left: -165px;
+  padding-left: 5px;
+  width: 230px;
+}
+
+.loginMenu div ul {
+  list-style-type: none;
+  padding-left: 16px;
+}
+
+.loginMenu div p {
+  margin-top: 1px;
+  margin-bottom: 1px;
+  margin-left: 16px;
+}
+
+.loginMenu div ul li {
+  margin-right: 16px;
+}
+
+.loginMenu div ul li a {
+  padding-left: 0px;
+}
+
+.loginMenu div li a {
+  color: aliceblue;
+}
+
+.loginMenu div ul hr {
+  margin-right: 15px;
+}
+
+
+

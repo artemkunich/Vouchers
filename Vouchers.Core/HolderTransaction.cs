@@ -1,43 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Vouchers.Entities;
 
 namespace Vouchers.Core
 {
-    public class HolderTransaction
+    public class HolderTransaction : Entity
     {
-        public Guid Id { get; }
-
         public DateTime Timestamp { get; private set; }
 
-        public DomainAccount Creditor { get; }
-        public DomainAccount Debtor { get; }
+        public Guid CreditorId { get;}
+        public Account Creditor { get; }
+
+        public Guid DebtorId { get;}
+        public Account Debtor { get; }
         
-        public VoucherValueQuantity Quantity { get; private set; }
+        public UnitTypeQuantity Quantity { get; private set; }
 
         public ICollection<HolderTransactionItem> TransactionItems { get; }
 
         public bool IsPerformed { get; private set; }
 
-        public static HolderTransaction Create(DomainAccount creditor, DomainAccount debtor, VoucherValue value)
-        {
-            if (creditor.Domain.NotEquals(debtor.Domain))
-                throw new ApplicationException("Creditor and debtor are not in the same domain");
+        public static HolderTransaction Create(Account creditor, Account debtor, UnitType value) =>
+            new HolderTransaction(Guid.NewGuid(), DateTime.Now, creditor, debtor, value);
 
-            return new HolderTransaction(Guid.NewGuid(), DateTime.Now, creditor, debtor, value);
-        }
-
-        internal HolderTransaction(Guid id, DateTime timestamp, DomainAccount creditor, DomainAccount debtor, VoucherValue value) : this(timestamp, creditor, debtor, value) =>
-            Id = id;
-
-        internal HolderTransaction(DateTime timestamp, DomainAccount creditor, DomainAccount debtor, VoucherValue value)
+        internal HolderTransaction(Guid id, DateTime timestamp, Account creditor, Account debtor, UnitType unitType) : base(id)
         {
             Timestamp = timestamp;
 
+            CreditorId = creditor.Id;
             Creditor = creditor;
+
+            DebtorId = debtor.Id;
             Debtor = debtor;            
-            
-            Quantity = VoucherValueQuantity.Create(0, value);
+
+            Quantity = UnitTypeQuantity.Create(0, unitType);
 
             if (Creditor.Equals(Debtor))
                 throw new CoreException("Creditor and debtor are the same");
@@ -50,7 +47,7 @@ namespace Vouchers.Core
 
         public void AddTransactionItem(HolderTransactionItem item)
         {
-            if (item.Quantity.Unit.Value.NotEquals(Quantity.Unit))
+            if (item.Quantity.Unit.UnitType.NotEquals(Quantity.UnitType))
                 throw new CoreException("Transaction and item have different voucher values");
 
             if (item.Quantity.Unit.ValidTo < DateTime.Today)
@@ -65,8 +62,8 @@ namespace Vouchers.Core
                 throw new CoreException("Amount must be greater than 0");
 
             foreach (var item in TransactionItems) {
-                item.CreditAccount.ProcessCredit(item.Quantity.Amount);
-                item.DebitAccount.ProcessDebit(item.Quantity.Amount);
+                item.CreditAccountItem.ProcessCredit(item.Quantity.Amount);
+                item.DebitAccountItem.ProcessDebit(item.Quantity.Amount);
             }
 
             IsPerformed = true;

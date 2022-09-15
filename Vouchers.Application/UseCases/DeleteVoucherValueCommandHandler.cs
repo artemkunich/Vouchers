@@ -4,36 +4,40 @@ using System.Text;
 using Vouchers.Core;
 using Vouchers.Application.Commands;
 using Vouchers.Application.Infrastructure;
-using Vouchers.Details;
 using System.Threading.Tasks;
 using System.Threading;
+using Vouchers.Values;
 
 namespace Vouchers.Application.UseCases
 {
     public class DeleteVoucherValueCommandHandler : IAuthIdentityHandler<DeleteVoucherValueCommand>
     {     
-        private readonly IVoucherValueRepository valueRepository;
+        private readonly IRepository<VoucherValue> _valueRepository;
+        private readonly IRepository<UnitType> _unitTypeRepository;
 
-        public DeleteVoucherValueCommandHandler(IVoucherValueRepository valueRepository)
+        public DeleteVoucherValueCommandHandler(IRepository<VoucherValue> valueRepository, IRepository<UnitType> unitTypeRepository)
         {
-            this.valueRepository = valueRepository;
+            _valueRepository = valueRepository;
+            _unitTypeRepository = unitTypeRepository;
         }
 
         public async Task HandleAsync(DeleteVoucherValueCommand command, Guid authIdentityId, CancellationToken cancellation)
         {
-            var value = await valueRepository.GetByIdAsync(command.VoucherValueId);
+            var value = await _valueRepository.GetByIdAsync(command.VoucherValueId);
             if(value is null)
                 throw new ApplicationException("Voucher's value does not exist");
 
-            var issuerDomainAccount = value.Issuer;
-
-            if (issuerDomainAccount.Identity.Id != authIdentityId)
+            if (value.IssuerIdentityId != authIdentityId)
                 throw new ApplicationException("Operation is not allowed");
 
-            if (value.CanBeRemoved())
+            var unitType = await _unitTypeRepository.GetByIdAsync(command.VoucherValueId);
+            if (unitType is null)
+                throw new ApplicationException("Unit type does not exist");
+
+            if (unitType.CanBeRemoved())
             {
-                valueRepository.Remove(value);
-                await valueRepository.SaveAsync();
+                _unitTypeRepository.Remove(unitType);
+                _valueRepository.Remove(value);
             }
         }
     }

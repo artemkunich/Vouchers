@@ -7,9 +7,9 @@ using Vouchers.Core;
 
 namespace Vouchers.Application.UseCases
 {
-    public interface IAuthIdentityHandler<in TRequest>
+    public interface IAuthIdentityHandler<in TMessage>
     {
-        Task HandleAsync(TRequest request, Guid authIdentityId, CancellationToken cancellation);
+        Task HandleAsync(TMessage request, Guid authIdentityId, CancellationToken cancellation);
     }
 
     public interface IAuthIdentityHandler<in TRequest, TResponse>

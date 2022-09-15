@@ -10,24 +10,16 @@ namespace Vouchers.Application.Commands
     public class CreateHolderTransactionCommand
     {
         [Required]
-        public Guid CreditorDomainAccountId { get; }
+        public Guid CreditorDomainAccountId { get; set; }
         [Required]
-        public Guid DebtorDomainAccountId { get; }
+        public Guid DebtorDomainAccountId { get; set; }
 
         [Required]
-        public decimal Quantity { get; }
+        public decimal Quantity { get; set; }
         [Required]
-        public Guid VoucherValueId { get; }
+        public Guid VoucherValueId { get; set; }
 
         [Required]
-        public ICollection<Tuple<decimal, Guid>> TransactionItems { get; }
-
-        public void AddItem(decimal quantity, Guid voucherId) =>
-            TransactionItems.Add(new Tuple<decimal, Guid>(quantity, voucherId));
-
-        public CreateHolderTransactionCommand()
-        {
-            TransactionItems = new List<Tuple<decimal, Guid>>();
-        }
+        public ICollection<Tuple<Guid, decimal>> Items { get; set; }
     }
 }

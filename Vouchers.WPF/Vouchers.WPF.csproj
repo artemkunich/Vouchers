@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Images\Close.png" />
+    <None Remove="Images\Create.png" />
+    <None Remove="Images\Edit.png" />
+    <None Remove="Images\MainBackground.png" />
+    <None Remove="Images\Requests.png" />
+    <None Remove="Images\Test.png" />
+    <None Remove="Images\Transactions.png" />
+    <None Remove="Images\Trash.png" />
+    <None Remove="Images\Vouchers.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Images\MainBackground.png" />
+    <Resource Include="Images\Close.png" />
+    <Resource Include="Images\Create.png" />
+    <Resource Include="Images\Edit.png" />
+    <Resource Include="Images\Requests.png" />
+    <Resource Include="Images\Transactions.png" />
+    <Resource Include="Images\Trash.png" />
+    <Resource Include="Images\Vouchers.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="App.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+    </Page>
+    <Page Update="Views\AuthWindow.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Prism.Core" Version="8.1.97" />
+  </ItemGroup>
+
+</Project>

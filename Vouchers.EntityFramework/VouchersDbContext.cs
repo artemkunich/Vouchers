@@ -9,6 +9,7 @@ using System.Text;
 using Vouchers.Core;
 using Vouchers.Domains;
 using Vouchers.EntityFramework.Configurations;
+using Vouchers.Files;
 using Vouchers.Identities;
 using Vouchers.Values;
 
@@ -27,25 +28,28 @@ namespace Vouchers.EntityFramework
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
 
-            modelBuilder.ApplyConfiguration(new DomainConfiguration());
-            modelBuilder.ApplyConfiguration(new DomainAccountConfiguration());
-            modelBuilder.ApplyConfiguration(new IdentityDetailConfiguration());
+            modelBuilder.ApplyConfiguration(new AccountConfiguration());
             modelBuilder.ApplyConfiguration(new HolderTransactionConfiguration());
             modelBuilder.ApplyConfiguration(new HolderTransactionItemConfiguration());
             modelBuilder.ApplyConfiguration(new IssuerTransactionConfiguration());
-            modelBuilder.ApplyConfiguration(new VoucherConfiguration());
-            modelBuilder.ApplyConfiguration(new VoucherAccountConfiguration());
-            modelBuilder.ApplyConfiguration(new VoucherValueConfiguration());
+            modelBuilder.ApplyConfiguration(new UnitConfiguration());
+            modelBuilder.ApplyConfiguration(new AccountItemConfiguration());
+            modelBuilder.ApplyConfiguration(new UnitTypeConfiguration());
             modelBuilder.ApplyConfiguration(new IdentityConfiguration());
             
-            modelBuilder.ApplyConfiguration(new IdentityDetailConfiguration());
+            modelBuilder.ApplyConfiguration(new IdentityConfiguration());
             modelBuilder.ApplyConfiguration(new LoginConfiguration());
 
-            modelBuilder.ApplyConfiguration(new VoucherValueDetailConfiguration());
+            modelBuilder.ApplyConfiguration(new VoucherValueConfiguration());
 
-            modelBuilder.ApplyConfiguration(new DomainDetailConfiguration());
+            modelBuilder.ApplyConfiguration(new DomainConfiguration());
             modelBuilder.ApplyConfiguration(new DomainOfferConfiguration());
             modelBuilder.ApplyConfiguration(new DomainContractConfiguration());
+            modelBuilder.ApplyConfiguration(new DomainOffersPerIdentityCounterConfiguration());
+            modelBuilder.ApplyConfiguration(new DomainAccountConfiguration());
+
+            modelBuilder.ApplyConfiguration(new AppImageConfiguration());
+
         }
 
         internal object Include()
@@ -55,36 +59,41 @@ namespace Vouchers.EntityFramework
 
         #region Core
 
-        public DbSet<Domain> Domains { get; set; }
-        public DbSet<DomainAccount> DomainAccounts { get; set; }       
-        public DbSet<VoucherAccount> VoucherAccounts { get; set; }
+        public DbSet<Account> Accounts { get; set; }       
+        public DbSet<AccountItem> AccountItems { get; set; }
         public DbSet<HolderTransaction> HolderTransactions { get; set; }
         public DbSet<HolderTransactionItem> HolderTransactionItems { get; set; }
         public DbSet<IssuerTransaction> IssuerTransactions { get; set; }
-        public DbSet<Voucher> Vouchers { get; set; }        
-        public DbSet<VoucherValue> VoucherValues { get; set; }
-        public DbSet<Identity> Identities { get; set; }
+        public DbSet<Unit> Units { get; set; }        
+        public DbSet<UnitType> UnitTypes { get; set; }
 
         #endregion
 
         #region Values
 
-        public DbSet<VoucherValueDetail> VoucherValueDetails { get; set; }
+        public DbSet<VoucherValue> VoucherValues { get; set; }
 
         #endregion
 
         #region Identities
 
-        public DbSet<IdentityDetail> IdentityDetails { get; set; }
+        public DbSet<Identities.Identity> Identities { get; set; }
         public DbSet<Login> Logins { get; set; }
 
         #endregion
 
-        #region DomainDetails
+        #region Domains
 
-        public DbSet<DomainDetail> DomainDetails { get; set; }
+        public DbSet<Domain> Domains { get; set; }
+
+        public DbSet<DomainAccount> DomainAccounts { get; set; }
         public DbSet<DomainOffer> DomainOffers { get; set; }
         public DbSet<DomainContract> DomainContracts { get; set; }
+        public DbSet<DomainOffersPerIdentityCounter> DomainOffersPerIdentityCounters { get; set; }
+        #endregion
+
+        #region Images
+        public DbSet<AppImage> Images { get; set; }
         #endregion
     }
 }

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 
 using Vouchers.Core;
+using Vouchers.Domains;
 
 namespace Vouchers.EntityFramework.Configurations
 {
@@ -16,35 +17,18 @@ namespace Vouchers.EntityFramework.Configurations
 
             builder.HasKey(account => account.Id);
 
-            builder
-                .Property<Guid>("DomainId")
-                .HasColumnName("DomainId")
-                .IsRequired();
+            builder.Property(account => account.DomainId).IsRequired();
+
+            builder.Property(account => account.IdentityId).IsRequired();
 
             builder
-                .Property<Guid>("IdentityId")
-                .HasColumnName("IdentityId")
-                .IsRequired();
-
-            builder
-                .HasIndex("DomainId", "IdentityId")
+                .HasIndex(account => new { account.DomainId, account.IdentityId })
                 .IsUnique();
 
             builder
-                .Property(userAccount => userAccount.Supply)
-                .HasPrecision(18, 2)
-                .HasDefaultValue(0);
-
-            builder
-                .HasOne(domainAccount => domainAccount.Domain)
+                .HasOne(account => account.Domain)
                 .WithMany()
-                .HasForeignKey("DomainId")
-                .OnDelete(DeleteBehavior.Restrict);
-
-            builder
-                .HasOne(domainAccount => domainAccount.Identity)
-                .WithMany()
-                .HasForeignKey("IdentityId")
+                .HasForeignKey(account => account.DomainId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Property<byte[]>("RowVersion").IsRowVersion();

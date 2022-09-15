@@ -1,0 +1,32 @@
+@import '../../node_modules/bootstrap/scss/bootstrap.scss';
+
+
+$body-color: #585858;
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  color: $body-color;
+}
+
+.label-text label {
+  display: inline-block;
+  width: 320px;
+  text-align: right;
+  margin: 10px;
+}
+
+.label-text label input {
+  margin-left: 20px;
+}
+
+.submit-button {
+    margin-top: 20px;
+}
+
+.submit-button button {
+  margin-left: 140px;
+  width: 190px;
+}

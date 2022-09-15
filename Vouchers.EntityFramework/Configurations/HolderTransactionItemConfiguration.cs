@@ -28,13 +28,13 @@ namespace Vouchers.EntityFramework.Configurations
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder
-                .HasOne(item => item.CreditAccount)
-                .WithMany()
+                .HasOne(item => item.CreditAccountItem)
+                .WithMany().HasForeignKey(item => item.CreditAccountItemId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder
-                .HasOne(item => item.DebitAccount)
-                .WithMany()
+                .HasOne(item => item.DebitAccountItem)
+                .WithMany().HasForeignKey(item => item.DebitAccountItemId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

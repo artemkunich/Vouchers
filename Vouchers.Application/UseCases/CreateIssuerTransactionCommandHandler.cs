@@ -7,49 +7,59 @@ using System.Threading.Tasks;
 using Vouchers.Core;
 using Vouchers.Application.Commands;
 using Vouchers.Application.Infrastructure;
+using Vouchers.Domains;
 
 namespace Vouchers.Application.UseCases
 {
-    public abstract class CreateIssuerTransactionCommandHandler : IAuthIdentityHandler<CreateIssuerTransactionCommand>
+    public class CreateIssuerTransactionCommandHandler : IAuthIdentityHandler<CreateIssuerTransactionCommand, Guid>
     {
-        private readonly IDomainAccountRepository domainAccountRepository;
-        private readonly IVoucherRepository voucherRepository;
-        private readonly IIssuerTransactionRepository issuerTransactionRepository;
-        private readonly IVoucherAccountRepository voucherAccountRepository;
+        private readonly IRepository<DomainAccount> _domainAccountRepository;
+        private readonly IRepository<Account> _accountRepository;
+        private readonly IRepository<AccountItem> _accountItemRepository;
+        private readonly IRepository<Unit> _unitRepository;
+        private readonly IRepository<IssuerTransaction> _issuerTransactionRepository;
 
-        public CreateIssuerTransactionCommandHandler(IDomainAccountRepository domainAccountRepository, IVoucherRepository voucherRepository, IIssuerTransactionRepository issuerTransactionRepository, IVoucherAccountRepository voucherAccountRepository) 
+
+        public CreateIssuerTransactionCommandHandler(IRepository<DomainAccount> domainAccountRepository, IRepository<Account> accountRepository, IRepository<AccountItem> accountItemRepository, IRepository<Unit> unitRepository, IRepository<IssuerTransaction> issuerTransactionRepository) 
         {
-            this.domainAccountRepository = domainAccountRepository;
-            this.voucherRepository = voucherRepository;
-            this.issuerTransactionRepository = issuerTransactionRepository;
-            this.voucherAccountRepository = voucherAccountRepository;
+            _domainAccountRepository = domainAccountRepository;
+            _accountRepository = accountRepository;
+            _accountItemRepository = accountItemRepository;
+            _unitRepository = unitRepository;
+            _issuerTransactionRepository = issuerTransactionRepository;
         }
 
-        public async Task HandleAsync(CreateIssuerTransactionCommand command, Guid authIdentityId, CancellationToken cancellation)
+        public async Task<Guid> HandleAsync(CreateIssuerTransactionCommand command, Guid authIdentityId, CancellationToken cancellation)
         {
-            var issuerDomainAccount = await domainAccountRepository.GetByIdAsync(command.IssuerDomainAccountId);
+            var issuerDomainAccount = await _domainAccountRepository.GetByIdAsync(command.IssuerDomainAccountId);
+            if (issuerDomainAccount?.IdentityId != authIdentityId)
+                throw new ApplicationException("Operation is not allowed");
+            if (!issuerDomainAccount.IsConfirmed)
+                throw new ApplicationException("Issuer account is not activated");
 
-            if (issuerDomainAccount?.Identity.Id != authIdentityId)
-                    throw new ApplicationException("Operation is not allowed");
+            var issuerAccount = await _accountRepository.GetByIdAsync(command.IssuerDomainAccountId);
+            if (issuerAccount is null)
+                throw new ApplicationException("Issuer's account does not exist");
 
-            var voucherAccount = voucherAccountRepository.Get(command.IssuerDomainAccountId, command.VoucherId);
-            if (voucherAccount is null)
+            var accountItem = (await _accountItemRepository.GetByExpressionAsync(accItem => accItem.HolderId == issuerAccount.Id && accItem.Unit.Id == command.VoucherId)).FirstOrDefault();
+            if (accountItem is null)
             {
                 if (command.Quantity > 0)
                 {
-                    var voucher = await voucherRepository.GetByIdAsync(command.VoucherId);
-                    voucherAccount = VoucherAccount.Create(issuerDomainAccount, 0, voucher);
+                    var unit = await _unitRepository.GetByIdAsync(command.VoucherId);
+                    accountItem = AccountItem.Create(issuerAccount, 0, unit);
                 }
                 else
-                    throw new ApplicationException($"Issuer {issuerDomainAccount.Id} does not have account for voucher {command.VoucherId}");
+                    throw new ApplicationException($"Issuer {issuerDomainAccount.Id} does not have account item for unit {command.VoucherId}");
             }
 
 
-            IssuerTransaction transaction = IssuerTransaction.Create(voucherAccount, command.Quantity);
+            IssuerTransaction transaction = IssuerTransaction.Create(accountItem, command.Quantity);
             transaction.Perform();
 
-            await issuerTransactionRepository.AddAsync(transaction);
-            await issuerTransactionRepository.SaveAsync();
+            await _issuerTransactionRepository.AddAsync(transaction);
+
+            return transaction.Id;
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 
 using Vouchers.Core;
+using Vouchers.Domains;
 
 namespace Vouchers.EntityFramework.Configurations
 {
@@ -15,6 +16,15 @@ namespace Vouchers.EntityFramework.Configurations
             builder.ToTable(nameof(Domain));
 
             builder.HasKey(domain => domain.Id);
+
+            builder.Property(domain => domain.ContractId).IsRequired();
+            builder
+                .HasIndex(domain => domain.ContractId).IsUnique();
+            builder
+                .HasOne(contract => contract.Contract)
+                .WithMany()
+                .HasForeignKey(domain => domain.ContractId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder
                 .Property(domain => domain.Credit)

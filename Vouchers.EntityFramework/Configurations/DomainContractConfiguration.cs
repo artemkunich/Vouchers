@@ -14,22 +14,29 @@ namespace Vouchers.EntityFramework.Configurations
         {
             builder.ToTable(nameof(DomainContract));
 
-            builder.HasKey(domainContract => domainContract.Id);
+            builder.HasKey(contract => contract.Id);
 
-            builder.Property<Guid>("DomainId").HasColumnName("DomainId").IsRequired();
-            builder.HasIndex("DomainId").IsUnique();
-            builder.HasOne(domainContract => domainContract.Domain).WithMany().HasForeignKey("DomainId").OnDelete(DeleteBehavior.Restrict);
+            builder
+                .Property(contract => contract.OfferId)
+                .IsRequired();
+            builder
+                .HasIndex(contract => contract.OfferId);
+            builder
+                .HasOne(contract => contract.Offer)
+                .WithMany()
+                .HasForeignKey(contract => contract.OfferId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            builder.Property<Guid>("OfferId").HasColumnName("OfferId").IsRequired();
-            builder.HasIndex("OfferId").IsUnique();
-            builder.HasOne(domainContract => domainContract.Offer).WithMany().HasForeignKey("OfferId").OnDelete(DeleteBehavior.Restrict);
+            builder
+                .Property(contract => contract.PartyId)
+                .IsRequired();
+            builder
+                .HasIndex(contract => contract.PartyId);
 
-            builder.Property<Guid>("PartyId").HasColumnName("PartyId").IsRequired();
-            builder.HasIndex("PartyId").IsUnique();
-            builder.HasOne(domain => domain.Party).WithMany().HasForeignKey("PartyId").OnDelete(DeleteBehavior.Restrict);
 
-            builder.Property(contract => contract.ContractNumber);
             builder.Property(contract => contract.DomainName);
+            builder.HasIndex(contract => contract.DomainName).IsUnique();
+
             builder.Property(contract => contract.CreatedDate);
 
             builder.Property<byte[]>("RowVersion").IsRowVersion();

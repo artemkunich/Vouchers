@@ -1,34 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Vouchers.Core;
+using Vouchers.Entities;
 
 namespace Vouchers.Domains
 {
-    public class DomainContract
+    public class DomainContract : Entity
     {
-        public Guid Id { get; }
+        public Guid OfferId { get; }
+        public DomainOffer Offer { get; }
 
-        public string ContractNumber { get; }
+        public Guid OffersPerIdentityCounterId { get; }
+        public DomainOffersPerIdentityCounter OffersPerIdentityCounter { get; }
 
-        public DomainOffer Offer { get; set; }
-
-        public Identity Party { get; }
+        public Guid PartyId { get; }
 
         public DateTime CreatedDate { get; }
 
         public string DomainName { get; }
 
-        public Domain Domain { get; set; }
+        public static DomainContract Create(DomainOffer offer, DomainOffersPerIdentityCounter offersPerIdentityCounter, Guid partyId, string domainName) =>
+            new DomainContract(Guid.NewGuid(), offer, offersPerIdentityCounter, partyId, domainName, DateTime.Now);
 
-        public static DomainContract CreateDomainContract(Domain domain, DomainOffer offer, Identity party, string name) =>
-            new DomainContract(Guid.NewGuid(), offer, party, name, DateTime.Now);
-
-        internal DomainContract(Guid id, DomainOffer offer, Identity party, string domainName, DateTime createdDate)
+        internal DomainContract(Guid id, DomainOffer offer, DomainOffersPerIdentityCounter offersPerIdentityCounter, Guid partyId, string domainName, DateTime createdDate) : base(id)
         {
-            Id = id;
+            OfferId = offer.Id;
             Offer = offer;
-            Party = party;
+           
+            OffersPerIdentityCounterId = offersPerIdentityCounter.Id;
+            OffersPerIdentityCounter = offersPerIdentityCounter; 
+
+            PartyId = partyId;
             DomainName = domainName;
             CreatedDate = createdDate;
         }

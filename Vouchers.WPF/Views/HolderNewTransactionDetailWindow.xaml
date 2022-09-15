@@ -1,0 +1,62 @@
+﻿<Window x:Class="Vouchers.WPF.Views.HolderNewTransactionDetailWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Vouchers.WPF.Views"
+        mc:Ignorable="d"
+        Title="TransactionDetailWindow" Height="450" Width="800">
+    <Grid Margin="5">
+        <Border Background="LightGray" BorderBrush="Gray" BorderThickness="2">
+            <StackPanel Background="White">
+                <TextBlock Margin="20 20 20 0" Text="{Binding Header}" FontSize="20" HorizontalAlignment="Center"/>
+
+
+                <Grid Margin="20,20,20,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Row="0" Grid.Column="0">
+                        <TextBlock  FontSize="15" >
+                            Issuer: <Run Text="{Binding Unit.IssuerId}" FontWeight="Bold"/>
+                        </TextBlock>
+                        <TextBlock  FontSize="15">
+                            Value: 
+                            <Run Text="{Binding Unit.Category}" FontWeight="Bold"/><Run Text="/" FontWeight="Bold"/><Run Text="{Binding Unit.Name}" FontWeight="Bold"/>
+                        </TextBlock>
+                        <StackPanel Orientation="Horizontal" Margin="0 20 0 0">
+                            <TextBlock Text="Receiver:" FontSize="15"/>
+                            <TextBox x:Name="ReceiverTextBox" Text="{Binding DebtorId}" Padding="2" Margin="5 0" Width="130"/>
+                        </StackPanel>
+                    </StackPanel>
+                    <TextBlock Grid.Row="0" Grid.Column="1" FontSize="15" HorizontalAlignment="Right">
+                        Total amount: <Run FontWeight="Bold" Text="{Binding Amount}"/>
+                    </TextBlock>
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Items:" FontSize="15" Margin="0 10 0 0"/>
+                    <DataGrid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" ItemsSource="{Binding Items}" Margin="0 0 0 20" AutoGenerateColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Valid from" Binding="{Binding Unit.ValidFrom}" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Valid to" Binding="{Binding Unit.ValidTo}" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Balance" Binding="{Binding Unit.Balance}" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Amount" Binding="{Binding Amount}" IsReadOnly="False" FontWeight="Bold"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <TextBlock Text="{Binding ErrorMessage}" Grid.Row="3" Grid.ColumnSpan="2" Foreground="Red" HorizontalAlignment="Center" FontSize="15" Padding="5"/>
+                    <Button Grid.Row="4" Grid.Column="0" Command="{Binding ProcessTransactionCommand}" IsDefault="True" Margin="0,3,10,3" Padding="3" Height="30" Content="Process"/>
+                    <Button Grid.Row="4" Grid.Column="1" IsCancel="True" Margin="10,3,0,3" Padding="3" Height="30" Content="Cancel" />
+                </Grid>
+
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

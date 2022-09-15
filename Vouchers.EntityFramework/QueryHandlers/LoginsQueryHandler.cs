@@ -17,7 +17,7 @@ using System.Threading;
 
 namespace Vouchers.EntityFramework.QueryHandlers
 {
-    public class LoginsQueryHandler : IHandler<LoginsQuery, IPaginatedEnumerable<LoginDto>>
+    public class LoginsQueryHandler : IHandler<LoginsQuery, IEnumerable<LoginDto>>
     {
         VouchersDbContext dbContext;
 
@@ -26,7 +26,7 @@ namespace Vouchers.EntityFramework.QueryHandlers
             this.dbContext = dbContext;
         }
 
-        public async Task<IPaginatedEnumerable<LoginDto>> HandleAsync(LoginsQuery query, CancellationToken cancellation) =>
+        public async Task<IEnumerable<LoginDto>> HandleAsync(LoginsQuery query, CancellationToken cancellation) =>
             await PaginatedList<LoginDto>.CreateAsync(GetQuery(query), query.PageIndex, query.PageSize);
 
 
@@ -40,29 +40,24 @@ namespace Vouchers.EntityFramework.QueryHandlers
                 loginsQuery = loginsQuery.Where(login => login.LoginName.Contains(query.LoginName));
 
 
-            var identityDetailsQuery = dbContext.IdentityDetails
-                .Include(detail => detail.Identity)
-                .AsQueryable();
-
-            if (query.IdentityName != null)
-                identityDetailsQuery = identityDetailsQuery.Where(detail => detail.IdentityName.Contains(query.IdentityName));
+            var identitiesQuery = dbContext.Identities.AsQueryable();
 
             if (query.FirstName != null)
-                identityDetailsQuery = identityDetailsQuery.Where(detail => detail.FirstName.Contains(query.FirstName));
+                identitiesQuery = identitiesQuery.Where(identity => identity.FirstName.Contains(query.FirstName));
 
             if (query.LastName != null)
-                identityDetailsQuery = identityDetailsQuery.Where(detail => detail.LastName.Contains(query.LastName));
+                identitiesQuery = identitiesQuery.Where(identity => identity.LastName.Contains(query.LastName));
 
 
             var resultQuery = loginsQuery
-                .Join(identityDetailsQuery,
+                .Join(identitiesQuery,
                     login => login.Identity.Id,
-                    detail => detail.Identity.Id,
+                    identity => identity.Id,
                     (login, detail) => new LoginDto
                     {
                         Id = login.Id,
                         LoginName = login.LoginName,
-                        IdentityName = detail.IdentityName,
+                        Email = detail.Email,
                         FirstName = detail.FirstName,
                         LastName = detail.LastName
                     }
@@ -75,12 +70,6 @@ namespace Vouchers.EntityFramework.QueryHandlers
                     break;
                 case "LoginNameDesc":
                     resultQuery = resultQuery.OrderByDescending(login => login.LoginName);
-                    break;
-                case "IdentityName":
-                    resultQuery = resultQuery.OrderBy(login => login.IdentityName);
-                    break;
-                case "IdentityNameDesc":
-                    resultQuery = resultQuery.OrderByDescending(login => login.IdentityName);
                     break;
                 case "FirstName":
                     resultQuery = resultQuery.OrderBy(login => login.FirstName);

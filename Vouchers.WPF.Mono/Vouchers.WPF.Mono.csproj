@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Vouchers.Application\Vouchers.Application.csproj" />
+    <ProjectReference Include="..\Vouchers.Infrastructure\Vouchers.EntityFramework.csproj" />
+    <ProjectReference Include="..\Vouchers.WPF\Vouchers.WPF.csproj" />
+  </ItemGroup>
+
+</Project>

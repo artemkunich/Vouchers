@@ -15,7 +15,7 @@ using Vouchers.Values;
 
 namespace Vouchers.EntityFramework.QueryHandlers
 {
-    public class HolderValuesQueryHandler : IHandler<HolderValuesQuery,IEnumerable<VoucherValueDto>>
+    public class HolderValuesQueryHandler : IAuthIdentityHandler<HolderValuesQuery,IEnumerable<VoucherValueDto>>
     {
         VouchersDbContext dbContext;
 
@@ -24,81 +24,52 @@ namespace Vouchers.EntityFramework.QueryHandlers
             this.dbContext = dbContext;
         }
 
-        public async Task<IEnumerable<VoucherValueDto>> HandleAsync(HolderValuesQuery query, CancellationToken cancellation)
-        { 
-
-            var values = await dbContext.VoucherValueDetails
-                .Include(detail => detail.Value.Issuer)
-                .Where(detail =>
-                   dbContext.Vouchers.Where(
-                        voucher => dbContext.VoucherAccounts
-                        .Include(acc => acc.Holder)
-                        .Include(acc => acc.Unit)
-                        .Where(acc => acc.Holder.Id == query.HolderId && acc.Balance > 0).Select(acc => acc.Unit.Id)
-                        .Contains(voucher.Id) && voucher.ValidTo >= DateTime.Today && voucher.Value.Id == detail.Value.Id
-                    ).ToList().Any()
-                ).ToListAsync();
-
-            var accounts = await dbContext.VoucherAccounts
-                .Include(account => account.Holder)
-                .Include(account => account.Unit).ThenInclude(unit => unit.Value)
-                .Where(account => account.Holder.Id == query.HolderId)
-                .ToListAsync();
-
-            return ConvertToHolderVoucherValues(query.HolderId, values, accounts);
-        }
-
-        public IEnumerable<VoucherValueDto> Handle(HolderValuesQuery query)
+        public async Task<IEnumerable<VoucherValueDto>> HandleAsync(HolderValuesQuery query, Guid authIdentityId, CancellationToken cancellation)
         {
-            var values = dbContext.VoucherValueDetails
-                .Include(detail => detail.Value.Issuer)
-                .Where(detail =>
-                   dbContext.Vouchers.Where(
-                        voucher => dbContext.VoucherAccounts
-                        .Include(acc => acc.Holder)
-                        .Include(acc => acc.Unit)
-                        .Where(acc => acc.Holder.Id == query.HolderId && acc.Balance > 0).Select(acc => acc.Unit.Id)
-                        .Contains(voucher.Id) && voucher.ValidTo >= DateTime.Today && voucher.Value.Id == detail.Value.Id
-                    ).ToList().Any()
-                ).ToList();
+            var authDomainAccounts = await dbContext.DomainAccounts.Where(a => a.IdentityId == authIdentityId && a.Id == query.HolderId).ToListAsync();
 
-            var accounts = dbContext.VoucherAccounts
-                .Include(account => account.Holder)
-                .Include(account => account.Unit).ThenInclude(unit => unit.Value)
-                .Where(account => account.Holder.Id == query.HolderId)
-                .ToList();
+            if (!authDomainAccounts.Any())
+                return new List<VoucherValueDto>();
 
-            return ConvertToHolderVoucherValues(query.HolderId, values, accounts);
-        }
+            var authDomainAccount = authDomainAccounts.First();
 
-        private IEnumerable<VoucherValueDto> ConvertToHolderVoucherValues(Guid holderId, IEnumerable<VoucherValueDetail> valueDetails, IEnumerable<VoucherAccount> accounts) =>
-            valueDetails.Select(valueDetail =>
-                new VoucherValueDto
-                {
-                    Id = valueDetail.Value.Id,
-                    Ticker = valueDetail.Ticker,
-                    Description = valueDetail.Description,
-                    IssuerId = valueDetail.Value.Issuer.Id,
-                    Supply = valueDetail.Value.Supply,
-                    Vouchers = dbContext.Vouchers.Where(
-                        voucher => dbContext.VoucherAccounts
-                        .Include(acc => acc.Holder)
-                        .Include(acc => acc.Unit)
-                        .Where(acc => acc.Holder.Id == holderId && acc.Balance > 0).Select(acc => acc.Unit.Id)
-                        .Contains(voucher.Id) && voucher.ValidTo >= DateTime.Today && voucher.Value.Id == valueDetail.Value.Id
-                    ).ToList()
-                    .Select(voucher =>
-                        new VoucherDto
-                        {
-                            Id = voucher.Id,
-                            ValidFrom = voucher.ValidFrom,
-                            ValidTo = voucher.ValidTo,
-                            CanBeExchanged = voucher.CanBeExchanged,
-                            Supply = voucher.Supply,
-                            Balance = accounts.FirstOrDefault(acc => acc.Unit.Id == voucher.Id)?.Balance ?? 0.0m
-                        }
-                    ).ToList()
-                }
+            var valuesQuery = dbContext.VoucherValues.Join(
+                dbContext.UnitTypes,
+                v => v.Id,
+                u => u.Id,
+                (v, u) => new { Value = v, UnitType = u }
+            ).GroupJoin(
+                dbContext.Images,
+                o => o.Value.ImageId,
+                i => i.Id,
+                (o, imgs) => new { Value = o.Value, UnitType = o.UnitType, Images = imgs }
+            ).SelectMany(
+                result => result.Images.DefaultIfEmpty(),
+                (result, image) => new { result.Value, result.UnitType, Image = image }
             );
+            if(query.Ticker is not null)
+                valuesQuery = valuesQuery.Where(o => o.Value.Ticker.Contains(query.Ticker));
+
+            return await valuesQuery
+                .Where(o =>
+                   dbContext.Units.Where(
+                        unit => dbContext.AccountItems
+                        .Include(acc => acc.Holder)
+                        .Include(acc => acc.Unit)
+                        .Where(acc => acc.HolderId == query.HolderId && acc.Balance > 0).Select(acc => acc.Unit.Id)
+                        .Contains(unit.Id) && unit.ValidTo >= DateTime.Today && unit.UnitType.Id == o.Value.Id
+                    ).Any()
+                ).Select(o =>
+                    new VoucherValueDto
+                    {
+                        Id = o.Value.Id,
+                        Ticker = o.Value.Ticker,
+                        Description = o.Value.Description,
+                        ImageBase64 = o.Value.ImageId == null ? null : Convert.ToBase64String(o.Image.CroppedContent),
+                        IssuerId = o.Value.IssuerIdentityId,
+                        Supply = o.UnitType.Supply,
+                    }
+                ).ToListAsync();
+        }
     }
 }

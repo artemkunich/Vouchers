@@ -6,35 +6,42 @@ using Vouchers.Application.Commands;
 using Vouchers.Application.Infrastructure;
 using System.Threading.Tasks;
 using System.Threading;
+using Vouchers.Values;
+using System.Linq;
 
 namespace Vouchers.Application.UseCases
 {
-    public class CreateVoucherCommandHandler : IAuthIdentityHandler<CreateVoucherCommand>
+    public class CreateVoucherCommandHandler : IAuthIdentityHandler<CreateVoucherCommand, Guid>
     {
-        private readonly IVoucherValueRepository voucherValueRepository;
-        private readonly IVoucherRepository voucherRepository;
+        private readonly IRepository<VoucherValue> _voucherValueRepository;
+        private readonly IRepository<UnitType> _unitTypeRepository;
+        private readonly IRepository<Unit> _unitRepository;
 
-        public CreateVoucherCommandHandler(IVoucherValueRepository voucherValueRepository, IVoucherRepository voucherRepository)
+        public CreateVoucherCommandHandler(IRepository<VoucherValue> voucherValueRepository, IRepository<UnitType> unitTypeRepository, IRepository<Unit> unitRepository)
         {
-            this.voucherValueRepository = voucherValueRepository;
-            this.voucherRepository = voucherRepository;
+            _voucherValueRepository = voucherValueRepository;
+            _unitTypeRepository = unitTypeRepository;
+            _unitRepository = unitRepository;
         }
 
-        public async Task HandleAsync(CreateVoucherCommand command, Guid authIdentityId, CancellationToken cancellation)
+        public async Task<Guid> HandleAsync(CreateVoucherCommand command, Guid authIdentityId, CancellationToken cancellation)
         {
-            var value = await voucherValueRepository.GetByIdAsync(command.VoucherValueId);
+            var value = await _voucherValueRepository.GetByIdAsync(command.VoucherValueId);
 
             if (value is null)
-                throw new ApplicationException("Voucher's value does not exist");
+                throw new ApplicationException("Unit type does not exist");
 
-            if (value.Issuer.Identity.Id != authIdentityId)
+            if (value.IssuerIdentityId != authIdentityId)
                 throw new ApplicationException("Operation is not allowed");
 
-            var voucherDto = command.VoucherDto;
-            var voucher = Voucher.Create(voucherDto.ValidFrom, voucherDto.ValidTo, voucherDto.CanBeExchanged, value);
+            var unitType = await _unitTypeRepository.GetByIdAsync(command.VoucherValueId);
 
-            await voucherRepository.AddAsync(voucher);
-            await voucherRepository.SaveAsync();
+            var unitDto = command.Voucher;
+            var unit = Unit.Create(unitDto.ValidFrom, unitDto.ValidTo ?? DateTime.MaxValue, unitDto.CanBeExchanged, unitType);
+
+            await _unitRepository.AddAsync(unit);
+
+            return unit.Id;
         }
     }
 }

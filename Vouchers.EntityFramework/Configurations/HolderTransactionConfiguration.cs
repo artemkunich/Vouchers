@@ -23,18 +23,18 @@ namespace Vouchers.EntityFramework.Configurations
 
             builder
                 .OwnsOne(transaction => transaction.Quantity)
-                .HasOne(quantity => quantity.Unit)
+                .HasOne(quantity => quantity.UnitType)
                 .WithMany()
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder
                 .HasOne(transaction => transaction.Creditor)
-                .WithMany()
+                .WithMany().HasForeignKey(transaction => transaction.CreditorId)
                 .OnDelete(DeleteBehavior.Restrict);
             
             builder
                 .HasOne(transaction => transaction.Debtor)
-                .WithMany()
+                .WithMany().HasForeignKey(transaction => transaction.DebtorId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder

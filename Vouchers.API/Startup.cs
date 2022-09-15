@@ -17,6 +17,7 @@ using Vouchers.EntityFramework;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Vouchers.Application.Commands;
 using Vouchers.Application.UseCases;
 using Vouchers.Application.Queries;
 using Vouchers.Application.Dtos;
@@ -24,10 +25,12 @@ using Vouchers.EntityFramework.QueryHandlers;
 using Vouchers.Application.Infrastructure;
 using Vouchers.EntityFramework.Repositories;
 using Vouchers.Identities;
-using Vouchers.MVC.Services;
+using Vouchers.API.Services;
 using Vouchers.Auth;
+using Microsoft.IdentityModel.Tokens;
 
-namespace Vouchers.Web
+
+namespace Vouchers.API
 {
     public class Startup
     {
@@ -43,84 +46,118 @@ namespace Vouchers.Web
         {
             services.AddDbContext<VouchersDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("VouchersDbContextConnection")));
 
-            services.AddDbContext<AuthDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("AuthDbContextConnection")));
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer("Bearer", options =>
+                {
+                    options.RequireHttpsMetadata = false;
+                    options.Authority = "http://vouchers.identityserver";
+                    //options.Authority = "http://localhost:5000";                    
 
-            services.AddIdentity<ApplicationUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = false)
-                    .AddEntityFrameworkStores<AuthDbContext>()
-                    .AddDefaultTokenProviders();
-            //services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            //    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options => Configuration.Bind("JwtSettings", options))
-            //    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options => Configuration.Bind("CookieSettings", options));
-            //services.AddIdentity<User, Role>(options => 
-            //{
-            //    options.Password.RequireDigit = true;
-            //    options.Password.RequireLowercase = true;
-            //    options.Password.RequireNonAlphanumeric = true;
-            //    options.Password.RequireUppercase = true;
-            //    options.Password.RequiredLength = 9;
-            //    options.Password.RequiredUniqueChars = 1;
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateAudience = false
+                    };
+                });
+                //.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options => Configuration.Bind("CookieSettings", options));
 
-            //    // Lockout settings.
-            //    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-            //    options.Lockout.MaxFailedAccessAttempts = 5;
-            //    options.Lockout.AllowedForNewUsers = true;
-
-            //    // User settings.
-            //    options.User.AllowedUserNameCharacters =
-            //    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
-            //    options.User.RequireUniqueEmail = true;
-
-            //}).AddEntityFrameworkStores<IdentityDbContext>().AddDefaultTokenProviders();
+            services.AddCors(options =>
+            {
+                // this defines a CORS policy called "default"
+                options.AddPolicy("default", policy =>
+                {
+                    policy.WithOrigins("http://localhost:8080")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
+            });
 
             services.AddControllers();
+            services.AddEndpointsApiExplorer();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Vouchers.Web", Version = "v1" });
             });
 
             services.AddAuthorization(options =>
+            {
+                options.AddPolicy("EmailId", policy => policy.RequireClaim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"));
+                options.AddPolicy("RoleAdmin", policy => policy.RequireRole("Admin"));
+                options.AddPolicy("ApiScope", policy =>
                 {
-                    options.AddPolicy("EmailId", policy => policy.RequireClaim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"));
-                    options.AddPolicy("RoleAdmin", policy => policy.RequireRole("Admin"));
-                }
-            );
+                    policy.RequireAuthenticatedUser();
+                    policy.RequireClaim("scope", "vouapi");
+                });
+            });
 
             services.AddHttpContextAccessor();
 
+            services.AddScoped<IDispatcher, Dispatcher>();
+
+            services.AddScoped<ILoginService, JWTLoginService>();
+
+            services.AddScoped<IImageService, ImageSharpService>();
+
+            //Repositories
+            services.AddRepositories();
+
+            //Identity
+            services.AddHandler<string, Guid?, IdentityQueryHandler>();
+            services.AddAuthIdentityHandler<Guid?, IdentityDetailDto, IdentityDetailQueryHandler>();
+
+            services.AddHandler<CreateIdentityCommand, CreateIdentityCommandHandler>();           
+            services.AddAuthIdentityHandler<UpdateIdentityCommand, UpdateIdentityCommandHandler>();
 
 
+            //Domain offers
+            services.AddHandler<DomainOffersQuery, IEnumerable<DomainOfferDto>, DomainOffersQueryHandler>();
+            services.AddAuthIdentityHandler<IdentityDomainOffersQuery, IEnumerable<DomainOfferDto>, IdentityDomainOffersQueryHandler>();
 
-            services.AddScoped<IRequestDispatcher, RequestDispatcher>();
+            services.AddAuthIdentityHandler<CreateDomainOfferCommand, Guid, CreateDomainOfferCommandHandler>();
+            services.AddAuthIdentityHandler<UpdateDomainOfferCommand, UpdateDomainOfferCommandHandler>();
+            
 
-            services.AddScoped<ILoginService, LoginService>();
+            services.AddAuthIdentityHandler<CreateDomainCommand, Guid?, CreateDomainCommandHandler>();
 
-            services.AddScoped<ILoginRepository, LoginRepository>();
+            //Domains
+            services.AddAuthIdentityHandler<DomainsQuery, IEnumerable<DomainDto>, DomainsQueryHandler>();
 
-            services.AddScoped<IIdentityDetailRepository, IdentityDetailRepository>();
+            //Domain accounts
+            services.AddAuthIdentityHandler<DomainAccountsQuery, IEnumerable<DomainAccountDto>, DomainAccountsQueryHandler>();
+            services.AddAuthIdentityHandler<IdentityDomainAccountsQuery, IEnumerable<DomainAccountDto>, IdentityDomainAccountsQueryHandler>();
+            services.AddAuthIdentityHandler<CreateDomainAccountCommand, Guid, CreateDomainAccountCommandHandler>();
 
-            //Create identity
-            services.AddScoped<IHandler<CreateIdentityCommand>, CreateIdentityCommandHandler>();
+            services.AddAuthIdentityHandler<UpdateDomainAccountCommand, UpdateDomainAccountCommandHandler>();            
 
-            //Get identity details
-            services.AddScoped<IAuthIdentityHandler<Guid?, IdentityDetailDto>, IdentityDetailQueryHandler>();
-            services.AddScoped<IHandler<Guid?, IdentityDetailDto>, AuthIdentityHandler<Guid?, IdentityDetailDto>>();
+            //Issuer values
+            services.AddAuthIdentityHandler<IssuerValuesQuery, IEnumerable<VoucherValueDto>, IssuerValuesQueryHandler>();
 
-            //Update identity details
-            services.AddScoped<IAuthIdentityHandler<UpdateIdentityDetailCommand>, UpdateIdentityDetailCommandHandler>();
-            services.AddScoped<IHandler<UpdateIdentityDetailCommand>, AuthIdentityHandler<UpdateIdentityDetailCommand>>();
+            services.AddAuthIdentityHandler<CreateVoucherValueCommand, Guid, CreateVoucherValueCommandHandler>();
+            services.AddAuthIdentityHandler<UpdateVoucherValueCommand, UpdateVoucherValueCommandHandler>();
+            services.AddAuthIdentityHandler<Guid, VoucherValueDetailDto, VoucherValueDetailQueryHandler>();
 
-            services.AddScoped<IAuthIdentityHandler<SubscriptionsQuery, IEnumerable<SubscriptionDto>>, SubscriptionsQueryHandler>();
-            services.AddScoped<AuthIdentityHandler<SubscriptionsQuery, IEnumerable<SubscriptionDto>>>();
+            //Issuer vouchers
+            services.AddAuthIdentityHandler<IssuerVouchersQuery, IEnumerable<VoucherDto>, IssuerVouchersQueryHandler>();
+            services.AddAuthIdentityHandler<CreateVoucherCommand, Guid, CreateVoucherCommandHandler>();
+            services.AddAuthIdentityHandler<UpdateVoucherCommand, UpdateVoucherCommandHandler>();
 
-            services.AddScoped<IHandler<DomainOffersQuery, IPaginatedEnumerable<DomainOfferDto>>, DomainOffersQueryHandler>();
-            services.AddScoped<IHandler<LoginsQuery, IPaginatedEnumerable<LoginDto>>, LoginsQueryHandler>();
+            //Issuer transactions
+            services.AddAuthIdentityHandler<IssuerTransactionsQuery, IEnumerable<IssuerTransactionDto>, IssuerTransactionsQueryHandler>();
 
-            services.AddScoped<IHandler<string, Guid?>, IdentityQueryHandler>();
+            services.AddAuthIdentityHandler<CreateIssuerTransactionCommand, Guid, CreateIssuerTransactionCommandHandler>();
+
+            //Holder values
+            services.AddAuthIdentityHandler<HolderValuesQuery, IEnumerable<VoucherValueDto>, HolderValuesQueryHandler>();
+            
+
+            //Holder vouchers
+            services.AddAuthIdentityHandler<HolderVouchersQuery, IEnumerable<VoucherDto>, HolderVouchersQueryHandler>();
+
+            //Holder transactions
+            services.AddAuthIdentityHandler<CreateHolderTransactionCommand, Guid, CreateHolderTransactionCommandHandler>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env,
-            UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -137,69 +174,20 @@ namespace Vouchers.Web
             {
                 using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
                 {
-                    var authContext = serviceScope.ServiceProvider.GetRequiredService<AuthDbContext>();
-                    authContext.Database.Migrate();
-
                     var vouchersContext = serviceScope.ServiceProvider.GetRequiredService<VouchersDbContext>();
                     vouchersContext.Database.Migrate();
-
                 }
             }
 
+            app.UseCors("default");
+        
             app.UseAuthentication();
-            app.UseAuthorization();
-
-            var task = InsureCreateRoles(userManager, roleManager);
-            task.Wait();
+            app.UseAuthorization();          
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
+                endpoints.MapControllers().RequireAuthorization("ApiScope");
             });
-        }
-
-        private async Task InsureCreateRoles(
-            UserManager<ApplicationUser> userManager,
-            RoleManager<IdentityRole> roleManager)
-        {
-            string[] roleNames = { "Admin", "Manager", "User" };
-            IdentityResult roleResult;
-
-            foreach (var roleName in roleNames)
-            {
-                var roleExist = await roleManager.RoleExistsAsync(roleName);
-                if (!roleExist)
-                {
-                    //create the roles and seed them to the database: Question 1
-                    roleResult = await roleManager.CreateAsync(new IdentityRole(roleName));
-                }
-            }
-
-            var adminEmail = Configuration["AppSettings:AdminEmail"];
-            var adminName = adminEmail;
-            var adminPassword = Configuration["AppSettings:AdminPassword"];
-
-            if (adminEmail == null || adminPassword == null)
-                return;
-
-            var admin = new ApplicationUser
-            {
-                UserName = adminName,
-                Email = adminEmail,
-            };
-
-            var _admin = await userManager.FindByEmailAsync(adminEmail);
-
-            if (_admin == null)
-            {
-                var createAdminResult = await userManager.CreateAsync(admin, adminPassword);
-                if (createAdminResult.Succeeded)
-                {
-                    //here we tie the new user to the role
-                    await userManager.AddToRoleAsync(admin, "Admin");
-
-                }
-            }
         }
     }
 }

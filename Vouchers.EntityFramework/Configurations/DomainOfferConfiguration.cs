@@ -25,8 +25,7 @@ namespace Vouchers.EntityFramework.Configurations
             builder.Property(offer => offer.InvoicePeriod);
             builder.Property(offer => offer.MaxSubscribersCount);
 
-            builder.Property<Guid>("RecipientId").HasColumnName("RecipientId");
-            builder.HasOne(offer => offer.Recipient).WithMany().HasForeignKey("RecipientId").OnDelete(DeleteBehavior.Restrict);
+            builder.Property(offer => offer.MaxContractsPerIdentity);
 
             builder.Property<byte[]>("RowVersion").IsRowVersion();
 

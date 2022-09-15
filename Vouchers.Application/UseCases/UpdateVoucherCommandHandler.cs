@@ -6,35 +6,42 @@ using Vouchers.Application.Commands;
 using Vouchers.Application.Infrastructure;
 using System.Threading.Tasks;
 using System.Threading;
+using Vouchers.Values;
 
 namespace Vouchers.Application.UseCases
 {
     public class UpdateVoucherCommandHandler : IAuthIdentityHandler<UpdateVoucherCommand>
     {     
-        private readonly IVoucherRepository voucherRepository;
+        private readonly IRepository<Unit> _unitRepository;
+        private readonly IRepository<VoucherValue> _voucherValueRepository;
 
-        public UpdateVoucherCommandHandler(IVoucherRepository voucherRepository)
+        public UpdateVoucherCommandHandler(IRepository<Unit> unitRepository, IRepository<VoucherValue> voucherValueRepository)
         {
-            this.voucherRepository = voucherRepository;
+            _unitRepository = unitRepository;
+            _voucherValueRepository = voucherValueRepository;
         }
 
         public async Task HandleAsync(UpdateVoucherCommand command, Guid authIdentityId, CancellationToken cancellation)
         {
-            var voucher = await voucherRepository.GetByIdAsync(command.VoucherId);
-            if(voucher is null)
-                throw new ApplicationException("Voucher does not exist");
+            var value = await _voucherValueRepository.GetByIdAsync(command.VoucherValueId);
+            if (value is null)
+                throw new ApplicationException("Voucher value does not exist");
 
-            var issuerDomainAccount = voucher.Value.Issuer;
-
-            if (issuerDomainAccount.Identity.Id != authIdentityId)
+            if (value.IssuerIdentityId != authIdentityId)
                 throw new ApplicationException("Operation is not allowed");
 
-            voucher.SetValidFrom(command.VoucherDto.ValidFrom);
-            voucher.SetValidTo(command.VoucherDto.ValidTo);
-            voucher.SetCanBeExchanged(command.VoucherDto.CanBeExchanged);
+            var unit = await _unitRepository.GetByIdAsync(command.Voucher.Id);
+            if (unit is null)
+                throw new ApplicationException("Voucher does not exist");
 
-            voucherRepository.Update(voucher);
-            await voucherRepository.SaveAsync();
+            if (unit.UnitType.Id != command.VoucherValueId)
+                throw new ApplicationException("Operation is not allowed");
+
+            unit.SetValidFrom(command.Voucher.ValidFrom);
+            unit.SetValidTo(command.Voucher.ValidTo ?? DateTime.MaxValue);
+            unit.SetCanBeExchanged(command.Voucher.CanBeExchanged);
+
+            _unitRepository.Update(unit);
         }
     }
 }

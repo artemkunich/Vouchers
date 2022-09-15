@@ -9,9 +9,9 @@ namespace Vouchers.Application.Commands
     public class CreateVoucherCommand
     {
         [Required]
-        public Guid VoucherValueId { get; }
+        public Guid VoucherValueId { get; set; }
 
         [Required]
-        public VoucherDto VoucherDto { get; }
+        public VoucherDto Voucher { get; set; }
     }
 }

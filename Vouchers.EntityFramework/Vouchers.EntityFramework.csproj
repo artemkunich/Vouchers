@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,6 +19,7 @@
     <ProjectReference Include="..\Vouchers.Auth\Vouchers.Auth.csproj" />
     <ProjectReference Include="..\Vouchers.Core\Vouchers.Core.csproj" />
     <ProjectReference Include="..\Vouchers.Domains\Vouchers.Domains.csproj" />
+    <ProjectReference Include="..\Vouchers.Files\Vouchers.Files.csproj" />
     <ProjectReference Include="..\Vouchers.Values\Vouchers.Values.csproj" />
   </ItemGroup>
 

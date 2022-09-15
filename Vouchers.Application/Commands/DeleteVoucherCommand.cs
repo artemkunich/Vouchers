@@ -9,6 +9,9 @@ namespace Vouchers.Application.Commands
     public class DeleteVoucherCommand
     {
         [Required]
+        public Guid VoucherValueId { get; }
+
+        [Required]
         public Guid VoucherId { get; }
     }
 }

@@ -1,0 +1,18 @@
+  .issuer {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .issuerContent {
+    display: flex;
+    flex-direction: row;
+    column-gap: 20px;
+  }
+  
+  .issuerContentItem {
+    flex-grow: 1;
+  }
+
+  .issuerContentItem table {
+    display: inline-block;
+  }

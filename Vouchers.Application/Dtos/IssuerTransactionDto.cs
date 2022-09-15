@@ -12,10 +12,7 @@ namespace Vouchers.Application.Dtos
 
         public string UnitTicker { get; set; }
 
-        public DateTime ValidFrom { get; set; }
-        public DateTime ValidTo { get; set; }
-
-        public bool CanBeExchanged { get; set; }
+        public VoucherDto Unit { get; set; }
 
         public decimal Amount { get; set; }
     }

@@ -1,12 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Vouchers.Core\Vouchers.Core.csproj" />
     <ProjectReference Include="..\Vouchers.Domains\Vouchers.Domains.csproj" />
+    <ProjectReference Include="..\Vouchers.Files\Vouchers.Files.csproj" />
     <ProjectReference Include="..\Vouchers.Identities\Vouchers.Identities.csproj" />
     <ProjectReference Include="..\Vouchers.Values\Vouchers.Values.csproj" />
   </ItemGroup>

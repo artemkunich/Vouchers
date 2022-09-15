@@ -9,6 +9,7 @@ using Vouchers.Application.Dtos;
 using Vouchers.Application.Queries;
 using Vouchers.Application.UseCases;
 using System.Threading;
+using Vouchers.Core;
 
 namespace Vouchers.EntityFramework.QueryHandlers
 {
@@ -31,11 +32,13 @@ namespace Vouchers.EntityFramework.QueryHandlers
         {
 
             var issuerTransactionsQuery = dbContext.IssuerTransactions
-                .Include(tr => tr.Quantity.Unit)
-                    .ThenInclude(unit => unit.Value)
-                        .ThenInclude(value => value.Issuer)
-                            .ThenInclude(issuer => issuer.Identity)
-                .Where(tr => tr.Quantity.Unit.Value.Issuer.Identity.Id == authIdentityId);
+                .Include(tr => tr.Quantity.Unit).ThenInclude(unit => unit.UnitType).ThenInclude(value => value.Issuer)
+                .Join(dbContext.VoucherValues, 
+                    t => t.Quantity.Unit.UnitTypeId,
+                    v => v.Id,
+                    (t,v) => new { Transaction = t, Value = v }
+                )
+                .Where(o => o.Value.IssuerIdentityId == authIdentityId).Select(o => o.Transaction);
 
             if (query.MinAmount != null)
                 issuerTransactionsQuery.Where(tr => tr.Quantity.Amount >= query.MinAmount);
@@ -47,23 +50,24 @@ namespace Vouchers.EntityFramework.QueryHandlers
             if (query.MaxTimestamp != null)
                 issuerTransactionsQuery.Where(tr => tr.Timestamp <= query.MaxTimestamp);
 
-            var voucherValueDetailsQuery = dbContext.VoucherValueDetails
-                .Include(detail => detail.Value)
-                    .ThenInclude(value => value.Issuer)
-                        .ThenInclude(issuer => issuer.Identity)
-                .Where(valueDetail => valueDetail.Value.Issuer.Identity.Id == authIdentityId);
+            var voucherValuesQuery = dbContext.VoucherValues
+                .Where(value => value.IssuerIdentityId == authIdentityId);
 
             return issuerTransactionsQuery.Join(
-                voucherValueDetailsQuery,
-                t => t.Quantity.Unit.Value.Id,
-                v => v.Value.Id,
+                voucherValuesQuery,
+                t => t.Quantity.Unit.UnitTypeId,
+                v => v.Id,
                 (t, v) => new IssuerTransactionDto {
                     Id = t.Id,
                     Timestamp = t.Timestamp,
                     UnitTicker = v.Ticker,
-                    ValidFrom = t.Quantity.Unit.ValidFrom,
-                    ValidTo = t.Quantity.Unit.ValidTo,
-                    CanBeExchanged = t.Quantity.Unit.CanBeExchanged,
+                    Unit = new VoucherDto
+                    {
+                        Id = v.Id,
+                        ValidFrom = t.Quantity.Unit.ValidFrom,
+                        ValidTo = t.Quantity.Unit.ValidTo,
+                        CanBeExchanged = t.Quantity.Unit.CanBeExchanged,
+                    },                 
                     Amount = t.Quantity.Amount
                 }
             );
