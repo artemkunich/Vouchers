@@ -27,6 +27,8 @@ namespace Vouchers.EntityFramework.Configurations
 
             builder.Property(offer => offer.MaxContractsPerIdentity);
 
+            builder.Property(offer => offer.RecipientId);
+
             builder.Property<byte[]>("RowVersion").IsRowVersion();
 
         }

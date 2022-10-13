@@ -14,21 +14,11 @@ using System.Threading.Tasks;
 
 using Microsoft.EntityFrameworkCore;
 using Vouchers.EntityFramework;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Vouchers.Application.Commands;
-using Vouchers.Application.UseCases;
-using Vouchers.Application.Queries;
-using Vouchers.Application.Dtos;
-using Vouchers.EntityFramework.QueryHandlers;
 using Vouchers.Application.Infrastructure;
-using Vouchers.EntityFramework.Repositories;
-using Vouchers.Identities;
 using Vouchers.API.Services;
-using Vouchers.Auth;
 using Microsoft.IdentityModel.Tokens;
-
+using Application.Infrastructure;
 
 namespace Vouchers.API
 {
@@ -92,68 +82,13 @@ namespace Vouchers.API
             services.AddHttpContextAccessor();
 
             services.AddScoped<IDispatcher, Dispatcher>();
-
             services.AddScoped<ILoginService, JWTLoginService>();
-
             services.AddScoped<IImageService, ImageSharpService>();
 
-            //Repositories
             services.AddRepositories();
+            services.AddCommandHandlers();
+            services.AddQueryHandlers();
 
-            //Identity
-            services.AddHandler<string, Guid?, IdentityQueryHandler>();
-            services.AddAuthIdentityHandler<Guid?, IdentityDetailDto, IdentityDetailQueryHandler>();
-
-            services.AddHandler<CreateIdentityCommand, CreateIdentityCommandHandler>();           
-            services.AddAuthIdentityHandler<UpdateIdentityCommand, UpdateIdentityCommandHandler>();
-
-
-            //Domain offers
-            services.AddHandler<DomainOffersQuery, IEnumerable<DomainOfferDto>, DomainOffersQueryHandler>();
-            services.AddAuthIdentityHandler<IdentityDomainOffersQuery, IEnumerable<DomainOfferDto>, IdentityDomainOffersQueryHandler>();
-
-            services.AddAuthIdentityHandler<CreateDomainOfferCommand, Guid, CreateDomainOfferCommandHandler>();
-            services.AddAuthIdentityHandler<UpdateDomainOfferCommand, UpdateDomainOfferCommandHandler>();
-            
-
-            services.AddAuthIdentityHandler<CreateDomainCommand, Guid?, CreateDomainCommandHandler>();
-
-            //Domains
-            services.AddAuthIdentityHandler<DomainsQuery, IEnumerable<DomainDto>, DomainsQueryHandler>();
-
-            //Domain accounts
-            services.AddAuthIdentityHandler<DomainAccountsQuery, IEnumerable<DomainAccountDto>, DomainAccountsQueryHandler>();
-            services.AddAuthIdentityHandler<IdentityDomainAccountsQuery, IEnumerable<DomainAccountDto>, IdentityDomainAccountsQueryHandler>();
-            services.AddAuthIdentityHandler<CreateDomainAccountCommand, Guid, CreateDomainAccountCommandHandler>();
-
-            services.AddAuthIdentityHandler<UpdateDomainAccountCommand, UpdateDomainAccountCommandHandler>();            
-
-            //Issuer values
-            services.AddAuthIdentityHandler<IssuerValuesQuery, IEnumerable<VoucherValueDto>, IssuerValuesQueryHandler>();
-
-            services.AddAuthIdentityHandler<CreateVoucherValueCommand, Guid, CreateVoucherValueCommandHandler>();
-            services.AddAuthIdentityHandler<UpdateVoucherValueCommand, UpdateVoucherValueCommandHandler>();
-            services.AddAuthIdentityHandler<Guid, VoucherValueDetailDto, VoucherValueDetailQueryHandler>();
-
-            //Issuer vouchers
-            services.AddAuthIdentityHandler<IssuerVouchersQuery, IEnumerable<VoucherDto>, IssuerVouchersQueryHandler>();
-            services.AddAuthIdentityHandler<CreateVoucherCommand, Guid, CreateVoucherCommandHandler>();
-            services.AddAuthIdentityHandler<UpdateVoucherCommand, UpdateVoucherCommandHandler>();
-
-            //Issuer transactions
-            services.AddAuthIdentityHandler<IssuerTransactionsQuery, IEnumerable<IssuerTransactionDto>, IssuerTransactionsQueryHandler>();
-
-            services.AddAuthIdentityHandler<CreateIssuerTransactionCommand, Guid, CreateIssuerTransactionCommandHandler>();
-
-            //Holder values
-            services.AddAuthIdentityHandler<HolderValuesQuery, IEnumerable<VoucherValueDto>, HolderValuesQueryHandler>();
-            
-
-            //Holder vouchers
-            services.AddAuthIdentityHandler<HolderVouchersQuery, IEnumerable<VoucherDto>, HolderVouchersQueryHandler>();
-
-            //Holder transactions
-            services.AddAuthIdentityHandler<CreateHolderTransactionCommand, Guid, CreateHolderTransactionCommandHandler>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

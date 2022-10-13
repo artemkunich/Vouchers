@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Vouchers.Domains
 {
-    public class UpdateDomainContractRequest
+    public sealed class UpdateDomainContractRequest
     {
         public Guid Id { get; }
 

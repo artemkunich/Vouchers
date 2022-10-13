@@ -9,7 +9,7 @@ using Vouchers.Application.Infrastructure;
 
 namespace Vouchers.API.Services
 {
-    public class ImageSharpService : IImageService
+    public sealed class ImageSharpService : IImageService
     {
         private const int MAX_IMAGE_SIDE = 1024;
         private const int CROPPED_IMAGE_SIDE = 100;
@@ -45,6 +45,16 @@ namespace Vouchers.API.Services
                 image.Mutate(x => x.Resize(image.Width * MAX_IMAGE_SIDE / maxSide, image.Height * MAX_IMAGE_SIDE / maxSide));
 
             image.SaveAsPngAsync($"/app/images/{imageId}.png");
+        }
+
+        public Task RemoveImageAsync(Guid imageId) 
+        {
+            var fileName = $"/app/images/{imageId}.png";
+
+            if (File.Exists(fileName))
+                File.Delete(fileName);
+
+            return Task.CompletedTask;
         }
 
         public async Task<byte[]> GetImageBinaryAsync(Guid imageId) {

@@ -16,17 +16,17 @@ namespace Vouchers.EntityFramework.Configurations
 
             builder.HasKey(unitType => unitType.Id);
 
-            builder.Property(unitType => unitType.IssuerId).IsRequired();
+            builder.Property(unitType => unitType.IssuerAccountId).IsRequired();
 
             builder.Property(unitType => unitType.Supply)
                     .IsRequired()
                     .HasPrecision(18, 2);
 
             builder
-                .HasOne(unitType => unitType.Issuer)
+                .HasOne(unitType => unitType.IssuerAccount)
                 .WithMany()
                 .IsRequired()
-                .HasForeignKey(unitType => unitType.IssuerId)
+                .HasForeignKey(unitType => unitType.IssuerAccountId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Property<byte[]>("RowVersion").IsRowVersion();

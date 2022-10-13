@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "Vouchers.WPF": {
-      "commandName": "Project",
-      "commandLineArgs": "Arg1"
-    }
-  }
-}

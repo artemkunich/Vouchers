@@ -2,7 +2,7 @@
 
 namespace Vouchers.Core
 {
-    public class UnitQuantity
+    public sealed class UnitQuantity
     {       
         public decimal Amount { get; }
 

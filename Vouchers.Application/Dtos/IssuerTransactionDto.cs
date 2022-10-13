@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Vouchers.Application.Dtos
 {
-    public class IssuerTransactionDto
+    public sealed class IssuerTransactionDto
     {
         public Guid Id { get; set; }
 

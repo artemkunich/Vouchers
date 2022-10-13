@@ -14,34 +14,34 @@ using Vouchers.Values;
 
 namespace Vouchers.EntityFramework.QueryHandlers
 {
-    public class IssuerVouchersQueryHandler : IAuthIdentityHandler<IssuerVouchersQuery,IEnumerable<VoucherDto>>
+    internal sealed class IssuerVouchersQueryHandler : IAuthIdentityHandler<IssuerVouchersQuery,IEnumerable<VoucherDto>>
     {
-        VouchersDbContext dbContext;
+        VouchersDbContext _dbContext;
 
         public IssuerVouchersQueryHandler(VouchersDbContext dbContext)
         {
-            this.dbContext = dbContext;
+            _dbContext = dbContext;
         }     
 
         public async Task<IEnumerable<VoucherDto>> HandleAsync(IssuerVouchersQuery query, Guid authIdentityId, CancellationToken cancellation)
         {
-            var issuerDomainAccount = await dbContext.UnitTypes.Where(v => v.Id == query.ValueId)
-                .Join(dbContext.DomainAccounts, u => u.IssuerId, a => a.Id, (u, a) => a).FirstOrDefaultAsync();
+            var issuerDomainAccount = await _dbContext.UnitTypes.Where(v => v.Id == query.ValueId)
+                .Join(_dbContext.DomainAccounts, u => u.IssuerAccountId, a => a.Id, (u, a) => a).FirstOrDefaultAsync();
             if (issuerDomainAccount is null)
                 return new List<VoucherDto>();
 
-            var authDomainAccounts = await dbContext.DomainAccounts.Where(a => a.IdentityId == authIdentityId && a.Domain.Id == issuerDomainAccount.Domain.Id).ToListAsync();
+            var authDomainAccounts = await _dbContext.DomainAccounts.Where(a => a.IdentityId == authIdentityId && a.Domain.Id == issuerDomainAccount.DomainId).ToListAsync();
             if(!authDomainAccounts.Any())
                 return new List<VoucherDto>();
 
             var authDomainAccount = authDomainAccounts.FirstOrDefault();
-            var accountsQuery = dbContext.AccountItems.Where(account => account.Holder.Id == authDomainAccount.Id);
+            var accountsQuery = _dbContext.AccountItems.Where(account => account.HolderAccountId == authDomainAccount.Id);
 
-            return await dbContext.Units.Include(voucher => voucher.UnitType).Where(voucher => voucher.UnitType.Id == query.ValueId)
+            return await _dbContext.Units.Where(voucher => voucher.UnitTypeId == query.ValueId)
                 .GroupJoin(
                     accountsQuery,
                     v => v.Id,
-                    a => a.Unit.Id,
+                    a => a.UnitId,
                     (voucher, accounts) => new { Voucher = voucher, Accounts = accounts }
                 ).SelectMany(
                     result => result.Accounts.DefaultIfEmpty(),

@@ -5,24 +5,24 @@ using Vouchers.Entities;
 
 namespace Vouchers.Core
 {
-    public class IssuerTransaction : Entity
+    public sealed class IssuerTransaction : Entity
     {
         public DateTime Timestamp { get; private set; }
 
         public UnitQuantity Quantity { get; }
 
-        public Guid IssuerAccountId { get; }
-        public AccountItem IssuerAccount { get; }
+        public Guid IssuerAccountItemId { get; }
+        public AccountItem IssuerAccountItem { get; }
 
-        public static IssuerTransaction Create(AccountItem issuerAccount, decimal amount) =>
-            new IssuerTransaction(Guid.NewGuid(), DateTime.Now, issuerAccount, UnitQuantity.Create(amount, issuerAccount.Unit));
+        public static IssuerTransaction Create(AccountItem issuerAccountItem, decimal amount) =>
+            new IssuerTransaction(Guid.NewGuid(), DateTime.Now, issuerAccountItem, UnitQuantity.Create(amount, issuerAccountItem.Unit));
 
-        internal IssuerTransaction(Guid id, DateTime timestamp, AccountItem issuerAccount, UnitQuantity quantity) : base(id)
+        internal IssuerTransaction(Guid id, DateTime timestamp, AccountItem issuerAccountItem, UnitQuantity quantity) : base(id)
         {
             Timestamp = timestamp;
 
-            IssuerAccountId = issuerAccount.Id;
-            IssuerAccount = issuerAccount;
+            IssuerAccountItemId = issuerAccountItem.Id;
+            IssuerAccountItem = issuerAccountItem;
             
             Quantity = quantity;
             //new VoucherQuantity(quantity.Amount, issuerAccount.Unit);
@@ -30,11 +30,11 @@ namespace Vouchers.Core
             if (Quantity.Unit.ValidTo < DateTime.Today)
                 throw new CoreException($"Voucher {Quantity.Unit.Id} is expired");
 
-            if (Quantity.Unit.UnitType.Issuer.NotEquals(IssuerAccount.Holder))
-                throw new CoreException($"Account owner {IssuerAccount.HolderId} is not issuer of voucher {Quantity.Unit.UnitType.Id}");
+            if (Quantity.Unit.UnitType.IssuerAccount.NotEquals(IssuerAccountItem.HolderAccount))
+                throw new CoreException($"Account owner {IssuerAccountItem.HolderAccountId} is not issuer of voucher {Quantity.Unit.UnitType.Id}");
 
-            if (Quantity.Unit.NotEquals(IssuerAccount.Unit))
-                throw new CoreException($"Account unit {IssuerAccount.UnitId} is not voucher {Quantity.Unit.UnitType.Id}");
+            if (Quantity.Unit.NotEquals(IssuerAccountItem.Unit))
+                throw new CoreException($"Account unit {IssuerAccountItem.UnitId} is not voucher {Quantity.Unit.UnitType.Id}");
 
 
             if (Quantity.Amount == 0)
@@ -48,13 +48,13 @@ namespace Vouchers.Core
         {
             if (Quantity.Amount > 0)
             {
-                IssuerAccount.ProcessDebit(Quantity.Amount);
-                IssuerAccount.Unit.IncreaseSupply(Quantity.Amount);
+                IssuerAccountItem.ProcessDebit(Quantity.Amount);
+                IssuerAccountItem.Unit.IncreaseSupply(Quantity.Amount);
             }
             else
             {
-                IssuerAccount.ProcessCredit(-Quantity.Amount);
-                IssuerAccount.Unit.ReduceSupply(-Quantity.Amount);
+                IssuerAccountItem.ProcessCredit(-Quantity.Amount);
+                IssuerAccountItem.Unit.ReduceSupply(-Quantity.Amount);
             }
         }
     }

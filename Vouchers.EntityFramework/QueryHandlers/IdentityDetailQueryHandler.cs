@@ -9,18 +9,17 @@ using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.UseCases;
 using Vouchers.Core;
+using Vouchers.Domains;
 using Vouchers.Files;
 
 namespace Vouchers.EntityFramework.QueryHandlers
 {
-    public class IdentityDetailQueryHandler : IAuthIdentityHandler<Guid?, IdentityDetailDto>
+    internal sealed class IdentityDetailQueryHandler : IAuthIdentityHandler<Guid?, IdentityDetailDto>
     {
-        private readonly VouchersDbContext dbContext;
-        private readonly IImageService imageService;
-        public IdentityDetailQueryHandler(VouchersDbContext dbContext, IImageService imageService)
+        private readonly VouchersDbContext _dbContext;
+        public IdentityDetailQueryHandler(VouchersDbContext dbContext)
         {
-            this.dbContext = dbContext;
-            this.imageService = imageService;
+            _dbContext = dbContext;
         }
 
         Func<CropParameters, CropParametersDto> mapCropParameters = (CropParameters cp) => cp is null ? null : new CropParametersDto
@@ -31,13 +30,21 @@ namespace Vouchers.EntityFramework.QueryHandlers
             Height = cp.Height,
         };
 
-        public async Task<IdentityDetailDto> HandleAsync(Guid? identityId, Guid authIdentityId, CancellationToken cancellation)
+        public async Task<IdentityDetailDto> HandleAsync(Guid? accountId, Guid authIdentityId, CancellationToken cancellation)
         {
-            if (identityId is null)
-                identityId = authIdentityId;
+            var identityId = authIdentityId;
+            DomainAccount domainAccount = null;
+            if (accountId is not null)
+            {
+                domainAccount = await _dbContext.DomainAccounts.Include(acc => acc.Domain).ThenInclude(domain => domain.Contract).FirstOrDefaultAsync(account => account.Id == accountId);
+                if (domainAccount is null)
+                    return null;
 
-            var identityWithImage = await dbContext.Identities.Where(id => id.Id == identityId).GroupJoin(
-                dbContext.Images,
+                identityId = domainAccount.IdentityId;
+            }
+
+            var identityWithImage = await _dbContext.Identities.Where(id => id.Id == identityId).GroupJoin(
+                _dbContext.CroppedImages,
                 id => id.ImageId,
                 im => im.Id,
                 (id, ims) => new {Identity = id, Images = ims}
@@ -46,25 +53,19 @@ namespace Vouchers.EntityFramework.QueryHandlers
                 (result, image) => new { result.Identity, Image = image }
             ).FirstOrDefaultAsync();
 
-            string imageBase64 = null;
-            if(identityWithImage.Image is not null)
-            {
-                var imageBinary = await imageService.GetImageBinaryAsync(identityWithImage.Image.Id);
-                if(imageBinary is not null)
-                    imageBase64 = Convert.ToBase64String(imageBinary);
-            }
-
-            string croppedImageBase64 = identityWithImage.Image?.CroppedContent is null ? null : Convert.ToBase64String(identityWithImage.Image.CroppedContent);
-
             return new IdentityDetailDto
             {
                 IdentityId = identityWithImage.Identity.Id,
                 Email = identityWithImage.Identity.Email,
                 FirstName = identityWithImage.Identity.FirstName,
                 LastName = identityWithImage.Identity.LastName,
-                ImageBase64 = imageBase64,
-                CroppedImageBase64 = croppedImageBase64,
+                ImageId = identityWithImage.Image == null ? null : identityWithImage.Image.ImageId,
+                CroppedImageId = identityWithImage.Image == null ? null : identityWithImage.Image.Id,
                 CropParameters = mapCropParameters(identityWithImage.Image?.CropParameters),
+                AccountId = accountId,
+                IsAdmin = domainAccount?.IsAdmin,
+                IsIssuer = domainAccount?.IsIssuer,
+                IsOwner = domainAccount?.IsOwner,
             };
         }
     }

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Vouchers.Application.Queries
 {
-    public class IdentityDomainOffersQuery : Query
+    public sealed class IdentityDomainOffersQuery : ListQuery
     {
     }
 }

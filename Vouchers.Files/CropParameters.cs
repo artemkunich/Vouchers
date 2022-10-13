@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Vouchers.Files
 {
-    public class CropParameters
+    public sealed class CropParameters
     {
         public decimal X { get; set; }
         public decimal Y { get; set; }
@@ -20,9 +20,9 @@ namespace Vouchers.Files
                 throw new ArgumentException("Invalid x value");
             if (y > 100 || y < 0)
                 throw new ArgumentException("Invalid y value");
-            if (width > 100 || width < 0)
+            if (width > 100 || width <= 0)
                 throw new ArgumentException("Invalid width value");
-            if (height > 100 || height < 0)
+            if (height > 100 || height <= 0)
                 throw new ArgumentException("Invalid height value");
 
             X = x;

@@ -3,19 +3,19 @@ using Vouchers.Entities;
 
 namespace Vouchers.Core
 {
-    public class UnitType : Entity
+    public sealed class UnitType : Entity
     {
-        public Guid IssuerId { get; }
-        public Account Issuer { get; }
+        public Guid IssuerAccountId { get; }
+        public Account IssuerAccount { get; }
         public decimal Supply { get; private set; }
 
-        public static UnitType Create(Account issuer) =>
-            new UnitType(Guid.NewGuid(), issuer);
+        public static UnitType Create(Account issuerAccount) =>
+            new UnitType(Guid.NewGuid(), issuerAccount);
 
-        internal UnitType(Guid id, Account issuer) : base(id)
+        internal UnitType(Guid id, Account issuerAccount) : base(id)
         {
-            IssuerId = issuer.Id;
-            Issuer = issuer;
+            IssuerAccountId = issuerAccount.Id;
+            IssuerAccount = issuerAccount;
         }    
 
         private UnitType() { }
@@ -26,7 +26,7 @@ namespace Vouchers.Core
                 throw new CoreException($"Supply cannot be changed by 0 or negative amount");
             Supply += amount;
 
-            Issuer.IncreaseSupply(amount);
+            IssuerAccount.IncreaseSupply(amount);
         }
 
         public void ReduceSupply(decimal amount)
@@ -37,7 +37,7 @@ namespace Vouchers.Core
                 throw new CoreException($"Detected attempt to set negative user's supply");
             Supply -= amount;
 
-            Issuer.ReduceSupply(amount);
+            IssuerAccount.ReduceSupply(amount);
         }
 
         public bool CanBeRemoved()

@@ -17,13 +17,13 @@ using System.Threading;
 
 namespace Vouchers.EntityFramework.QueryHandlers
 {
-    public class LoginsQueryHandler : IHandler<LoginsQuery, IEnumerable<LoginDto>>
+    internal sealed class LoginsQueryHandler : IHandler<LoginsQuery, IEnumerable<LoginDto>>
     {
-        VouchersDbContext dbContext;
+        VouchersDbContext _dbContext;
 
         public LoginsQueryHandler(VouchersDbContext dbContext)
         {           
-            this.dbContext = dbContext;
+            _dbContext = dbContext;
         }
 
         public async Task<IEnumerable<LoginDto>> HandleAsync(LoginsQuery query, CancellationToken cancellation) =>
@@ -32,7 +32,7 @@ namespace Vouchers.EntityFramework.QueryHandlers
 
         private IQueryable<LoginDto> GetQuery(LoginsQuery query)
         {
-            var loginsQuery = dbContext.Logins
+            var loginsQuery = _dbContext.Logins
                 .Include(login => login.Identity)
                 .AsQueryable();
 
@@ -40,7 +40,7 @@ namespace Vouchers.EntityFramework.QueryHandlers
                 loginsQuery = loginsQuery.Where(login => login.LoginName.Contains(query.LoginName));
 
 
-            var identitiesQuery = dbContext.Identities.AsQueryable();
+            var identitiesQuery = _dbContext.Identities.AsQueryable();
 
             if (query.FirstName != null)
                 identitiesQuery = identitiesQuery.Where(identity => identity.FirstName.Contains(query.FirstName));

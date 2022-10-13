@@ -2,16 +2,16 @@
 
 namespace Vouchers.API.Services
 {
-    public class Mapper<T,TResult> : IMapper<T,TResult>
+    public sealed class Mapper<T,TResult> : IMapper<T,TResult>
     {
-        private readonly AutoMapper.IMapper mapper;
+        private readonly AutoMapper.IMapper _mapper;
 
         public Mapper(AutoMapper.IMapper mapper) =>
-            this.mapper = mapper;
+            _mapper = mapper;
 
         public TResult Map(T obj)
         {
-            return mapper.Map<TResult>(obj);
+            return _mapper.Map<TResult>(obj);
         }
     }
 }

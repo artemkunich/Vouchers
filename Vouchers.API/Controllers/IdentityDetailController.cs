@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 using Vouchers.Application;
-using Vouchers.Application.Commands;
+using Vouchers.Application.Commands.IdentityCommands;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.UseCases;
@@ -12,25 +12,25 @@ using Vouchers.Application.UseCases;
 namespace Vouchers.API.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
     [Authorize]
-    public class IdentityDetailController : Controller
+    public sealed class IdentityDetailController : Controller
     {
-        private readonly IDispatcher dispatcher;
-        private readonly ILoginService loginService;
+        private readonly IDispatcher _dispatcher;
+        private readonly ILoginService _loginService;
 
         public IdentityDetailController(IDispatcher dispatcher, ILoginService loginService)
         {
-            this.dispatcher = dispatcher;
-            this.loginService = loginService;
+            _dispatcher = dispatcher;
+            _loginService = loginService;
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get(Guid? identityId)
+        [Route("[controller]/{accountId:guid?}")]
+        public async Task<IActionResult> Get(Guid? accountId)
         {
             try
             {
-                var detail = await dispatcher.DispatchAsync<Guid?, IdentityDetailDto>(identityId);
+                var detail = await _dispatcher.DispatchAsync<Guid?, IdentityDetailDto>(accountId);
                 if (detail is null)
                     return NotFound();
 
@@ -39,24 +39,25 @@ namespace Vouchers.API.Controllers
             catch (NotRegisteredException)
             {
                 return NotFound();
-            }      
+            }
         }
 
         [HttpPost]
+        [Route("[controller]")]
         public async Task<IActionResult> Post([FromForm] IdentityDetailDto identityDetailDto)
         {
-            var loginName = loginService.CurrentLoginName;
-            var identityId = await dispatcher.DispatchAsync<string, Guid?>(loginName);
+            var loginName = _loginService.CurrentLoginName;
+            var identityId = await _dispatcher.DispatchAsync<string, Guid?>(loginName);
 
             if (identityId is null)
             {
-                await dispatcher.DispatchAsync(new CreateIdentityCommand { LoginName = loginName, IdentityDetail = identityDetailDto });
-                identityId = await dispatcher.DispatchAsync<string, Guid?>(loginName);
+                await _dispatcher.DispatchAsync(new CreateIdentityCommand { LoginName = loginName, IdentityDetail = identityDetailDto });
+                identityId = await _dispatcher.DispatchAsync<string, Guid?>(loginName);
                 return Json(new { identityId });
             }
             else
             {
-                await dispatcher.DispatchAsync(new UpdateIdentityCommand { IdentityDetail = identityDetailDto });
+                await _dispatcher.DispatchAsync(new UpdateIdentityCommand { IdentityDetail = identityDetailDto });
             }
 
             return NoContent();

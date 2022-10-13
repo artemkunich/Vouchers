@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Vouchers.Application.Queries
 {
-    public class IssuerVouchersQuery
+    public sealed class IssuerVouchersQuery : ListQuery
     {
         public Guid ValueId { get; set; }
     }

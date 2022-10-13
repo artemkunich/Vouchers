@@ -13,13 +13,13 @@ using Vouchers.Core;
 
 namespace Vouchers.EntityFramework.QueryHandlers
 {
-    public class HolderTransactionsQueryHandler : IAuthIdentityHandler<HolderTransactionsQuery,IEnumerable<HolderTransactionDto>>
+    internal sealed class HolderTransactionsQueryHandler : IAuthIdentityHandler<HolderTransactionsQuery,IEnumerable<HolderTransactionDto>>
     {
-        VouchersDbContext dbContext;
+        VouchersDbContext _dbContext;
 
         public HolderTransactionsQueryHandler(VouchersDbContext dbContext)
         {
-            this.dbContext = dbContext;
+            _dbContext = dbContext;
         }
 
         public IEnumerable<HolderTransactionDto> Handle(HolderTransactionsQuery query, Guid authIdentityId) =>
@@ -30,14 +30,14 @@ namespace Vouchers.EntityFramework.QueryHandlers
 
         public IQueryable<HolderTransactionDto> GetQuery(HolderTransactionsQuery query, Guid authIdentityId) {
 
-            var holderTransactionsQuery = dbContext.HolderTransactions
-                .Include(tr => tr.Creditor)
-                .Include(tr => tr.Debtor)
-                .Include(tr => tr.Quantity.UnitType).ThenInclude(unit => unit.Issuer)
+            var holderTransactionsQuery = _dbContext.HolderTransactions
+                .Include(tr => tr.CreditorAccount)
+                .Include(tr => tr.DebtorAccount)
+                .Include(tr => tr.Quantity.UnitType).ThenInclude(unit => unit.IssuerAccount)
                 .Include(tr => tr.TransactionItems)
                 .Join(
-                    dbContext.DomainAccounts,
-                    tr => tr.DebtorId,
+                    _dbContext.DomainAccounts,
+                    tr => tr.DebtorAccountId,
                     debtor => debtor.Id,
                     (tr, debtor) => new 
                     { 
@@ -46,8 +46,8 @@ namespace Vouchers.EntityFramework.QueryHandlers
                     }
                 )
                 .Join(
-                    dbContext.DomainAccounts,
-                    o => o.Transaction.CreditorId,
+                    _dbContext.DomainAccounts,
+                    o => o.Transaction.CreditorAccountId,
                     creditor => creditor.Id,
                     (tr, creditor) => new
                     {
@@ -56,7 +56,7 @@ namespace Vouchers.EntityFramework.QueryHandlers
                         CreditorDomainAccount = creditor
                     }
                 )
-                .Where(o => o.DebtorDomainAccount.IdentityId == authIdentityId || o.CreditorDomainAccount.IdentityId == authIdentityId).Select(o => o.Transaction);
+                .Where(o => o.DebtorDomainAccount.IdentityId == authIdentityId && o.DebtorDomainAccount.Id == query.AccountId || o.CreditorDomainAccount.IdentityId == authIdentityId && o.CreditorDomainAccount.Id == query.AccountId).Select(o => o.Transaction);     
 
             if (query.MinAmount != null)
                 holderTransactionsQuery = holderTransactionsQuery.Where(transaction => transaction.Quantity.Amount >= query.MinAmount);
@@ -68,60 +68,99 @@ namespace Vouchers.EntityFramework.QueryHandlers
             if (query.MaxTimestamp != null)
                 holderTransactionsQuery = holderTransactionsQuery.Where(transaction => transaction.Timestamp <= query.MaxTimestamp);
 
-            var voucherValuesQuery = dbContext.VoucherValues.AsQueryable();
+            var voucherValuesQuery = _dbContext.VoucherValues.AsQueryable();
             if (query.Ticker != null)
                 voucherValuesQuery = voucherValuesQuery.Where(value => value.Ticker.Contains(query.Ticker));
 
-            return holderTransactionsQuery.Join(
+            var holderTransactionsQueryWithIdentities = holderTransactionsQuery.Join(
                 voucherValuesQuery,
                 t => t.Quantity.UnitTypeId,
                 v => v.Id,
-                (t, v) => new 
-                { 
+                (t, v) => new
+                {
                     Transaction = t,
                     Value = v
                 }
             ).Join(
-                dbContext.DomainAccounts.Join(dbContext.Identities, a => a.IdentityId, i => i.Id, (a, i) => new { DomainAccountId = a.Id, Identity = i }),
-                t => t.Transaction.CreditorId,
+                _dbContext.DomainAccounts.Join(_dbContext.Identities, a => a.IdentityId, i => i.Id, (a, i) => new { DomainAccountId = a.Id, Identity = i }),
+                t => t.Transaction.CreditorAccountId,
                 i => i.DomainAccountId,
                 (t, i) => new
                 {
                     Transaction = t.Transaction,
                     Value = t.Value,
                     Creditor = i.Identity
-                }              
+                }
             ).Join(
-                dbContext.DomainAccounts.Join(dbContext.Identities, a => a.IdentityId, i => i.Id, (a, i) => new { DomainAccountId = a.Id, Identity = i }),
-                t => t.Transaction.DebtorId,
+                _dbContext.Identities,
+                res => res.Value.IssuerIdentityId,
+                identity => identity.Id,
+                (res, identity) => new {
+                    res.Transaction,
+                    res.Value,
+                    res.Creditor,
+                    UnitIssuer = identity
+                }
+            ).Join(
+                _dbContext.DomainAccounts.Join(_dbContext.Identities, a => a.IdentityId, i => i.Id, (a, i) => new { DomainAccountId = a.Id, Identity = i }),
+                t => t.Transaction.DebtorAccountId,
                 i => i.DomainAccountId,
-                (t, i) => new HolderTransactionDto
-                {
-                    Id = t.Transaction.Id,
-                    Timestamp = t.Transaction.Timestamp,
-                    CreditorId = t.Transaction.Creditor.Id,
-                    CreditorName = t.Creditor.FirstName + " " + t.Creditor.LastName,
-                    DebtorId = t.Transaction.Debtor.Id,
-                    DebtorName = i.Identity.FirstName + " " + i.Identity.LastName,
-                    UnitId = t.Value.Id,
-                    UnitTicker = t.Value.Ticker,
-                    UnitIssuerId = t.Value.IssuerIdentityId,
-                    Amount = t.Transaction.Quantity.Amount,
-                    Items = t.Transaction.TransactionItems.Select(item => new VoucherQuantityDto
-                    {
-                        Amount = item.Quantity.Amount,
-                        Unit = new VoucherDto
-                        {
-                            Id = item.Quantity.Unit.Id,
-                            ValidFrom = item.Quantity.Unit.ValidFrom,
-                            ValidTo = item.Quantity.Unit.ValidTo,
-                            CanBeExchanged = item.Quantity.Unit.CanBeExchanged,
-                            Supply = item.Quantity.Unit.Supply,
-                            Balance = 0
-                        }
-                    })
+                (res, i) => new {
+                    res.Transaction,
+                    res.Value,
+                    res.Creditor,
+                    res.UnitIssuer,
+                    Debtor = i.Identity
                 }
             );
+
+            if (query.CounterpartyName != null)
+                holderTransactionsQueryWithIdentities = holderTransactionsQueryWithIdentities.Where(t =>
+                    t.Debtor.Id == authIdentityId && ((t.Creditor.FirstName + " " + t.Creditor.LastName).Contains(query.CounterpartyName) || t.Creditor.Email.Contains(query.CounterpartyName)) ||
+                    t.Creditor.Id == authIdentityId && ((t.Debtor.FirstName + " " + t.Debtor.LastName).Contains(query.CounterpartyName) || t.Debtor.Email.Contains(query.CounterpartyName)));
+
+            return holderTransactionsQueryWithIdentities.Select(t => new HolderTransactionDto
+            {
+                Id = t.Transaction.Id,
+                Timestamp = t.Transaction.Timestamp,
+                CreditorAccountId = t.Transaction.CreditorAccount.Id,
+                CreditorName = t.Creditor.FirstName + " " + t.Creditor.LastName,
+                CreditorEmail = t.Creditor.Email,
+                CreditorImageId = t.Creditor.ImageId,
+
+                DebtorAccountId = t.Transaction.DebtorAccount.Id,
+                DebtorName = t.Debtor.FirstName + " " + t.Debtor.LastName,
+                DebtorEmail = t.Debtor.Email,
+                DebtorImageId = t.Debtor.ImageId,
+
+                UnitTypeId = t.Value.Id,
+                UnitTicker = t.Value.Ticker,
+                UnitImageId = t.Value.ImageId,
+
+                UnitIssuerId = t.Value.IssuerIdentityId,
+                UnitIssuerName = t.UnitIssuer.FirstName + " " + t.UnitIssuer.LastName,
+                UnitIssuerEmail = t.UnitIssuer.Email,
+                Amount = t.Transaction.Quantity.Amount,
+                Message = t.Transaction.Message,
+                Items = t.Transaction.TransactionItems.Select(item => new VoucherQuantityDto
+                {
+                    Amount = item.Quantity.Amount,
+                    Unit = new VoucherDto
+                    {
+                        Id = item.Quantity.Unit.Id,
+                        ValidFrom = item.Quantity.Unit.ValidFrom,
+                        ValidTo = item.Quantity.Unit.ValidTo,
+                        CanBeExchanged = item.Quantity.Unit.CanBeExchanged,
+                        Supply = item.Quantity.Unit.Supply,
+                        Balance = 0
+                    }
+                })
+            }
+            ).OrderByDescending(value => value.Timestamp);
+
+            
+
+            
         }
     }
 }

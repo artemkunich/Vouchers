@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Vouchers.Application.Queries
 {
-    public class DomainAccountsQuery
+    public sealed class DomainAccountsQuery
     {
         [Required]
         public Guid DomainId { get; set; }

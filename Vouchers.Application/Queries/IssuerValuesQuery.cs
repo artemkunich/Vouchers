@@ -5,10 +5,10 @@ using System.Text;
 
 namespace Vouchers.Application.Queries
 {
-    public class IssuerValuesQuery
+    public sealed class IssuerValuesQuery : ListQuery
     {
         [Required]
-        public Guid IssuerDomainAccountId { get; set; }
+        public Guid IssuerAccountId { get; set; }
 
         public string Ticker { get; set; }
     }

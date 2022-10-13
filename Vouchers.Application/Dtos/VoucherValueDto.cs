@@ -6,11 +6,15 @@ using System.Threading.Tasks;
 
 namespace Vouchers.Application.Dtos
 {
-    public class VoucherValueDto
+    public sealed class VoucherValueDto
     {
         public Guid Id { get; set; }
 
-        public Guid IssuerId { get; set; }
+        public Guid IssuerAccountId { get; set; }
+
+        public string IssuerName { get; set; }
+
+        public string IssuerEmail { get; set; }
 
         public decimal Supply { get; set; }
 
@@ -20,8 +24,7 @@ namespace Vouchers.Application.Dtos
 
         public string Description { get; set; }
 
-        public string ImageBase64 { get; set; }
+        public Guid? ImageId { get; set; }
 
-        public ICollection<VoucherDto> Vouchers { get; set; }
     }
 }

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Vouchers.Application.Queries
 {
-    public class IdentityDomainAccountsQuery
+    public sealed class IdentityDomainAccountsQuery : ListQuery
     {
         public string DomainName { get; set; }
     }

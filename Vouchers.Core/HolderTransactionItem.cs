@@ -5,7 +5,7 @@ using Vouchers.Entities;
 
 namespace Vouchers.Core
 {
-    public class HolderTransactionItem : Entity
+    public sealed class HolderTransactionItem : Entity
     {
         public UnitQuantity Quantity { get; }
 
@@ -29,7 +29,7 @@ namespace Vouchers.Core
             if (debitAccountItem.Unit.NotEquals(quantity.Unit))
                 throw new CoreException("Debit account and item have different units");
 
-            if(!quantity.Unit.CanBeExchanged && creditAccountItem.Holder.NotEquals(quantity.Unit.UnitType.Issuer) && debitAccountItem.Holder.NotEquals(quantity.Unit.UnitType.Issuer))
+            if(!quantity.Unit.CanBeExchanged && creditAccountItem.HolderAccount.NotEquals(quantity.Unit.UnitType.IssuerAccount) && debitAccountItem.HolderAccount.NotEquals(quantity.Unit.UnitType.IssuerAccount))
                 throw new CoreException("Item's unit cannot be exchanged");
 
             Quantity = quantity;

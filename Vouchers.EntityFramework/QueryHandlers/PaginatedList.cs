@@ -8,7 +8,7 @@ using Vouchers.Application.Queries;
 
 namespace Vouchers.EntityFramework.QueryHandlers
 {
-    public class PaginatedList<T> : List<T>
+    internal sealed class PaginatedList<T> : List<T>
     {
         public int PageIndex { get; private set; }
         public int TotalPages { get; private set; }

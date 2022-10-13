@@ -13,8 +13,9 @@ namespace Vouchers.EntityFramework.Configurations
         public void Configure(EntityTypeBuilder<HolderTransactionItem> builder)
         {
             builder.ToTable(nameof(HolderTransactionItem));
-
+            
             builder.HasKey(item => item.Id);
+            builder.Property(item => item.Id).IsRequired().ValueGeneratedNever();
 
             builder
                 .OwnsOne(item => item.Quantity)

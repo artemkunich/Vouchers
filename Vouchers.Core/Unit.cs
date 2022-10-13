@@ -3,7 +3,7 @@ using Vouchers.Entities;
 
 namespace Vouchers.Core
 {
-    public class Unit : Entity
+    public sealed class Unit : Entity
     {
         public Guid UnitTypeId { get; }
         public UnitType UnitType { get; }

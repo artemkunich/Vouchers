@@ -10,12 +10,12 @@ using Vouchers.Entities;
 
 namespace Vouchers.EntityFramework.Repositories
 {
-    public class Repository<TEntity> : IRepository<TEntity> where TEntity : Entity
+    public abstract class Repository<TEntity> : IRepository<TEntity> where TEntity : Entity
     {
         VouchersDbContext _dbContext;
         protected VouchersDbContext DbContext => _dbContext;
 
-        public Repository(VouchersDbContext context)
+        protected Repository(VouchersDbContext context)
         {
             _dbContext = context;
         }

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Vouchers.Application.Queries
 {
-    public class LoginsQuery : Query
+    public sealed class LoginsQuery : ListQuery
     {
         public string LoginName { get; set; }
 

@@ -15,37 +15,37 @@ using Vouchers.Values;
 
 namespace Vouchers.EntityFramework.QueryHandlers
 {
-    public class HolderVouchersQueryHandler : IAuthIdentityHandler<HolderVouchersQuery,IEnumerable<VoucherDto>>
+    internal sealed class HolderVouchersQueryHandler : IAuthIdentityHandler<HolderVouchersQuery,IEnumerable<VoucherDto>>
     {
-        VouchersDbContext dbContext;
+        VouchersDbContext _dbContext;
 
         public HolderVouchersQueryHandler(VouchersDbContext dbContext)
         {
-            this.dbContext = dbContext;
+            _dbContext = dbContext;
         }
 
         public async Task<IEnumerable<VoucherDto>> HandleAsync(HolderVouchersQuery query, Guid authIdentityId, CancellationToken cancellation)
         {
-            var issuerDomainAccount = await dbContext.DomainAccounts.Where(x => x.IdentityId == authIdentityId).FirstOrDefaultAsync();
+            var issuerDomainAccount = await _dbContext.DomainAccounts.Where(x => x.IdentityId == authIdentityId).FirstOrDefaultAsync();
             if (issuerDomainAccount is null)
                 return new List<VoucherDto>();
 
-            var authDomainAccounts = await dbContext.DomainAccounts.Where(a => a.IdentityId == authIdentityId && a.DomainId == issuerDomainAccount.DomainId).ToListAsync();
+            var authDomainAccounts = await _dbContext.DomainAccounts.Where(a => a.IdentityId == authIdentityId && a.DomainId == issuerDomainAccount.DomainId).ToListAsync();
             if (!authDomainAccounts.Any())
                 return new List<VoucherDto>();
 
             var authDomainAccount = authDomainAccounts.FirstOrDefault();
 
-            var accountsQuery = dbContext.AccountItems
-                .Include(account => account.Holder)
+            var accountsQuery = _dbContext.AccountItems
+                .Include(account => account.HolderAccount)
                 .Include(account => account.Unit).ThenInclude(unit => unit.UnitType)
-                .Where(account => account.Holder.Id == authDomainAccount.Id);
+                .Where(account => account.HolderAccount.Id == authDomainAccount.Id);
 
-            var vouchersQuery = dbContext.Units.Where(
-                voucher => dbContext.AccountItems
-                .Include(acc => acc.Holder)
+            var vouchersQuery = _dbContext.Units.Where(
+                voucher => _dbContext.AccountItems
+                .Include(acc => acc.HolderAccount)
                 .Include(acc => acc.Unit)
-                .Where(acc => acc.Holder.Id == authDomainAccount.Id && acc.Balance > 0).Select(acc => acc.Unit.Id)
+                .Where(acc => acc.HolderAccount.Id == authDomainAccount.Id && acc.Balance > 0).Select(acc => acc.Unit.Id)
                 .Contains(voucher.Id) && voucher.ValidTo >= DateTime.Today && voucher.UnitType.Id == query.ValueId
             );
 

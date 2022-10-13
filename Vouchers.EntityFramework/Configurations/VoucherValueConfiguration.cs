@@ -23,6 +23,8 @@ namespace Vouchers.EntityFramework.Configurations
             
             builder.Property(value => value.Ticker).IsRequired();
 
+            builder.Property(value => value.IssuerIdentityId).IsRequired();
+
             builder.Property<byte[]>("RowVersion").IsRowVersion();
         }
     }

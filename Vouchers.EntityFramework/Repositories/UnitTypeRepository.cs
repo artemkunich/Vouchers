@@ -9,7 +9,7 @@ using Vouchers.Core;
 
 namespace Vouchers.EntityFramework.Repositories
 {
-    public class UnitTypeRepository : Repository<UnitType>
+    public sealed class UnitTypeRepository : Repository<UnitType>
     {
         public UnitTypeRepository(VouchersDbContext dbContext) : base(dbContext)
         {
@@ -17,22 +17,22 @@ namespace Vouchers.EntityFramework.Repositories
 
         public override async Task<UnitType> GetByIdAsync(Guid id) =>
             await DbContext.UnitTypes
-                .Include(unitType => unitType.Issuer)
+                .Include(unitType => unitType.IssuerAccount)
                 .FirstOrDefaultAsync(unitType => unitType.Id == id);
 
         public override UnitType GetById(Guid id) =>
             DbContext.UnitTypes
-                .Include(unitType => unitType.Issuer)
+                .Include(unitType => unitType.IssuerAccount)
                 .FirstOrDefault(unitType => unitType.Id == id);
 
         public override async Task<IEnumerable<UnitType>> GetByExpressionAsync(Expression<Func<UnitType,bool>> expression) =>
             await DbContext.UnitTypes
-                .Include(unitType => unitType.Issuer)
+                .Include(unitType => unitType.IssuerAccount)
                 .Where(expression).ToListAsync();
 
         public override IEnumerable<UnitType> GetByExpression(Expression<Func<UnitType, bool>> expression) =>
             DbContext.UnitTypes
-                .Include(unitType => unitType.Issuer)
+                .Include(unitType => unitType.IssuerAccount)
                 .Where(expression).ToList();
 
     }

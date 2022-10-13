@@ -13,13 +13,13 @@ using Vouchers.Core;
 
 namespace Vouchers.EntityFramework.QueryHandlers
 {
-    public class IssuerTransactionsQueryHandler : IAuthIdentityHandler<IssuerTransactionsQuery,IEnumerable<IssuerTransactionDto>>
+    internal sealed class IssuerTransactionsQueryHandler : IAuthIdentityHandler<IssuerTransactionsQuery,IEnumerable<IssuerTransactionDto>>
     {
-        VouchersDbContext dbContext;
+        VouchersDbContext _dbContext;
 
         public IssuerTransactionsQueryHandler(VouchersDbContext dbContext)
         {
-            this.dbContext = dbContext;
+            _dbContext = dbContext;
         }
 
         public IEnumerable<IssuerTransactionDto> Handle(IssuerTransactionsQuery query, Guid authIdentityId, CancellationToken cancellation) =>
@@ -31,9 +31,9 @@ namespace Vouchers.EntityFramework.QueryHandlers
         IQueryable<IssuerTransactionDto> GetQuery(IssuerTransactionsQuery query, Guid authIdentityId) 
         {
 
-            var issuerTransactionsQuery = dbContext.IssuerTransactions
-                .Include(tr => tr.Quantity.Unit).ThenInclude(unit => unit.UnitType).ThenInclude(value => value.Issuer)
-                .Join(dbContext.VoucherValues, 
+            var issuerTransactionsQuery = _dbContext.IssuerTransactions
+                .Include(tr => tr.Quantity.Unit).ThenInclude(unit => unit.UnitType).ThenInclude(value => value.IssuerAccount)
+                .Join(_dbContext.VoucherValues, 
                     t => t.Quantity.Unit.UnitTypeId,
                     v => v.Id,
                     (t,v) => new { Transaction = t, Value = v }
@@ -50,7 +50,7 @@ namespace Vouchers.EntityFramework.QueryHandlers
             if (query.MaxTimestamp != null)
                 issuerTransactionsQuery.Where(tr => tr.Timestamp <= query.MaxTimestamp);
 
-            var voucherValuesQuery = dbContext.VoucherValues
+            var voucherValuesQuery = _dbContext.VoucherValues
                 .Where(value => value.IssuerIdentityId == authIdentityId);
 
             return issuerTransactionsQuery.Join(

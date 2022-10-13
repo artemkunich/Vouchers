@@ -16,13 +16,13 @@ using System.Threading;
 
 namespace Vouchers.EntityFramework.QueryHandlers
 {
-    public class IdentityDomainAccountsQueryHandler : IAuthIdentityHandler<IdentityDomainAccountsQuery, IEnumerable<DomainAccountDto>>
+    internal sealed class IdentityDomainAccountsQueryHandler : IAuthIdentityHandler<IdentityDomainAccountsQuery, IEnumerable<DomainAccountDto>>
     {
-        VouchersDbContext dbContext;
+        VouchersDbContext _dbContext;
 
         public IdentityDomainAccountsQueryHandler(VouchersDbContext dbContext)
         {           
-            this.dbContext = dbContext;
+            _dbContext = dbContext;
         }
 
         public async Task<IEnumerable<DomainAccountDto>> HandleAsync(IdentityDomainAccountsQuery query, Guid authIdentityId, CancellationToken cancellation) =>
@@ -33,7 +33,7 @@ namespace Vouchers.EntityFramework.QueryHandlers
 
         private IQueryable<DomainAccountDto> GetQuery(IdentityDomainAccountsQuery query, Guid authIdentityId) 
         {
-            var domainAccountsQuery = dbContext.DomainAccounts
+            var domainAccountsQuery = _dbContext.DomainAccounts
                 .Include(a => a.Domain).ThenInclude(d => d.Contract)
                 .Where(a => a.IdentityId == authIdentityId && a.IsConfirmed);
 

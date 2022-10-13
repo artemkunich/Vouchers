@@ -16,7 +16,7 @@ using System.Threading;
 
 namespace Vouchers.EntityFramework.QueryHandlers
 {
-    public class DomainAccountsQueryHandler : IAuthIdentityHandler<DomainAccountsQuery, IEnumerable<DomainAccountDto>>
+    internal sealed class DomainAccountsQueryHandler : IAuthIdentityHandler<DomainAccountsQuery, IEnumerable<DomainAccountDto>>
     {
         VouchersDbContext _dbContext;
 
@@ -50,7 +50,7 @@ namespace Vouchers.EntityFramework.QueryHandlers
                 authIdentityDomainAccountQuery,
                 a => a.Domain.Id,
                 a => a.Domain.Id,
-                (a, c) => new DomainAccountDto
+                (a, c) => new
                 {
                     Id = a.Id,
                     DomainName = a.Domain.Contract.DomainName,
@@ -71,38 +71,23 @@ namespace Vouchers.EntityFramework.QueryHandlers
             if (query.Name is not null)
                 identitiesQuery = identitiesQuery.Where(identity => (identity.FirstName + " " + identity.LastName).Contains(query.Name));
 
-            var identitiesWithImageQuery = identitiesQuery.GroupJoin(
-                _dbContext.Images.AsQueryable(),
-                identity => identity.ImageId,
-                image => image.Id,
-                (identity, images) => new {
-                    IdentityId = identity.Id,
-                    Identity = identity,
-                    Images = images
-                }
-            ).SelectMany(
-                result => result.Images.DefaultIfEmpty(),
-                (result, image) => new {result.IdentityId, result.Identity, Image=image}
-            );
-
             return resultQuery.Join(
-                identitiesWithImageQuery,
+                identitiesQuery,
                 a => a.IdentityId,
-                i => i.IdentityId,
-                (a, i) =>
+                i => i.Id,
+                (account, identity) =>
                 new DomainAccountDto()
                 {
-                    Id = a.Id,
-                    DomainId = a.DomainId,
-                    DomainName = a.DomainName,
-                    IdentityId = a.IdentityId,
-                    Email = i.Identity.Email,
-                    Name = i.Identity.FirstName + " " + i.Identity.LastName,
-                    IsAdmin = a.IsAdmin,
-                    IsIssuer = a.IsIssuer,
-                    IsOwner = a.IsOwner,
-                    IsConfirmed = a.IsConfirmed,
-                    ImageBase64 = i.Image == null ? null : Convert.ToBase64String(i.Image.CroppedContent)
+                    Id = account.Id,
+                    DomainId = account.DomainId,
+                    DomainName = account.DomainName,
+                    Email = identity.Email,
+                    Name = identity.FirstName + " " + identity.LastName,
+                    IsAdmin = account.IsAdmin,
+                    IsIssuer = account.IsIssuer,
+                    IsOwner = account.IsOwner,
+                    IsConfirmed = account.IsConfirmed,
+                    ImageId = identity.ImageId
                 }
             );
         }

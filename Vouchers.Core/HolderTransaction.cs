@@ -5,38 +5,41 @@ using Vouchers.Entities;
 
 namespace Vouchers.Core
 {
-    public class HolderTransaction : Entity
+    public sealed class HolderTransaction : Entity
     {
         public DateTime Timestamp { get; private set; }
 
-        public Guid CreditorId { get;}
-        public Account Creditor { get; }
+        public Guid CreditorAccountId { get;}
+        public Account CreditorAccount { get; }
 
-        public Guid DebtorId { get;}
-        public Account Debtor { get; }
+        public Guid DebtorAccountId { get;}
+        public Account DebtorAccount { get; }
         
         public UnitTypeQuantity Quantity { get; private set; }
 
         public ICollection<HolderTransactionItem> TransactionItems { get; }
 
+        public string Message { get; }
         public bool IsPerformed { get; private set; }
 
-        public static HolderTransaction Create(Account creditor, Account debtor, UnitType value) =>
-            new HolderTransaction(Guid.NewGuid(), DateTime.Now, creditor, debtor, value);
+        public static HolderTransaction Create(Account creditorAccount, Account debtorAccount, UnitType value, string message) =>
+            new HolderTransaction(Guid.NewGuid(), DateTime.Now, creditorAccount, debtorAccount, value, message);
 
-        internal HolderTransaction(Guid id, DateTime timestamp, Account creditor, Account debtor, UnitType unitType) : base(id)
+        internal HolderTransaction(Guid id, DateTime timestamp, Account creditorAccount, Account debtorAccount, UnitType unitType, string message) : base(id)
         {
             Timestamp = timestamp;
 
-            CreditorId = creditor.Id;
-            Creditor = creditor;
+            CreditorAccountId = creditorAccount.Id;
+            CreditorAccount = creditorAccount;
 
-            DebtorId = debtor.Id;
-            Debtor = debtor;            
+            DebtorAccountId = debtorAccount.Id;
+            DebtorAccount = debtorAccount;            
 
             Quantity = UnitTypeQuantity.Create(0, unitType);
 
-            if (Creditor.Equals(Debtor))
+            Message = message;
+
+            if (CreditorAccount.Equals(DebtorAccount))
                 throw new CoreException("Creditor and debtor are the same");
 
             TransactionItems = new List<HolderTransactionItem>();            

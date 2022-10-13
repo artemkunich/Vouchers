@@ -17,13 +17,13 @@ using System.Threading;
 
 namespace Vouchers.EntityFramework.QueryHandlers
 {
-    public class IdentityDomainOffersQueryHandler : IAuthIdentityHandler<IdentityDomainOffersQuery, IEnumerable<DomainOfferDto>>
+    internal sealed class IdentityDomainOffersQueryHandler : IAuthIdentityHandler<IdentityDomainOffersQuery, IEnumerable<DomainOfferDto>>
     {
-        VouchersDbContext dbContext;
+        VouchersDbContext _dbContext;
 
         public IdentityDomainOffersQueryHandler(VouchersDbContext dbContext)
         {           
-            this.dbContext = dbContext;
+            _dbContext = dbContext;
         }
 
         public async Task<IEnumerable<DomainOfferDto>> HandleAsync(IdentityDomainOffersQuery query, Guid authIdentityId, CancellationToken cancellation) =>
@@ -31,11 +31,11 @@ namespace Vouchers.EntityFramework.QueryHandlers
 
         IQueryable<DomainOfferDto> GetQuery(IdentityDomainOffersQuery query, Guid authIdentityId)
         {
-            IQueryable<DomainOffer> domainOffersQuery = dbContext.DomainOffers.Where(offer => offer.RecipientId == null || offer.RecipientId == authIdentityId);
+            IQueryable<DomainOffer> domainOffersQuery = _dbContext.DomainOffers.Where(offer => offer.RecipientId == null || offer.RecipientId == authIdentityId);
             domainOffersQuery = domainOffersQuery.Where(offer => offer.ValidFrom <= DateTime.Now && offer.ValidTo > DateTime.Now);
 
             return domainOffersQuery.GroupJoin(
-                dbContext.DomainOffersPerIdentityCounters.Where(counter => counter.IdentityId == authIdentityId),
+                _dbContext.DomainOffersPerIdentityCounters.Where(counter => counter.IdentityId == authIdentityId),
                 offer => offer.Id, 
                 counter => counter.OfferId,
                 (offer, counters) => new { Offer = offer, Counters = counters }

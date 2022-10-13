@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Vouchers.Application.Queries
 {
-    public class SubscribersQuery
+    public sealed class SubscribersQuery : ListQuery
     {
         [Required]
         public Guid DomainId { get; set; }

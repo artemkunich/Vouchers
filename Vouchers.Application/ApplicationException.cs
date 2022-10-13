@@ -4,9 +4,9 @@ using System.Text;
 
 namespace Vouchers.Application
 {
-    public class NotRegisteredException : ApplicationException
+    public class ApplicationException : Exception
     {
-        internal NotRegisteredException() : base("User is not registered")
+        internal ApplicationException(string message) : base(message)
         {
         }
     }

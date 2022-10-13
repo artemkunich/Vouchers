@@ -15,8 +15,9 @@ namespace Vouchers.EntityFramework.Configurations
             builder.ToTable(nameof(AccountItem));
 
             builder.HasKey(account => account.Id);
+            builder.Property(account => account.Id).IsRequired().ValueGeneratedNever();
 
-            builder.HasIndex(item => new { item.HolderId, item.UnitId });  //account => new { account.OwnerId, account.UnitId }).IsUnique();
+            builder.HasIndex(item => new { item.HolderAccountId, item.UnitId });  //account => new { account.OwnerId, account.UnitId }).IsUnique();
 
             builder.Property<byte[]>("RowVersion").IsRowVersion();
 
@@ -25,9 +26,9 @@ namespace Vouchers.EntityFramework.Configurations
                     .HasPrecision(18, 2);
 
             builder
-                .HasOne(account=>account.Holder)
+                .HasOne(account=>account.HolderAccount)
                 .WithMany()
-                .HasForeignKey(account => account.HolderId)
+                .HasForeignKey(account => account.HolderAccountId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder

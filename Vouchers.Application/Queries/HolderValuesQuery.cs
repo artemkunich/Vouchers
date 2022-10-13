@@ -5,11 +5,13 @@ using System.Text;
 
 namespace Vouchers.Application.Queries
 {
-    public class HolderValuesQuery
+    public sealed class HolderValuesQuery : ListQuery
     {
         [Required]
         public Guid HolderId { get; set; }
 
         public string Ticker { get; set; }
+
+        public string IssuerName { get; set; }
     }
 }

@@ -6,7 +6,7 @@ using Vouchers.Entities;
 
 namespace Vouchers.Domains
 {
-    public class DomainAccount : Entity
+    public sealed class DomainAccount : Entity
     {
         public Guid IdentityId { get; }
 
@@ -18,6 +18,8 @@ namespace Vouchers.Domains
         public bool IsIssuer { get; set; }
 
         public bool IsAdmin { get; set; }
+
+        public bool IsOwner => IdentityId == Domain.Contract.PartyId;
 
         public bool IsConfirmed { get; set; }
 

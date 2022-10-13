@@ -4,7 +4,7 @@
     {
         public Guid Id { get; }
 
-        public Entity(Guid id)
+        protected Entity(Guid id)
         {
             Id = id;
         }

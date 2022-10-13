@@ -9,7 +9,7 @@ using Vouchers.Identities;
 
 namespace Vouchers.Application.UseCases
 {
-    public class AuthIdentityHandler<TMessage> : IHandler<TMessage>
+    public sealed class AuthIdentityHandler<TMessage> : IHandler<TMessage>
     {
         private readonly IRepository<Login> _loginRepository;
         IAuthIdentityHandler<TMessage> _handler;

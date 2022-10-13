@@ -15,7 +15,7 @@ using Vouchers.Values;
 
 namespace Vouchers.EntityFramework
 {
-    public class VouchersDbContext : DbContext
+    public sealed class VouchersDbContext : DbContext
     {
         public VouchersDbContext()
         {
@@ -30,6 +30,7 @@ namespace Vouchers.EntityFramework
 
             modelBuilder.ApplyConfiguration(new AccountConfiguration());
             modelBuilder.ApplyConfiguration(new HolderTransactionConfiguration());
+            modelBuilder.ApplyConfiguration(new HolderTransactionRequestConfiguration());
             modelBuilder.ApplyConfiguration(new HolderTransactionItemConfiguration());
             modelBuilder.ApplyConfiguration(new IssuerTransactionConfiguration());
             modelBuilder.ApplyConfiguration(new UnitConfiguration());
@@ -48,7 +49,7 @@ namespace Vouchers.EntityFramework
             modelBuilder.ApplyConfiguration(new DomainOffersPerIdentityCounterConfiguration());
             modelBuilder.ApplyConfiguration(new DomainAccountConfiguration());
 
-            modelBuilder.ApplyConfiguration(new AppImageConfiguration());
+            modelBuilder.ApplyConfiguration(new CroppedImageConfiguration());
 
         }
 
@@ -64,6 +65,7 @@ namespace Vouchers.EntityFramework
         public DbSet<HolderTransaction> HolderTransactions { get; set; }
         public DbSet<HolderTransactionItem> HolderTransactionItems { get; set; }
         public DbSet<IssuerTransaction> IssuerTransactions { get; set; }
+        public DbSet<HolderTransactionRequest> HolderTransactionRequests { get; set; }
         public DbSet<Unit> Units { get; set; }        
         public DbSet<UnitType> UnitTypes { get; set; }
 
@@ -93,7 +95,7 @@ namespace Vouchers.EntityFramework
         #endregion
 
         #region Images
-        public DbSet<AppImage> Images { get; set; }
+        public DbSet<CroppedImage> CroppedImages { get; set; }
         #endregion
     }
 }

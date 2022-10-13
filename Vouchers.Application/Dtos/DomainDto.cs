@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Vouchers.Application.Dtos
 {
-    public class DomainDto
+    public sealed class DomainDto
     {
         public Guid Id { get; set; }
 
@@ -15,5 +15,7 @@ namespace Vouchers.Application.Dtos
         public bool IsPublic { get; set; }
 
         public int MembersCount { get; set; }
+
+        public Guid? ImageId { get; set; }
     }
 }

@@ -14,32 +14,29 @@ using Vouchers.Values;
 
 namespace Vouchers.EntityFramework.QueryHandlers
 {
-    public class IssuerValuesQueryHandler : IAuthIdentityHandler<IssuerValuesQuery,IEnumerable<VoucherValueDto>>
+    internal sealed class IssuerValuesQueryHandler : IAuthIdentityHandler<IssuerValuesQuery,IEnumerable<VoucherValueDto>>
     {
-        VouchersDbContext dbContext;
+        VouchersDbContext _dbContext;
 
         public IssuerValuesQueryHandler(VouchersDbContext dbContext)
         {
-            this.dbContext = dbContext;
+            _dbContext = dbContext;
         }     
 
         public async Task<IEnumerable<VoucherValueDto>> HandleAsync(IssuerValuesQuery query, Guid authIdentityId, CancellationToken cancellation)
         {
-            var issuerDomainAccount = await dbContext.DomainAccounts.Include(a => a.Domain).FirstOrDefaultAsync(a => a.Id == query.IssuerDomainAccountId);
+            var issuerDomainAccount = await _dbContext.DomainAccounts.Include(a => a.Domain).FirstOrDefaultAsync(a => a.Id == query.IssuerAccountId);
             if(issuerDomainAccount is null)
                 return new List<VoucherValueDto>();
 
-            var authDomainAccounts = await dbContext.DomainAccounts.Where(a => a.IdentityId == authIdentityId && a.Domain.Id == issuerDomainAccount.Domain.Id).ToListAsync();
+            var authDomainAccounts = await _dbContext.DomainAccounts.Where(a => a.IdentityId == authIdentityId && a.Domain.Id == issuerDomainAccount.Domain.Id).ToListAsync();
 
             if(!authDomainAccounts.Any())
                 return new List<VoucherValueDto>();
 
-            var valuesQuery = dbContext.VoucherValues.AsQueryable()
-                .Join(dbContext.UnitTypes, v => v.Id, u => u.Id, (v,u) => new { Value = v, UnitType = u })
-                .GroupJoin(dbContext.Images, o => o.Value.ImageId, i => i.Id, (o, imgs) => new { Value = o.Value, UnitType = o.UnitType, Images = imgs }).SelectMany(
-                    result => result.Images.DefaultIfEmpty(),
-                    (result, image) => new {result.Value, result.UnitType, Image = image} 
-                );
+            var valuesQuery = _dbContext.VoucherValues.AsQueryable()
+                .Join(_dbContext.UnitTypes, v => v.Id, u => u.Id, (v, u) => new { Value = v, UnitType = u });
+
             if (query.Ticker is not null)
                 valuesQuery = valuesQuery.Where(o => o.Value.Ticker.Contains(query.Ticker));
 
@@ -49,11 +46,11 @@ namespace Vouchers.EntityFramework.QueryHandlers
                     new VoucherValueDto
                     {
                         Id = o.Value.Id,
-                        IssuerId = o.Value.IssuerIdentityId,
+                        IssuerAccountId = o.UnitType.IssuerAccountId,
                         Supply = o.UnitType.Supply,
                         Ticker = o.Value.Ticker,
                         Description = o.Value.Description,
-                        ImageBase64 = o.Image == null ? null : Convert.ToBase64String(o.Image.CroppedContent)
+                        ImageId = o.Value.ImageId,
                     }
                 ).ToListAsync();          
         }

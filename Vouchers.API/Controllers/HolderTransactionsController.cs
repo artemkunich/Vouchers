@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Vouchers.Application.Commands;
+using Vouchers.Application.Commands.HolderTransactionCommands;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Queries;
@@ -13,26 +13,26 @@ namespace Vouchers.API.Controllers
     [ApiController]
     [Route("[controller]")]
     [Authorize(Roles = "User")]
-    public class HolderTransactionsController : Controller
+    public sealed class HolderTransactionsController : Controller
     {
-        private readonly IDispatcher dispatcher;
+        private readonly IDispatcher _dispatcher;
 
         public HolderTransactionsController(IDispatcher dispatcher)
         {
-            this.dispatcher = dispatcher;
+            _dispatcher = dispatcher;
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get([FromQuery] HolderValuesQuery query)
+        public async Task<IActionResult> Get([FromQuery] HolderTransactionsQuery query)
         {
-            var result = await dispatcher.DispatchAsync<HolderValuesQuery, IEnumerable<HolderTransactionDto>>(query);
+            var result = await _dispatcher.DispatchAsync<HolderTransactionsQuery, IEnumerable<HolderTransactionDto>>(query);
             return Json(result);
         }
 
         [HttpPost]
         public async Task<IActionResult> Post(CreateHolderTransactionCommand command)
         {
-            var holderTransactionId = await dispatcher.DispatchAsync<CreateHolderTransactionCommand, Guid>(command);
+            var holderTransactionId = await _dispatcher.DispatchAsync<CreateHolderTransactionCommand, Guid>(command);
             return Json(new { HolderTransactionId = holderTransactionId });
         }
     }

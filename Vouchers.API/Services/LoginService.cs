@@ -4,27 +4,27 @@ using Vouchers.Application.Infrastructure;
 
 namespace Vouchers.API.Services
 {
-    public class LoginService : ILoginService
+    public sealed class LoginService : ILoginService
     {
-        IHttpContextAccessor httpContextAccessor;
+        IHttpContextAccessor _httpContextAccessor;
 
         public LoginService(IHttpContextAccessor httpContextAccessor)
         {
-            this.httpContextAccessor = httpContextAccessor;
+            _httpContextAccessor = httpContextAccessor;
         }
 
-        public string CurrentLoginName { get => httpContextAccessor.HttpContext.User.Identity.Name; }
+        public string CurrentLoginName { get => _httpContextAccessor.HttpContext.User.Identity.Name; }
     }
 
-    public class JWTLoginService : ILoginService
+    public sealed class JWTLoginService : ILoginService
     {
-        IHttpContextAccessor httpContextAccessor;
+        IHttpContextAccessor _httpContextAccessor;
 
         public JWTLoginService(IHttpContextAccessor httpContextAccessor)
         {
-            this.httpContextAccessor = httpContextAccessor;
+            _httpContextAccessor = httpContextAccessor;
         }
 
-        public string CurrentLoginName { get => httpContextAccessor.HttpContext.User.Claims.Where(c => c.Type.ToLower() == "name").Select(c => c.Value).FirstOrDefault(); }
+        public string CurrentLoginName { get => _httpContextAccessor.HttpContext.User.Claims.Where(c => c.Type.ToLower() == "name").Select(c => c.Value).FirstOrDefault(); }
     }
 }

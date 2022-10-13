@@ -9,18 +9,18 @@ using Vouchers.Application.UseCases;
 
 namespace Vouchers.EntityFramework.QueryHandlers
 {
-    public class IdentityQueryHandler : IHandler<string, Guid?>
+    internal sealed class IdentityQueryHandler : IHandler<string, Guid?>
     {
-        VouchersDbContext dbContext;
+        VouchersDbContext _dbContext;
 
         public IdentityQueryHandler(VouchersDbContext dbContext)
         {
-            this.dbContext = dbContext;
+            _dbContext = dbContext;
         }
 
         public async Task<Guid?> HandleAsync(string loginName, CancellationToken cancellation)
         {
-            var login = await dbContext.Logins.Include(login => login.Identity).Where(l => l.LoginName == loginName).FirstOrDefaultAsync();
+            var login = await _dbContext.Logins.Include(login => login.Identity).Where(l => l.LoginName == loginName).FirstOrDefaultAsync();
 
             return login?.Identity.Id;
         }

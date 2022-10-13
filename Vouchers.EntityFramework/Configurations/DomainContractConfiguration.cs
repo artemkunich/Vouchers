@@ -28,6 +28,15 @@ namespace Vouchers.EntityFramework.Configurations
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder
+                .HasIndex(contract => contract.OffersPerIdentityCounterId)
+                .IsUnique();
+            builder
+                .HasOne(contract => contract.OffersPerIdentityCounter)
+                .WithMany()
+                .HasForeignKey(contract => contract.OffersPerIdentityCounterId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder
                 .Property(contract => contract.PartyId)
                 .IsRequired();
             builder

@@ -6,7 +6,7 @@ using Vouchers.Entities;
 
 namespace Vouchers.Core
 {
-    public class Account : Entity
+    public sealed class Account : Entity
     {
         public DateTime CreatedDateTime { get; }
         public decimal Supply { get; private set; }

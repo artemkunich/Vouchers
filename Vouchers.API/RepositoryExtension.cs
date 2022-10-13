@@ -15,7 +15,7 @@ namespace Vouchers.API
         public static void AddRepositories(this IServiceCollection services)
         {
             services.AddScoped<IRepository<AccountItem>,AccountItemRepository>();
-            services.AddScoped<IRepository<CollectionRequest>, CollectionRequestRepository>();
+            services.AddScoped<IRepository<HolderTransactionRequest>, HolderTransactionRequestRepository>();
             services.AddScoped<IRepository<DomainAccount>, DomainAccountRepository>();
             services.AddScoped<IRepository<DomainContract>, DomainContractRepository>();
             services.AddScoped<IRepository<DomainOffersPerIdentityCounter>, DomainOffersPerIdentityCounterRepository>();
@@ -24,14 +24,14 @@ namespace Vouchers.API
             services.AddScoped<IRepository<Unit>, UnitRepository>();
             services.AddScoped<IRepository<UnitType>, UnitTypeRepository>();
 
-            services.AddScoped<IRepository<Account>, Repository<Account>>();
-            services.AddScoped<IRepository<HolderTransaction>, Repository<HolderTransaction>>();
-            services.AddScoped<IRepository<HolderTransactionItem>, Repository<HolderTransactionItem>>();
-            services.AddScoped<IRepository<IssuerTransaction>, Repository<IssuerTransaction>>();
-            services.AddScoped<IRepository<DomainOffer>, Repository<DomainOffer>>();
-            services.AddScoped<IRepository<VoucherValue>, Repository<VoucherValue>>();
-            services.AddScoped<IRepository<Identity>, Repository<Identity>>();
-            services.AddScoped<IRepository<AppImage>, Repository<AppImage>>();
+            services.AddScoped<IRepository<Account>, GenericRepository<Account>>();
+            services.AddScoped<IRepository<HolderTransaction>, GenericRepository<HolderTransaction>>();
+            services.AddScoped<IRepository<HolderTransactionItem>, GenericRepository<HolderTransactionItem>>();
+            services.AddScoped<IRepository<IssuerTransaction>, GenericRepository<IssuerTransaction>>();
+            services.AddScoped<IRepository<DomainOffer>, GenericRepository<DomainOffer>>();
+            services.AddScoped<IRepository<VoucherValue>, GenericRepository<VoucherValue>>();
+            services.AddScoped<IRepository<Identity>, GenericRepository<Identity>>();
+            services.AddScoped<IRepository<CroppedImage>, GenericRepository<CroppedImage>>();
         }
     }
 }

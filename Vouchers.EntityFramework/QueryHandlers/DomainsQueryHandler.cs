@@ -12,32 +12,35 @@ using Vouchers.Core;
 
 namespace Vouchers.EntityFramework.QueryHandlers
 {
-    public class DomainsQueryHandler : IAuthIdentityHandler<DomainsQuery, IEnumerable<DomainDto>>
+    internal sealed class DomainsQueryHandler : IAuthIdentityHandler<DomainsQuery, IEnumerable<DomainDto>>
     {
-        private readonly VouchersDbContext dbContext;
+        private readonly VouchersDbContext _dbContext;
 
         public DomainsQueryHandler(VouchersDbContext dbContext)
         {
-            this.dbContext = dbContext;
+            _dbContext = dbContext;
         }
 
         public async Task<IEnumerable<DomainDto>> HandleAsync(DomainsQuery query, Guid authIdentityId, CancellationToken cancellation)
         {
-             var domainsQuery = dbContext.Domains
-                .Include(domain => domain.Contract)
-                .Where(domain => domain.Contract.DomainName
-                .Contains(query.Name))
-                .Select(domain => new DomainDto
-                {
+            var domainsQuery = _dbContext.Domains
+               .Include( domain => domain.Contract)
+               .Select( domain =>
+               new DomainDto {
                     Id = domain.Id,
                     Name = domain.Contract.DomainName,
                     Description = domain.Description,
                     IsPublic = domain.IsPublic,
-                    MembersCount = domain.MembersCount
-                });
+                    MembersCount = domain.MembersCount,
+                    ImageId = domain.ImageId
+                }
+            );
+
+            if(!string.IsNullOrEmpty(query.Name))
+                domainsQuery = domainsQuery.Where(domain => domain.Name.Contains(query.Name));
 
             domainsQuery = domainsQuery.GroupJoin(
-                dbContext.DomainAccounts.Where(domain => domain.IdentityId == authIdentityId),
+                _dbContext.DomainAccounts.Where(domain => domain.IdentityId == authIdentityId),
                 domain => domain.Id,
                 account => account.Domain.Id,
                 (domain, accounts) => new { Domain = domain, Accounts = accounts }

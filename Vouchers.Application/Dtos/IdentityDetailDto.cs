@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Vouchers.Application.Dtos
 {
-    public class IdentityDetailDto
+    public sealed class IdentityDetailDto
     {
         public Guid? IdentityId { get; set; }
 
@@ -21,11 +21,19 @@ namespace Vouchers.Application.Dtos
 
         public IFormFile Image { get; set; }
 
-        public string ImageBase64 { get; set; }
+        public Guid? ImageId { get; set; }
 
-        public string CroppedImageBase64 { get; set; }
+        public Guid? CroppedImageId { get; set; }
 
         public CropParametersDto CropParameters { get; set; }
+
+        public Guid? AccountId { get; set; }
+
+        public bool? IsIssuer { get; set; }
+
+        public bool? IsAdmin { get; set; }
+
+        public bool? IsOwner { get; set; }
 
     }
 }

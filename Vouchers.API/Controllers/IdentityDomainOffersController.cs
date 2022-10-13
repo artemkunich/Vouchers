@@ -13,19 +13,19 @@ namespace Vouchers.API.Controllers
     [ApiController]
     [Route("[controller]")]
     [Authorize(Roles = "User")]
-    public class IdentityDomainOffersController : Controller
+    public sealed class IdentityDomainOffersController : Controller
     {
-        private readonly IDispatcher dispatcher;
+        private readonly IDispatcher _dispatcher;
 
         public IdentityDomainOffersController(IDispatcher dispatcher)
         {
-            this.dispatcher = dispatcher;
+            _dispatcher = dispatcher;
         }
 
         [HttpGet]
         public async Task<IActionResult> Get([FromQuery] IdentityDomainOffersQuery query)
         {
-            var result = await dispatcher.DispatchAsync<IdentityDomainOffersQuery, IEnumerable<DomainOfferDto>>(query);
+            var result = await _dispatcher.DispatchAsync<IdentityDomainOffersQuery, IEnumerable<DomainOfferDto>>(query);
             return Json(result);
         }
     }

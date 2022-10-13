@@ -15,13 +15,13 @@ using Vouchers.Core;
 
 namespace Vouchers.EntityFramework.QueryHandlers
 {
-    public class SubscribersQueryHandler : IAuthIdentityHandler<SubscribersQuery, IEnumerable<SubscriberDto>>
+    internal sealed class SubscribersQueryHandler : IAuthIdentityHandler<SubscribersQuery, IEnumerable<SubscriberDto>>
     {
-        VouchersDbContext dbContext;
+        VouchersDbContext _dbContext;
 
         public SubscribersQueryHandler(VouchersDbContext dbContext)
         {           
-            this.dbContext = dbContext;
+            _dbContext = dbContext;
         }
 
         public async Task<IEnumerable<SubscriberDto>> HandleAsync(SubscribersQuery query, Guid authIdentityId, CancellationToken cancellation) =>
@@ -35,11 +35,11 @@ namespace Vouchers.EntityFramework.QueryHandlers
 
         private IQueryable<SubscriberDto> GetQuery(SubscribersQuery query, Guid authIdentityId)
         {
-            var subscriptionQuery = dbContext.DomainAccounts
+            var subscriptionQuery = _dbContext.DomainAccounts
                 .Include(a => a.Domain)
                 .Where(a => a.IdentityId == authIdentityId && a.Domain.Id == query.DomainId);
 
-            var subscribersQuery = dbContext.DomainAccounts
+            var subscribersQuery = _dbContext.DomainAccounts
                 .Include(a => a.Domain)
                 .Where(a => a.Domain.Id == query.DomainId);
 
@@ -53,7 +53,7 @@ namespace Vouchers.EntityFramework.QueryHandlers
 
             return subscribersQuery
                 .Join(
-                    dbContext.Identities,
+                    _dbContext.Identities,
                     subscription => subscription.IdentityId,
                     identity => identity.Id,
                     (domainAccount, identityDetail) => new SubscriberDto

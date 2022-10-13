@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Vouchers.Application.Dtos
 {
-    public class DomainOfferDto
+    public sealed class DomainOfferDto
     {
         public Guid Id { get; set; }
 

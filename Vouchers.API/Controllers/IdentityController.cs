@@ -12,21 +12,21 @@ namespace Vouchers.API.Controllers
     [ApiController]
     [Route("[controller]")]
     [Authorize]
-    public class IdentityController : Controller
+    public sealed class IdentityController : Controller
     {
-        private readonly IDispatcher dispatcher;
-        private readonly ILoginService loginService;
+        private readonly IDispatcher _dispatcher;
+        private readonly ILoginService _loginService;
         public IdentityController(IDispatcher dispatcher, ILoginService loginService)
         {
-            this.dispatcher = dispatcher;
-            this.loginService = loginService;
+            _dispatcher = dispatcher;
+            _loginService = loginService;
         }
 
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var loginName = loginService.CurrentLoginName;
-            var identityId = await dispatcher.DispatchAsync<string, Guid?>(loginName);
+            var loginName = _loginService.CurrentLoginName;
+            var identityId = await _dispatcher.DispatchAsync<string, Guid?>(loginName);
             if (identityId is null)
                 return NotFound();
 

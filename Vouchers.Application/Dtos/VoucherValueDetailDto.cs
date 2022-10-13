@@ -5,13 +5,13 @@ using System.Text;
 
 namespace Vouchers.Application.Dtos
 {
-    public class VoucherValueDetailDto
+    public sealed class VoucherValueDetailDto
     {
         public string Ticker { get; set; }
 
         public string Description { get; set; }
 
-        public string ImageBase64 { get; set; }
+        public Guid? ImageId { get; set; }
 
         public CropParametersDto CropParameters { get; set; }
     }

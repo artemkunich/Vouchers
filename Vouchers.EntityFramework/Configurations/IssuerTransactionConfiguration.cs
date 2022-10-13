@@ -28,7 +28,7 @@ namespace Vouchers.EntityFramework.Configurations
                 .OnDelete(DeleteBehavior.Restrict); 
 
             builder
-                .HasOne(transaction => transaction.IssuerAccount)
+                .HasOne(transaction => transaction.IssuerAccountItem)
                 .WithMany()
                 .OnDelete(DeleteBehavior.Restrict);
         }

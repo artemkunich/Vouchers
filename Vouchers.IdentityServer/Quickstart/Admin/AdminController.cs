@@ -29,14 +29,14 @@ namespace IdentityServerHost.Quickstart.UI
         }
 
         [HttpGet]
-        public async Task<IActionResult> Users(string loginName, int? pageSize = 100, int? pageIndex = 0)
+        public async Task<IActionResult> Users(string loginName, int pageSize = 100, int pageIndex = 0)
         {
 
             var users = _dbContext.Users.AsQueryable();
             if (!string.IsNullOrEmpty(loginName))
                 users = users.Where(u => u.UserName.Contains(loginName));
 
-            var usersList = users.Skip(pageIndex.Value * pageSize.Value).Take(pageSize.Value).ToList();
+            var usersList = users.Skip(pageIndex * pageSize).Take(pageSize).ToList();
             var userList = new List<UserViewModel>();
 
             foreach (var user in usersList)

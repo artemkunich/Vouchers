@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Vouchers.Application.Commands;
+using Vouchers.Application.Commands.DomainCommands;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Queries;
@@ -13,26 +14,26 @@ namespace Vouchers.API.Controllers
     [ApiController]
     [Route("[controller]")]
     [Authorize(Roles = "User")]
-    public class DomainsController : Controller
+    public sealed class DomainsController : Controller
     {
-        private readonly IDispatcher dispatcher;
+        private readonly IDispatcher _dispatcher;
 
         public DomainsController(IDispatcher dispatcher)
         {
-            this.dispatcher = dispatcher;
+            _dispatcher = dispatcher;
         }
 
         [HttpGet]
         public async Task<IActionResult> Get([FromQuery] DomainsQuery query)
         {
-            var result = await dispatcher.DispatchAsync<DomainsQuery, IEnumerable<DomainDto>>(query);
+            var result = await _dispatcher.DispatchAsync<DomainsQuery, IEnumerable<DomainDto>>(query);
             return Json(result);
         }
 
         [HttpPost]
         public async Task<IActionResult> Post(CreateDomainCommand command)
         {
-            var domainId = await dispatcher.DispatchAsync<CreateDomainCommand, Guid?>(command);
+            var domainId = await _dispatcher.DispatchAsync<CreateDomainCommand, Guid?>(command);
 
             if (domainId is null)
                 return Accepted();

@@ -8,21 +8,21 @@ using Vouchers.Application.UseCases;
 
 namespace Vouchers.API.Services
 {
-    public class Dispatcher : IDispatcher
+    public sealed class Dispatcher : IDispatcher
     {
-        private readonly IServiceProvider serviceProvider;
+        private readonly IServiceProvider _serviceProvider;
 
-        public Dispatcher(IServiceProvider serviceProvider) => this.serviceProvider = serviceProvider;
+        public Dispatcher(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
 
         public async Task DispatchAsync<TMessage>(TMessage message, CancellationToken cancellation = default(CancellationToken))
         {
-            var handlers = serviceProvider.GetServices<IHandler<TMessage>>();
+            var handlers = _serviceProvider.GetServices<IHandler<TMessage>>();
             await Task.WhenAll(handlers.Select(handler => handler.HandleAsync(message, cancellation)));
         }
 
         public async Task<TResult> DispatchAsync<TRequest, TResult>(TRequest request, CancellationToken cancellation = default(CancellationToken))
         {
-            var handler = serviceProvider.GetRequiredService<IHandler<TRequest, TResult>>();
+            var handler = _serviceProvider.GetRequiredService<IHandler<TRequest, TResult>>();
             return await handler.HandleAsync(request, cancellation);
         }
     }

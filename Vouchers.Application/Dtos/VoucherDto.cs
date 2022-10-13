@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Vouchers.Application.Dtos
 {
-    public class VoucherDto
+    public sealed class VoucherDto
     {
         public Guid Id { get; set; }
 

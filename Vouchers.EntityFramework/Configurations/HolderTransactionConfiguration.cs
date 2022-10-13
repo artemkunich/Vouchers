@@ -15,6 +15,7 @@ namespace Vouchers.EntityFramework.Configurations
             builder.ToTable(nameof(HolderTransaction));
 
             builder.HasKey(transaction => transaction.Id);
+            builder.Property(transaction => transaction.Id).IsRequired().ValueGeneratedNever();
 
             builder
                 .OwnsOne(transaction => transaction.Quantity)
@@ -24,17 +25,17 @@ namespace Vouchers.EntityFramework.Configurations
             builder
                 .OwnsOne(transaction => transaction.Quantity)
                 .HasOne(quantity => quantity.UnitType)
-                .WithMany()
+                .WithMany().HasForeignKey(quantity => quantity.UnitTypeId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder
-                .HasOne(transaction => transaction.Creditor)
-                .WithMany().HasForeignKey(transaction => transaction.CreditorId)
+                .HasOne(transaction => transaction.CreditorAccount)
+                .WithMany().HasForeignKey(transaction => transaction.CreditorAccountId)
                 .OnDelete(DeleteBehavior.Restrict);
             
             builder
-                .HasOne(transaction => transaction.Debtor)
-                .WithMany().HasForeignKey(transaction => transaction.DebtorId)
+                .HasOne(transaction => transaction.DebtorAccount)
+                .WithMany().HasForeignKey(transaction => transaction.DebtorAccountId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder
@@ -43,6 +44,8 @@ namespace Vouchers.EntityFramework.Configurations
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Property(transaction => transaction.IsPerformed);
+
+            builder.Property(transaction => transaction.Message);
         }
     }
 }

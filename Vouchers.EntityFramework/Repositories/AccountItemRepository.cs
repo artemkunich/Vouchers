@@ -10,7 +10,7 @@ using Vouchers.Core;
 
 namespace Vouchers.EntityFramework.Repositories
 {
-    public class AccountItemRepository : Repository<AccountItem>
+    public sealed class AccountItemRepository : Repository<AccountItem>
     {
         public AccountItemRepository(VouchersDbContext dbContext) : base(dbContext)
         {
@@ -18,25 +18,25 @@ namespace Vouchers.EntityFramework.Repositories
 
         public override async Task<AccountItem> GetByIdAsync(Guid id) => 
             await DbContext.AccountItems
-                .Include(account => account.Holder)
+                .Include(account => account.HolderAccount)
                 .Include(account => account.Unit).ThenInclude(unit => unit.UnitType)
                 .Where(account => account.Id == id).FirstOrDefaultAsync();
 
         public override AccountItem GetById(Guid id) =>
             DbContext.AccountItems
-                .Include(account => account.Holder)
+                .Include(account => account.HolderAccount)
                 .Include(account => account.Unit).ThenInclude(unit => unit.UnitType)
                 .Where(account => account.Id == id).FirstOrDefault();
 
         public override async Task<IEnumerable<AccountItem>> GetByExpressionAsync(Expression<Func<AccountItem,bool>> expression) =>
             await DbContext.AccountItems
-                .Include(account => account.Holder)
+                .Include(account => account.HolderAccount)
                 .Include(account => account.Unit).ThenInclude(unit => unit.UnitType)
                 .Where(expression).ToListAsync();
 
         public override IEnumerable<AccountItem> GetByExpression(Expression<Func<AccountItem, bool>> expression) =>
             DbContext.AccountItems
-                .Include(account => account.Holder)
+                .Include(account => account.HolderAccount)
                 .Include(account => account.Unit).ThenInclude(unit => unit.UnitType)
                 .Where(expression).ToList();
 

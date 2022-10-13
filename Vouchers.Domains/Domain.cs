@@ -5,7 +5,7 @@ using Vouchers.Entities;
 
 namespace Vouchers.Domains
 {
-    public class Domain : Entity
+    public sealed class Domain : Entity
     {
         public Guid ContractId { get; }
         public DomainContract Contract { get; }
@@ -19,6 +19,8 @@ namespace Vouchers.Domains
         public string Description { get; set; }
 
         public bool IsPublic { get; set; }
+
+        public Guid? ImageId { get; set; }
 
         public static Domain Create(DomainContract contract, decimal credit) =>
             new Domain(Guid.NewGuid(), contract, credit, 0, DateTime.Now);

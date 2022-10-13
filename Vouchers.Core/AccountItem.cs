@@ -3,23 +3,23 @@ using Vouchers.Entities;
 
 namespace Vouchers.Core
 {
-    public class AccountItem : Entity
+    public sealed class AccountItem : Entity
     {
-        public Guid HolderId { get; }
-        public Account Holder { get; }
+        public Guid HolderAccountId { get; }
+        public Account HolderAccount { get; }
 
-        public decimal Balance { get; protected set; }
+        public decimal Balance { get; private set; }
 
         public Guid UnitId { get; }
         public Unit Unit { get; }
 
-        public static AccountItem Create(Account holder, decimal balance, Unit unit) =>
-            new AccountItem(Guid.NewGuid(), holder, balance, unit);
+        public static AccountItem Create(Account holderAccount, decimal balance, Unit unit) =>
+            new AccountItem(Guid.NewGuid(), holderAccount, balance, unit);
 
-        internal AccountItem(Guid id, Account holder, decimal balance, Unit unit) : base(id)
+        internal AccountItem(Guid id, Account holderAccount, decimal balance, Unit unit) : base(id)
         {
-            HolderId = holder.Id;
-            Holder = holder;
+            HolderAccountId = holderAccount.Id;
+            HolderAccount = holderAccount;
             
             Balance = balance;
 

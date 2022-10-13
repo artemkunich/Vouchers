@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Vouchers.Application.Dtos
 {
-    public class CropParametersDto
+    public sealed class CropParametersDto
     {
         public decimal X { get; set; }
 

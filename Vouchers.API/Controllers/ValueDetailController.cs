@@ -10,20 +10,20 @@ namespace Vouchers.API.Controllers
     [ApiController]
     //[Route("[controller]")]
     [Authorize(Roles = "User")]
-    public class ValueDetailController : Controller
+    public sealed class ValueDetailController : Controller
     {
-        private readonly IDispatcher dispatcher;
+        private readonly IDispatcher _dispatcher;
 
         public ValueDetailController(IDispatcher dispatcher)
         {
-            this.dispatcher = dispatcher;
+            _dispatcher = dispatcher;
         }
 
         [HttpGet]
         [Route("[controller]/{valueId:guid}")]
         public async Task<IActionResult> Get(Guid valueId)
         {
-            var result = await dispatcher.DispatchAsync<Guid, VoucherValueDetailDto>(valueId);
+            var result = await _dispatcher.DispatchAsync<Guid, VoucherValueDetailDto>(valueId);
             if(result is null)
                 return NotFound();
 

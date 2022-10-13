@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Vouchers.Application.Dtos
 {
-    public class VoucherValueQuantityDto
+    public sealed class VoucherValueQuantityDto
     {
         public VoucherValueDto Unit { get; set; }
         public decimal Amount { get; set; }

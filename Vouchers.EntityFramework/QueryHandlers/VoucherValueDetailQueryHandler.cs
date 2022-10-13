@@ -7,23 +7,18 @@ using System.Threading;
 using System.Threading.Tasks;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
-using Vouchers.Application.Queries;
 using Vouchers.Application.UseCases;
-using Vouchers.Core;
 using Vouchers.Files;
-using Vouchers.Values;
 
 namespace Vouchers.EntityFramework.QueryHandlers
 {
-    public class VoucherValueDetailQueryHandler : IAuthIdentityHandler<Guid,VoucherValueDetailDto>
+    internal sealed class VoucherValueDetailQueryHandler : IAuthIdentityHandler<Guid,VoucherValueDetailDto>
     {
-        private readonly VouchersDbContext dbContext;
-        private readonly IImageService imageService;
+        VouchersDbContext _dbContext;
 
-        public VoucherValueDetailQueryHandler(VouchersDbContext dbContext, IImageService imageService)
+        public VoucherValueDetailQueryHandler(VouchersDbContext dbContext)
         {
-            this.dbContext = dbContext;
-            this.imageService = imageService;
+            _dbContext = dbContext;
         }
 
         Func<CropParameters, CropParametersDto> mapCropParameters = (CropParameters cp) => cp is null ? null : new CropParametersDto
@@ -36,9 +31,14 @@ namespace Vouchers.EntityFramework.QueryHandlers
 
         public async Task<VoucherValueDetailDto> HandleAsync(Guid valueId, Guid authIdentityId, CancellationToken cancellation)
         {
-            var valueWithImage = await dbContext.VoucherValues.Where(v => v.Id == valueId && v.IssuerIdentityId == authIdentityId)
-                .GroupJoin(
-                    dbContext.Images,
+            var valueWithImage = await _dbContext.VoucherValues.Where(v => v.Id == valueId)
+                .Join(
+                _dbContext.DomainAccounts.Where(acc => acc.IdentityId == authIdentityId),
+                    v => v.DomainId,
+                    acc => acc.DomainId, 
+                    (v, acc) => v
+                ).GroupJoin(
+                    _dbContext.CroppedImages,
                     v => v.ImageId,
                     i => i.Id,
                     (v,imgs) => new {Value = v, Images = imgs}
@@ -50,22 +50,17 @@ namespace Vouchers.EntityFramework.QueryHandlers
             if(valueWithImage is null)
                 return null;
 
-            string imageBase64 = null;
             CropParameters cropParameters = null;
             if (valueWithImage.Image is not null)
             {
                 cropParameters = valueWithImage.Image.CropParameters;
-
-                var imageBinary = await imageService.GetImageBinaryAsync(valueWithImage.Image.Id);
-                if (imageBinary is not null)
-                    imageBase64 = Convert.ToBase64String(imageBinary);
             }
 
             return new VoucherValueDetailDto
             {
                 Ticker = valueWithImage.Value.Ticker,
                 Description = valueWithImage.Value.Description,
-                ImageBase64 = imageBase64,
+                ImageId = valueWithImage.Image == null ? null : valueWithImage.Image.ImageId,
                 CropParameters = mapCropParameters(cropParameters)
             };
         }
