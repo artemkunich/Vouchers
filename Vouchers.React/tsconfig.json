@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+      // "outDir": "./built",
+      "allowJs": true,
+      "target": "es5",
+      "jsx": "react",
+      "strict": true,
+      "plugins": [{ "name": "typescript-plugin-css-modules" }]
+    },
+    "include": ["./src/**/*"],
+
+  }
