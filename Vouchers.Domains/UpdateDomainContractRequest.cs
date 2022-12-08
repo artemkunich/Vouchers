@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Vouchers.Domains.Properties;
 
 namespace Vouchers.Domains
 {
@@ -23,7 +24,7 @@ namespace Vouchers.Domains
             set
             {
                 if (value < CreatedDateTime)
-                    throw new DomainsException("Performed datetime < created datetime");
+                    throw new DomainsException(Resources.PerformedDatetimeIsLessThanCreatedDatetime);
 
                 _performedDateTime = value;
             }

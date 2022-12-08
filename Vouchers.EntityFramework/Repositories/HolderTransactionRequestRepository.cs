@@ -11,7 +11,7 @@ using Vouchers.Domains;
 
 namespace Vouchers.EntityFramework.Repositories
 {
-    public sealed class HolderTransactionRequestRepository : Repository<HolderTransactionRequest>
+    internal sealed class HolderTransactionRequestRepository : Repository<HolderTransactionRequest>
     {
         public HolderTransactionRequestRepository(VouchersDbContext dbContext) : base(dbContext)
         {

@@ -8,23 +8,28 @@ using System.Threading.Tasks;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Queries;
+using Vouchers.Application.Services;
 using Vouchers.Application.UseCases;
 using Vouchers.Core;
 using Vouchers.Values;
 
 namespace Vouchers.EntityFramework.QueryHandlers
 {
-    internal sealed class IssuerVouchersQueryHandler : IAuthIdentityHandler<IssuerVouchersQuery,IEnumerable<VoucherDto>>
+    internal sealed class IssuerVouchersQueryHandler : IHandler<IssuerVouchersQuery,IEnumerable<VoucherDto>>
     {
-        VouchersDbContext _dbContext;
+        private readonly IAuthIdentityProvider _authIdentityProvider;
+        private readonly VouchersDbContext _dbContext;
 
-        public IssuerVouchersQueryHandler(VouchersDbContext dbContext)
+        public IssuerVouchersQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext)
         {
+            _authIdentityProvider = authIdentityProvider;
             _dbContext = dbContext;
         }     
 
-        public async Task<IEnumerable<VoucherDto>> HandleAsync(IssuerVouchersQuery query, Guid authIdentityId, CancellationToken cancellation)
+        public async Task<IEnumerable<VoucherDto>> HandleAsync(IssuerVouchersQuery query, CancellationToken cancellation)
         {
+            var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
+
             var issuerDomainAccount = await _dbContext.UnitTypes.Where(v => v.Id == query.ValueId)
                 .Join(_dbContext.DomainAccounts, u => u.IssuerAccountId, a => a.Id, (u, a) => a).FirstOrDefaultAsync();
             if (issuerDomainAccount is null)
@@ -54,7 +59,7 @@ namespace Vouchers.EntityFramework.QueryHandlers
                         Supply = result.Voucher.Supply,
                         Balance = account == null ? 0.0m : account.Balance
                     }
-                ).ToListAsync(cancellation);
+                ).GetListPageQuery(query).ToListAsync(cancellation);
         }
     }
 }

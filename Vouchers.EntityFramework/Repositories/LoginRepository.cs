@@ -11,7 +11,7 @@ using Vouchers.Identities;
 
 namespace Vouchers.EntityFramework.Repositories
 {
-    public sealed class LoginRepository : Repository<Login>
+    internal sealed class LoginRepository : Repository<Login>
     {
         public LoginRepository(VouchersDbContext dbContext) : base(dbContext)
         {

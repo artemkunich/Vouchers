@@ -8,36 +8,40 @@ using System.Threading.Tasks;
 using System.Threading;
 using Vouchers.Values;
 using System.Linq;
+using Vouchers.Application.Services;
 
 namespace Vouchers.Application.UseCases.VoucherCases
 {
-    internal sealed class CreateVoucherCommandHandler : IAuthIdentityHandler<CreateVoucherCommand, Guid>
+    internal sealed class CreateVoucherCommandHandler : IHandler<CreateVoucherCommand, Guid>
     {
+        private readonly IAuthIdentityProvider _authIdentityProvider;
         private readonly IRepository<VoucherValue> _voucherValueRepository;
         private readonly IRepository<UnitType> _unitTypeRepository;
         private readonly IRepository<Unit> _unitRepository;
 
-        public CreateVoucherCommandHandler(IRepository<VoucherValue> voucherValueRepository, IRepository<UnitType> unitTypeRepository, IRepository<Unit> unitRepository)
+        public CreateVoucherCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<VoucherValue> voucherValueRepository, IRepository<UnitType> unitTypeRepository, IRepository<Unit> unitRepository)
         {
+            _authIdentityProvider = authIdentityProvider;
             _voucherValueRepository = voucherValueRepository;
             _unitTypeRepository = unitTypeRepository;
             _unitRepository = unitRepository;
         }
 
-        public async Task<Guid> HandleAsync(CreateVoucherCommand command, Guid authIdentityId, CancellationToken cancellation)
+        public async Task<Guid> HandleAsync(CreateVoucherCommand command, CancellationToken cancellation)
         {
+            var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
+
             var value = await _voucherValueRepository.GetByIdAsync(command.VoucherValueId);
 
             if (value is null)
-                throw new ApplicationException("Unit type does not exist");
+                throw new ApplicationException(Properties.Resources.UnitTypeDoesNotExist);
 
             if (value.IssuerIdentityId != authIdentityId)
-                throw new ApplicationException("Operation is not allowed");
+                throw new ApplicationException(Properties.Resources.OperationIsNotAllowed);
 
             var unitType = await _unitTypeRepository.GetByIdAsync(command.VoucherValueId);
 
-            var unitDto = command.Voucher;
-            var unit = Unit.Create(unitDto.ValidFrom, unitDto.ValidTo ?? DateTime.MaxValue, unitDto.CanBeExchanged, unitType);
+            var unit = Unit.Create(command.ValidFrom, command.ValidTo ?? DateTime.MaxValue, command.CanBeExchanged, unitType);
 
             await _unitRepository.AddAsync(unit);
 

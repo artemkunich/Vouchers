@@ -9,7 +9,7 @@ using Vouchers.Domains;
 
 namespace Vouchers.EntityFramework.Configurations
 {
-    public class DomainOfferConfiguration : IEntityTypeConfiguration<DomainOffer>
+    internal class DomainOfferConfiguration : IEntityTypeConfiguration<DomainOffer>
     {
         public void Configure(EntityTypeBuilder<DomainOffer> builder)
         {
@@ -23,7 +23,7 @@ namespace Vouchers.EntityFramework.Configurations
             builder.OwnsOne(offer => offer.Amount).Property(amount => amount.Currency);
 
             builder.Property(offer => offer.InvoicePeriod);
-            builder.Property(offer => offer.MaxSubscribersCount);
+            builder.Property(offer => offer.MaxMembersCount);
 
             builder.Property(offer => offer.MaxContractsPerIdentity);
 

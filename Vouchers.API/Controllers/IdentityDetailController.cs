@@ -16,12 +16,10 @@ namespace Vouchers.API.Controllers
     public sealed class IdentityDetailController : Controller
     {
         private readonly IDispatcher _dispatcher;
-        private readonly ILoginService _loginService;
 
-        public IdentityDetailController(IDispatcher dispatcher, ILoginService loginService)
+        public IdentityDetailController(IDispatcher dispatcher)
         {
             _dispatcher = dispatcher;
-            _loginService = loginService;
         }
 
         [HttpGet]
@@ -44,22 +42,18 @@ namespace Vouchers.API.Controllers
 
         [HttpPost]
         [Route("[controller]")]
-        public async Task<IActionResult> Post([FromForm] IdentityDetailDto identityDetailDto)
+        public async Task<IActionResult> Post([FromForm] CreateIdentityCommand command)
         {
-            var loginName = _loginService.CurrentLoginName;
-            var identityId = await _dispatcher.DispatchAsync<string, Guid?>(loginName);
+            
+            var identityId = await _dispatcher.DispatchAsync<CreateIdentityCommand, Guid>(command);
+            return Json(new { identityId });
+        }
 
-            if (identityId is null)
-            {
-                await _dispatcher.DispatchAsync(new CreateIdentityCommand { LoginName = loginName, IdentityDetail = identityDetailDto });
-                identityId = await _dispatcher.DispatchAsync<string, Guid?>(loginName);
-                return Json(new { identityId });
-            }
-            else
-            {
-                await _dispatcher.DispatchAsync(new UpdateIdentityCommand { IdentityDetail = identityDetailDto });
-            }
-
+        [HttpPut]
+        [Route("[controller]")]
+        public async Task<IActionResult> Put([FromForm] UpdateIdentityCommand command)
+        {
+            await _dispatcher.DispatchAsync(command);
             return NoContent();
         }
     }

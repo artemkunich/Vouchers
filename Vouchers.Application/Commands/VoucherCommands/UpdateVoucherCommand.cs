@@ -9,9 +9,16 @@ namespace Vouchers.Application.Commands.VoucherCommands
     public sealed class UpdateVoucherCommand
     {
         [Required]
-        public Guid VoucherValueId { get; set; }
+        public Guid Id { get; set; }
 
         [Required]
-        public VoucherDto Voucher { get; set; }   
+        public Guid VoucherValueId { get; set; }
+
+        public DateTime? ValidFrom { get; set; }
+
+        public DateTime? ValidTo { get; set; }
+
+        public bool? CanBeExchanged { get; set; }
+  
     }
 }

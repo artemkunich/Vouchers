@@ -8,7 +8,7 @@ namespace Vouchers.Files
         public CropParameters CropParameters { get; set; }
 
         private CroppedImage() { }
-        public CroppedImage(Guid id, Guid imageId, CropParameters cropParameters) : base(id)
+        private CroppedImage(Guid id, Guid imageId, CropParameters cropParameters) : base(id)
         {
             ImageId = imageId;
             CropParameters = cropParameters;

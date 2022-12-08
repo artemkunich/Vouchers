@@ -9,7 +9,7 @@ using Vouchers.Domains;
 
 namespace Vouchers.EntityFramework.Configurations
 {
-    public  class DomainOffersPerIdentityCounterConfiguration : IEntityTypeConfiguration<DomainOffersPerIdentityCounter>
+    internal class DomainOffersPerIdentityCounterConfiguration : IEntityTypeConfiguration<DomainOffersPerIdentityCounter>
     {
         public void Configure(EntityTypeBuilder<DomainOffersPerIdentityCounter> builder)
         {

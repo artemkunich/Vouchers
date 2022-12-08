@@ -10,7 +10,7 @@ using Vouchers.Core;
 
 namespace Vouchers.EntityFramework.Repositories
 {
-    public sealed class AccountItemRepository : Repository<AccountItem>
+    internal sealed class AccountItemRepository : Repository<AccountItem>
     {
         public AccountItemRepository(VouchersDbContext dbContext) : base(dbContext)
         {

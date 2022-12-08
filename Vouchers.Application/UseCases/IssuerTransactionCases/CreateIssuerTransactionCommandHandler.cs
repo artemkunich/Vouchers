@@ -8,11 +8,13 @@ using Vouchers.Core;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Domains;
 using Vouchers.Application.Commands.IssuerTransactionCommands;
+using Vouchers.Application.Services;
 
 namespace Vouchers.Application.UseCases.IssuerTransactionCases
 {
-    internal sealed class CreateIssuerTransactionCommandHandler : IAuthIdentityHandler<CreateIssuerTransactionCommand, Guid>
+    internal sealed class CreateIssuerTransactionCommandHandler : IHandler<CreateIssuerTransactionCommand, Guid>
     {
+        private readonly IAuthIdentityProvider _authIdentityProvider;
         private readonly IRepository<DomainAccount> _domainAccountRepository;
         private readonly IRepository<Account> _accountRepository;
         private readonly IRepository<AccountItem> _accountItemRepository;
@@ -20,8 +22,9 @@ namespace Vouchers.Application.UseCases.IssuerTransactionCases
         private readonly IRepository<IssuerTransaction> _issuerTransactionRepository;
 
 
-        public CreateIssuerTransactionCommandHandler(IRepository<DomainAccount> domainAccountRepository, IRepository<Account> accountRepository, IRepository<AccountItem> accountItemRepository, IRepository<Unit> unitRepository, IRepository<IssuerTransaction> issuerTransactionRepository) 
+        public CreateIssuerTransactionCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<DomainAccount> domainAccountRepository, IRepository<Account> accountRepository, IRepository<AccountItem> accountItemRepository, IRepository<Unit> unitRepository, IRepository<IssuerTransaction> issuerTransactionRepository) 
         {
+            _authIdentityProvider = authIdentityProvider;
             _domainAccountRepository = domainAccountRepository;
             _accountRepository = accountRepository;
             _accountItemRepository = accountItemRepository;
@@ -29,17 +32,19 @@ namespace Vouchers.Application.UseCases.IssuerTransactionCases
             _issuerTransactionRepository = issuerTransactionRepository;
         }
 
-        public async Task<Guid> HandleAsync(CreateIssuerTransactionCommand command, Guid authIdentityId, CancellationToken cancellation)
+        public async Task<Guid> HandleAsync(CreateIssuerTransactionCommand command, CancellationToken cancellation)
         {
+            var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
+
             var issuerDomainAccount = await _domainAccountRepository.GetByIdAsync(command.IssuerAccountId);
             if (issuerDomainAccount?.IdentityId != authIdentityId)
-                throw new ApplicationException("Operation is not allowed");
+                throw new ApplicationException(Properties.Resources.OperationIsNotAllowed);
             if (!issuerDomainAccount.IsConfirmed)
-                throw new ApplicationException("Issuer account is not activated");
+                throw new ApplicationException(Properties.Resources.IssuerAccountIsNotActivated);
 
             var issuerAccount = await _accountRepository.GetByIdAsync(command.IssuerAccountId);
             if (issuerAccount is null)
-                throw new ApplicationException("Issuer's account does not exist");
+                throw new ApplicationException(Properties.Resources.IssuerAccountDoesNotExist);
 
             var accountItem = (await _accountItemRepository.GetByExpressionAsync(accItem => accItem.HolderAccountId == issuerAccount.Id && accItem.Unit.Id == command.VoucherId)).FirstOrDefault();
             if (accountItem is null)
@@ -50,7 +55,7 @@ namespace Vouchers.Application.UseCases.IssuerTransactionCases
                     accountItem = AccountItem.Create(issuerAccount, 0, unit);
                 }
                 else
-                    throw new ApplicationException($"Issuer {issuerDomainAccount.Id} does not have account item for unit {command.VoucherId}");
+                    throw new ApplicationException(Properties.Resources.IssuerDoesNotHaveAccountItemForUnit, issuerDomainAccount.Id, command.VoucherId);
             }
 
 

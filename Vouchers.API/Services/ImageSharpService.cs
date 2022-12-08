@@ -11,8 +11,8 @@ namespace Vouchers.API.Services
 {
     public sealed class ImageSharpService : IImageService
     {
-        private const int MAX_IMAGE_SIDE = 1024;
-        private const int CROPPED_IMAGE_SIDE = 100;
+        private const int MaxImageSide = 1024;
+        private const int CroppedImageSide = 100;
 
         public async Task<byte[]> CropImageAsync(Stream imageStream, CropParametersDto cropParameters)
         {
@@ -25,9 +25,9 @@ namespace Vouchers.API.Services
                 Height = (int)Math.Round(cropParameters.Height * image.Height / 100),
             }));
 
-            if (image.Width != image.Height || image.Width != CROPPED_IMAGE_SIDE)
+            if (image.Width != image.Height || image.Width != CroppedImageSide)
             {
-                image.Mutate(x => x.Resize(CROPPED_IMAGE_SIDE, CROPPED_IMAGE_SIDE));
+                image.Mutate(x => x.Resize(CroppedImageSide, CroppedImageSide));
             }
 
             using (var pngMemoryStream = new MemoryStream())
@@ -41,8 +41,8 @@ namespace Vouchers.API.Services
         {
             var image = await Image.LoadAsync(imageStream);
             var maxSide = Math.Max(image.Width, image.Height);
-            if (maxSide > MAX_IMAGE_SIDE)
-                image.Mutate(x => x.Resize(image.Width * MAX_IMAGE_SIDE / maxSide, image.Height * MAX_IMAGE_SIDE / maxSide));
+            if (maxSide > MaxImageSide)
+                image.Mutate(x => x.Resize(image.Width * MaxImageSide / maxSide, image.Height * MaxImageSide / maxSide));
 
             image.SaveAsPngAsync($"/app/images/{imageId}.png");
         }

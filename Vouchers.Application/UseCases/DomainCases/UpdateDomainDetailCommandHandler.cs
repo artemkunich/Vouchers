@@ -11,49 +11,58 @@ using Vouchers.Domains;
 
 namespace Vouchers.Application.UseCases.DomainCases
 {
-    internal sealed class UpdateDomainDetailCommandHandler : IAuthIdentityHandler<UpdateDomainDetailCommand>
+    internal sealed class UpdateDomainDetailCommandHandler : IHandler<UpdateDomainDetailCommand>
     {
+        private readonly IAuthIdentityProvider _authIdentityProvider;
         private readonly IRepository<DomainAccount> _domainAccountRepository;
         private readonly IRepository<Domain> _domainRepository;
-        private readonly AppImageService _appImageService;
-        public UpdateDomainDetailCommandHandler(IRepository<DomainAccount> domainAccountRepository, IRepository<Domain> domainRepository, AppImageService appImageService)
+        private readonly IAppImageService _appImageService;
+        public UpdateDomainDetailCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<DomainAccount> domainAccountRepository, IRepository<Domain> domainRepository, IAppImageService appImageService)
         {
+            _authIdentityProvider = authIdentityProvider;
             _domainAccountRepository = domainAccountRepository;
             _domainRepository = domainRepository;
             _appImageService = appImageService;
         }
 
-        public async Task HandleAsync(UpdateDomainDetailCommand command, Guid authIdentityId, CancellationToken cancellation)
+        public async Task HandleAsync(UpdateDomainDetailCommand command, CancellationToken cancellation)
         {
+            var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
+
             var domainAccount = (await _domainAccountRepository.GetByExpressionAsync(account => account.DomainId == command.DomainId && account.IdentityId == authIdentityId)).FirstOrDefault();
             if (domainAccount is null)
-                throw new ApplicationException("Domain account does not exist");
+                throw new ApplicationException(Properties.Resources.DomainAccountDoesNotExist);
 
-            if (domainAccount.IsAdmin || domainAccount.Domain.Contract.PartyId != authIdentityId)
-                throw new ApplicationException("Operation is not allowed");
+            if (!domainAccount.IsAdmin && domainAccount.Domain.Contract.PartyId != authIdentityId)
+                throw new ApplicationException(Properties.Resources.OperationIsNotAllowed);
 
             var requireUpdate = false;
-            var domainDetailDto = command.DomainDetail;
             var domain = domainAccount.Domain;
 
-            if (command.Image is not null && domainDetailDto.CropParameters is not null)
+            if (command.Image is not null && command.CropParameters is not null)
             {
                 var imageStream = command.Image.OpenReadStream();
-                var image = await _appImageService.CreateCroppedImage(imageStream, domainDetailDto.CropParameters);
+                var image = await _appImageService.CreateCroppedImage(imageStream, command.CropParameters);
                 domain.ImageId = image.Id;
                 requireUpdate = true;
             }
 
-            if (command.Image is null && domain.ImageId is not null && domainDetailDto.CropParameters is not null)
+            if (command.Image is null && domain.ImageId is not null && command.CropParameters is not null)
             {
-                var image = await _appImageService.CreateCroppedImage(domain.ImageId.Value, domainDetailDto.CropParameters);
+                var image = await _appImageService.CreateCroppedImage(domain.ImageId.Value, command.CropParameters);
                 domain.ImageId = image.Id;
                 requireUpdate = true;
             }
 
-            if (domain.Description != domainDetailDto.Description)
+            if (domain.Description != command.Description)
             {
-                domain.Description = domainDetailDto.Description;
+                domain.Description = command.Description;
+                requireUpdate = true;
+            }
+
+            if (command.IsPublic is not null && domain.IsPublic != command.IsPublic)
+            {
+                domain.IsPublic = command.IsPublic.Value;
                 requireUpdate = true;
             }
 

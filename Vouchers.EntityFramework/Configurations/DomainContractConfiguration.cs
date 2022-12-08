@@ -8,7 +8,7 @@ using Vouchers.Domains;
 
 namespace Vouchers.EntityFramework.Configurations
 {
-    public class DomainContractConfiguration : IEntityTypeConfiguration<DomainContract>
+    internal class DomainContractConfiguration : IEntityTypeConfiguration<DomainContract>
     {
         public void Configure(EntityTypeBuilder<DomainContract> builder)
         {

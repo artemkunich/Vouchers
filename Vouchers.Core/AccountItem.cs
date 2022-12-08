@@ -1,5 +1,6 @@
 ﻿using System;
 using Vouchers.Entities;
+using System.Globalization;
 
 namespace Vouchers.Core
 {
@@ -16,7 +17,7 @@ namespace Vouchers.Core
         public static AccountItem Create(Account holderAccount, decimal balance, Unit unit) =>
             new AccountItem(Guid.NewGuid(), holderAccount, balance, unit);
 
-        internal AccountItem(Guid id, Account holderAccount, decimal balance, Unit unit) : base(id)
+        private AccountItem(Guid id, Account holderAccount, decimal balance, Unit unit) : base(id)
         {
             HolderAccountId = holderAccount.Id;
             HolderAccount = holderAccount;
@@ -33,11 +34,11 @@ namespace Vouchers.Core
         {
             Balance += amount;
         }
-        public void ProcessCredit(decimal amount)
+        public void ProcessCredit(decimal amount, CultureInfo cultureInfo = null)
         {
             if (amount > Balance)
             {
-                throw new CoreException("Attempt to set negative balance");
+                throw new CoreException("AmountIsGreaterThanBalance", cultureInfo);
             }
             Balance -= amount;
         }

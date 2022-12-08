@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Vouchers.Entities;
+using System.Globalization;
 
 namespace Vouchers.Core
 {
@@ -15,22 +16,22 @@ namespace Vouchers.Core
         public Guid DebitAccountItemId { get; }
         public AccountItem DebitAccountItem { get; }
 
-        public static HolderTransactionItem Create(UnitQuantity quantity, AccountItem creditAccount, AccountItem debitAccount) =>
-            new HolderTransactionItem(Guid.NewGuid(), quantity, creditAccount, debitAccount);
+        public static HolderTransactionItem Create(UnitQuantity quantity, AccountItem creditAccount, AccountItem debitAccount, CultureInfo cultureInfo = null) =>
+            new HolderTransactionItem(Guid.NewGuid(), quantity, creditAccount, debitAccount, cultureInfo);
 
-        internal HolderTransactionItem(Guid id, UnitQuantity quantity, AccountItem creditAccountItem, AccountItem debitAccountItem) : base(id)
+        private HolderTransactionItem(Guid id, UnitQuantity quantity, AccountItem creditAccountItem, AccountItem debitAccountItem, CultureInfo cultureInfo = null) : base(id)
         {
             if (creditAccountItem.Equals(debitAccountItem))
-                throw new CoreException("Credit and debit accounts equal");
+                throw new CoreException("CreditAndDebitAccountsAreEqual", cultureInfo);
 
             if (creditAccountItem.Unit.NotEquals(quantity.Unit))
-                throw new CoreException("Credit account and item have different units");
+                throw new CoreException("CreditAccountAndItemHaveDifferentUnits", cultureInfo);
 
             if (debitAccountItem.Unit.NotEquals(quantity.Unit))
-                throw new CoreException("Debit account and item have different units");
+                throw new CoreException("DebitAccountAndItemHaveDifferentUnits", cultureInfo);
 
             if(!quantity.Unit.CanBeExchanged && creditAccountItem.HolderAccount.NotEquals(quantity.Unit.UnitType.IssuerAccount) && debitAccountItem.HolderAccount.NotEquals(quantity.Unit.UnitType.IssuerAccount))
-                throw new CoreException("Item's unit cannot be exchanged");
+                throw new CoreException("ItemUnitCannotBeExchanged", cultureInfo);
 
             Quantity = quantity;
 

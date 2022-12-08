@@ -8,7 +8,7 @@ using Vouchers.Core;
 
 namespace Vouchers.EntityFramework.Configurations
 {
-    public class HolderTransactionRequestConfiguration : IEntityTypeConfiguration<HolderTransactionRequest>
+    internal class HolderTransactionRequestConfiguration : IEntityTypeConfiguration<HolderTransactionRequest>
     {
         public void Configure(EntityTypeBuilder<HolderTransactionRequest> builder)
         {

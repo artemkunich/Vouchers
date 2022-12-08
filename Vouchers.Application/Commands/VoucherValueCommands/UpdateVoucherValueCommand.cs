@@ -10,11 +10,14 @@ namespace Vouchers.Application.Commands.VoucherValueCommands
     public sealed class UpdateVoucherValueCommand
     {
         [Required]
-        public Guid VoucherValueId { get; set; }
+        public Guid Id { get; set; }
 
-        [Required]
-        public VoucherValueDetailDto VoucherValueDetail { get; set; }
+        public string Ticker { get; set; }
+
+        public string Description { get; set; }
 
         public IFormFile Image { get; set; }
+
+        public CropParametersDto CropParameters { get; set; }
     }
 }

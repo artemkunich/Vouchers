@@ -9,7 +9,7 @@ using Vouchers.Domains;
 
 namespace Vouchers.EntityFramework.Configurations
 {
-    public class AccountConfiguration : IEntityTypeConfiguration<Account>
+    internal class AccountConfiguration : IEntityTypeConfiguration<Account>
     {
         public void Configure(EntityTypeBuilder<Account> builder)
         {

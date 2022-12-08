@@ -13,23 +13,26 @@ using Vouchers.Application.Dtos;
 using Vouchers.Application.Queries;
 using Vouchers.Application.UseCases;
 using System.Threading;
+using Vouchers.Application.Services;
 
 namespace Vouchers.EntityFramework.QueryHandlers
 {
-    internal sealed class DomainAccountsQueryHandler : IAuthIdentityHandler<DomainAccountsQuery, IEnumerable<DomainAccountDto>>
+    internal sealed class DomainAccountsQueryHandler : IHandler<DomainAccountsQuery, IEnumerable<DomainAccountDto>>
     {
-        VouchersDbContext _dbContext;
+        private readonly IAuthIdentityProvider _authIdentityProvider;
+        private readonly VouchersDbContext _dbContext;
 
-        public DomainAccountsQueryHandler(VouchersDbContext dbContext)
-        {           
+        public DomainAccountsQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext)
+        {
+            _authIdentityProvider = authIdentityProvider;
             _dbContext = dbContext;
         }
 
-        public async Task<IEnumerable<DomainAccountDto>> HandleAsync(DomainAccountsQuery query, Guid authIdentityId, CancellationToken cancellation) =>
-            await GetQuery(query, authIdentityId).ToListAsync();
-
-        public IEnumerable<DomainAccountDto> Handle(DomainAccountsQuery query, Guid authIdentityId) =>
-            GetQuery(query, authIdentityId).ToList();
+        public async Task<IEnumerable<DomainAccountDto>> HandleAsync(DomainAccountsQuery query, CancellationToken cancellation)
+        {
+            var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
+            return await GetQuery(query, authIdentityId).ToListAsync();
+        }    
 
         private IQueryable<DomainAccountDto> GetQuery(DomainAccountsQuery query, Guid authIdentityId) {
 
@@ -52,14 +55,14 @@ namespace Vouchers.EntityFramework.QueryHandlers
                 a => a.Domain.Id,
                 (a, c) => new
                 {
-                    Id = a.Id,
-                    DomainName = a.Domain.Contract.DomainName,
-                    DomainId = a.DomainId,
-                    IdentityId = a.IdentityId,
-                    IsAdmin = a.IsAdmin,
-                    IsIssuer = a.IsIssuer,
+                    a.Id,
+                    a.Domain.Contract.DomainName,
+                    a.DomainId,
+                    a.IdentityId,
+                    a.IsAdmin,
+                    a.IsIssuer,
                     IsOwner = a.IdentityId == a.Domain.Contract.PartyId,
-                    IsConfirmed = a.IsConfirmed,
+                    a.IsConfirmed,
                 }
             );
 
@@ -89,7 +92,7 @@ namespace Vouchers.EntityFramework.QueryHandlers
                     IsConfirmed = account.IsConfirmed,
                     ImageId = identity.ImageId
                 }
-            );
+            ).GetListPageQuery(query);
         }
     }
 }

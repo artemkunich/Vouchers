@@ -6,22 +6,25 @@ using System.Threading;
 using System.Threading.Tasks;
 using Vouchers.Application.Commands.DomainCommands;
 using Vouchers.Application.Infrastructure;
+using Vouchers.Application.Services;
 using Vouchers.Core;
 using Vouchers.Domains;
 
 namespace Vouchers.Application.UseCases.DomainCases
 {
-    internal sealed class CreateDomainCommandHandler : IAuthIdentityHandler<CreateDomainCommand, Guid?>
-    {       
+    internal sealed class CreateDomainCommandHandler : IHandler<CreateDomainCommand, Guid?>
+    {
+        private readonly IAuthIdentityProvider _authIdentityProvider;
         private readonly IRepository<DomainOffer> _domainOfferRepository;
         private readonly IRepository<DomainOffersPerIdentityCounter> _domainOffersPerIdentityCounterRepository;
         private readonly IRepository<DomainContract> _domainContractRepository;
         private readonly IRepository<DomainAccount> _domainAccountRepository;
         private readonly IRepository<Account> _accountRepository;
 
-        public CreateDomainCommandHandler(IRepository<DomainOffer> domainOfferRepository, IRepository<DomainOffersPerIdentityCounter> domainOffersPerIdentityCounterRepository, 
+        public CreateDomainCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<DomainOffer> domainOfferRepository, IRepository<DomainOffersPerIdentityCounter> domainOffersPerIdentityCounterRepository, 
             IRepository<DomainContract> domainContractRepository, IRepository<DomainAccount> domainAccountRepository, IRepository<Account> accountRepository)
         {
+            _authIdentityProvider = authIdentityProvider;
             _domainOfferRepository = domainOfferRepository;
             _domainOffersPerIdentityCounterRepository = domainOffersPerIdentityCounterRepository;
             _domainContractRepository = domainContractRepository;
@@ -29,8 +32,10 @@ namespace Vouchers.Application.UseCases.DomainCases
             _accountRepository = accountRepository;
         }
 
-        public async Task<Guid?> HandleAsync(CreateDomainCommand command, Guid authIdentityId, CancellationToken cancellation)
+        public async Task<Guid?> HandleAsync(CreateDomainCommand command, CancellationToken cancellation)
         {
+            var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
+
             var domainOffer = _domainOfferRepository.GetById(command.OfferId);
 
             DomainOffersPerIdentityCounter domainOffersPerIdentityCounter = null;
@@ -44,7 +49,7 @@ namespace Vouchers.Application.UseCases.DomainCases
                 }
                 else if (domainOffersPerIdentityCounter.Counter > domainOffer.MaxContractsPerIdentity)
                 {
-                    throw new ApplicationException("Max count of contracts is exceeded");
+                    throw new ApplicationException(Properties.Resources.MaxCountOfContractsExceeded);
                 }
                 else
                 {

@@ -6,30 +6,34 @@ using System.Threading;
 using System.Threading.Tasks;
 using Vouchers.Application.Commands.DomainAccountCommands;
 using Vouchers.Application.Infrastructure;
+using Vouchers.Application.Services;
 using Vouchers.Core;
 using Vouchers.Domains;
 
 namespace Vouchers.Application.UseCases.DomainAccountCases
 {
-    internal sealed class CreateDomainAccountCommandHandler : IAuthIdentityHandler<CreateDomainAccountCommand, Guid>
+    internal sealed class CreateDomainAccountCommandHandler : IHandler<CreateDomainAccountCommand, Guid>
     {
-
+        private readonly IAuthIdentityProvider _authIdentityProvider;
         private readonly IRepository<Domain> _domainRepository;
         private readonly IRepository<DomainAccount> _domainAccountRepository;
         private readonly IRepository<Account> _accountRepository;
 
-        public CreateDomainAccountCommandHandler(IRepository<Domain> domainRepository, IRepository<DomainAccount> domainAccountRepository, IRepository<Account> accountRepository)
+        public CreateDomainAccountCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<Domain> domainRepository, IRepository<DomainAccount> domainAccountRepository, IRepository<Account> accountRepository)
         {
+            _authIdentityProvider = authIdentityProvider;
             _domainRepository = domainRepository;
             _domainAccountRepository = domainAccountRepository;
             _accountRepository = accountRepository;
         }
 
-        public async Task<Guid> HandleAsync(CreateDomainAccountCommand command, Guid authIdentityId, CancellationToken cancellation)
+        public async Task<Guid> HandleAsync(CreateDomainAccountCommand command, CancellationToken cancellation)
         {
+            var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
+
             var domain = _domainRepository.GetById(command.DomainId);
             if (domain is null)
-                throw new ApplicationException("Domain does not exist");
+                throw new ApplicationException(Properties.Resources.DomainDoesNotExist);
 
             var account = Account.Create();
             await _accountRepository.AddAsync(account);

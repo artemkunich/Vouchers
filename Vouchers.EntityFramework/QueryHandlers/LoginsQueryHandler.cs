@@ -27,7 +27,7 @@ namespace Vouchers.EntityFramework.QueryHandlers
         }
 
         public async Task<IEnumerable<LoginDto>> HandleAsync(LoginsQuery query, CancellationToken cancellation) =>
-            await PaginatedList<LoginDto>.CreateAsync(GetQuery(query), query.PageIndex, query.PageSize);
+            await GetQuery(query).ToListAsync();
 
 
         private IQueryable<LoginDto> GetQuery(LoginsQuery query)
@@ -85,9 +85,7 @@ namespace Vouchers.EntityFramework.QueryHandlers
                     break;
             }
 
-            resultQuery.Skip((query.PageIndex - 1) * query.PageSize).Take(query.PageSize);
-
-            return resultQuery;
+            return resultQuery.GetListPageQuery(query);
         }
     }
 }

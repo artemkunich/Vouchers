@@ -13,24 +13,27 @@ using Vouchers.Application.Dtos;
 using Vouchers.Application.Queries;
 using Vouchers.Application.UseCases;
 using System.Threading;
+using Vouchers.Application.Services;
 
 namespace Vouchers.EntityFramework.QueryHandlers
 {
-    internal sealed class IdentityDomainAccountsQueryHandler : IAuthIdentityHandler<IdentityDomainAccountsQuery, IEnumerable<DomainAccountDto>>
+    internal sealed class IdentityDomainAccountsQueryHandler : IHandler<IdentityDomainAccountsQuery, IEnumerable<DomainAccountDto>>
     {
-        VouchersDbContext _dbContext;
+        private readonly IAuthIdentityProvider _authIdentityProvider;
+        private readonly VouchersDbContext _dbContext;
 
-        public IdentityDomainAccountsQueryHandler(VouchersDbContext dbContext)
-        {           
+        public IdentityDomainAccountsQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext)
+        {
+            _authIdentityProvider = authIdentityProvider;
             _dbContext = dbContext;
         }
 
-        public async Task<IEnumerable<DomainAccountDto>> HandleAsync(IdentityDomainAccountsQuery query, Guid authIdentityId, CancellationToken cancellation) =>
-            await GetQuery(query, authIdentityId).ToListAsync();
-
-        public IEnumerable<DomainAccountDto> Handle(IdentityDomainAccountsQuery query, Guid authIdentityId) =>
-            GetQuery(query, authIdentityId).ToList();
-
+        public async Task<IEnumerable<DomainAccountDto>> HandleAsync(IdentityDomainAccountsQuery query, CancellationToken cancellation)
+        {
+            var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
+            return await GetQuery(query, authIdentityId).ToListAsync();
+        }
+            
         private IQueryable<DomainAccountDto> GetQuery(IdentityDomainAccountsQuery query, Guid authIdentityId) 
         {
             var domainAccountsQuery = _dbContext.DomainAccounts
@@ -50,7 +53,7 @@ namespace Vouchers.EntityFramework.QueryHandlers
                     IsIssuer = a.IsIssuer,
                     IsOwner = a.IdentityId == a.Domain.Contract.PartyId
                 }
-            );
+            ).GetListPageQuery(query);
         }
     }
 }

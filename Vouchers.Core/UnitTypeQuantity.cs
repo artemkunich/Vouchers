@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 namespace Vouchers.Core
 {
@@ -21,20 +22,12 @@ namespace Vouchers.Core
 
         private UnitTypeQuantity() { }
 
-        public static UnitTypeQuantity operator + (UnitTypeQuantity q1, UnitTypeQuantity q2)
+        public UnitTypeQuantity Add(UnitQuantity unitQuantity, CultureInfo cultureInfo = null)
         {
-            if (q1.UnitType.NotEquals(q2.UnitType))
-                throw new CoreException("Cannot sum different voucher values");
+            if (UnitType.NotEquals(unitQuantity.Unit.UnitType))
+                throw new CoreException("CannotOperateWithDifferentUnitTypes", cultureInfo);
 
-            return Create(q1.Amount + q2.Amount, q1.UnitType);
-        }
-
-        public static UnitTypeQuantity operator +(UnitTypeQuantity q1, UnitQuantity q2)
-        {
-            if (q1.UnitType.NotEquals(q2.Unit.UnitType))
-                throw new CoreException("Cannot sum different voucher values");
-
-            return Create(q1.Amount + q2.Amount, q1.UnitType);
+            return Create(Amount + unitQuantity.Amount, UnitType);
         }
     }
 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Vouchers.Entities;
+using Vouchers.Domains.Properties;
 
 namespace Vouchers.Domains
 {
@@ -33,7 +34,7 @@ namespace Vouchers.Domains
         public void AddContract()
         {
             if (Counter + 1 > Offer.MaxContractsPerIdentity)
-                throw new DomainsException("Max count of contracts is exceeded");
+                throw new DomainsException(Resources.MaxContractsCountIsExceeded);
 
             Counter++;
         }

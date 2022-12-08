@@ -8,7 +8,7 @@ using Vouchers.Core;
 
 namespace Vouchers.EntityFramework.Configurations
 {
-    public class AccountItemConfiguration : IEntityTypeConfiguration<AccountItem>
+    internal class AccountItemConfiguration : IEntityTypeConfiguration<AccountItem>
     {
         public void Configure(EntityTypeBuilder<AccountItem> builder)
         {

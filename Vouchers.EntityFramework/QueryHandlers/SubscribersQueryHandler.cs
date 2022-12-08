@@ -11,27 +11,27 @@ using Vouchers.Application.Dtos;
 using Vouchers.Application.Queries;
 using Vouchers.Application.UseCases;
 using System.Threading;
-using Vouchers.Core;
+using Vouchers.Application.Services;
 
 namespace Vouchers.EntityFramework.QueryHandlers
 {
-    internal sealed class SubscribersQueryHandler : IAuthIdentityHandler<SubscribersQuery, IEnumerable<SubscriberDto>>
+    internal sealed class SubscribersQueryHandler : IHandler<SubscribersQuery, IEnumerable<SubscriberDto>>
     {
-        VouchersDbContext _dbContext;
+        private readonly IAuthIdentityProvider _authIdentityProvider;
+        private readonly VouchersDbContext _dbContext;
 
-        public SubscribersQueryHandler(VouchersDbContext dbContext)
-        {           
+        public SubscribersQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext)
+        {     
+            _authIdentityProvider = authIdentityProvider;
             _dbContext = dbContext;
         }
 
-        public async Task<IEnumerable<SubscriberDto>> HandleAsync(SubscribersQuery query, Guid authIdentityId, CancellationToken cancellation) =>
-            await GetQuery(query, authIdentityId).ToListAsync();
-
-        public IEnumerable<SubscriberDto> Handle(SubscribersQuery query, Guid authIdentityId) =>
-            GetQuery(query, authIdentityId).ToList();
-
-
-
+        public async Task<IEnumerable<SubscriberDto>> HandleAsync(SubscribersQuery query, CancellationToken cancellation)
+        {
+            var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
+            return await GetQuery(query, authIdentityId).ToListAsync();
+        }
+            
 
         private IQueryable<SubscriberDto> GetQuery(SubscribersQuery query, Guid authIdentityId)
         {
@@ -63,7 +63,7 @@ namespace Vouchers.EntityFramework.QueryHandlers
                         FirstName = identityDetail.FirstName,
                         LastName = identityDetail.LastName
                     }
-                );
+                ).GetListPageQuery(query);
         }
     }
 }

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Net.Mail;
 using Vouchers.Entities;
+using System.Globalization;
 
 namespace Vouchers.Core
 {
@@ -14,28 +14,28 @@ namespace Vouchers.Core
         public static Account Create() =>
             new Account(Guid.NewGuid(), DateTime.Now);
 
-        internal Account(Guid id, DateTime createdDateTime) : base(id)
+        private Account(Guid id, DateTime createdDateTime) : base(id)
         {
             CreatedDateTime = createdDateTime;
         }   
 
         private Account() { }
 
-        public void IncreaseSupply(decimal amount) 
+        public void IncreaseSupply(decimal amount, CultureInfo cultureInfo = null) 
         { 
             if(amount <= 0)
-                throw new CoreException($"Supply cannot be changed by 0 or negative amount");
+                throw new CoreException("AmountIsNotPositive", cultureInfo);
 
             Supply += amount;
         }
 
-        public void ReduceSupply(decimal amount)
+        public void ReduceSupply(decimal amount, CultureInfo cultureInfo = null)
         {
             if (amount <= 0)
-                throw new CoreException($"Supply cannot be changed by 0 or negative amount");
+                throw new CoreException("AmountIsNotPositive", cultureInfo);
 
             if (Supply < amount)
-                throw new CoreException($"Detected attempt to set negative user's supply");
+                throw new CoreException("AmountIsGreaterThanSupply", cultureInfo);
 
             Supply -= amount;
         }

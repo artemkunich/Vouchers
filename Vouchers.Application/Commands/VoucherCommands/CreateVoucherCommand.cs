@@ -12,6 +12,10 @@ namespace Vouchers.Application.Commands.VoucherCommands
         public Guid VoucherValueId { get; set; }
 
         [Required]
-        public VoucherDto Voucher { get; set; }
+        public DateTime ValidFrom { get; set; }
+
+        public DateTime? ValidTo { get; set; }
+
+        public bool CanBeExchanged { get; set; }
     }
 }

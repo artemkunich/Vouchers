@@ -14,20 +14,24 @@ using Vouchers.Domains;
 using Vouchers.Application.Queries;
 using Vouchers.Application.UseCases;
 using System.Threading;
+using Vouchers.Application.Services;
 
 namespace Vouchers.EntityFramework.QueryHandlers
 {
     internal sealed class DomainOffersQueryHandler : IHandler<DomainOffersQuery, IEnumerable<DomainOfferDto>>
     {
-        VouchersDbContext _dbContext;
+        private readonly VouchersDbContext _dbContext;
 
         public DomainOffersQueryHandler(VouchersDbContext dbContext)
-        {           
-            this._dbContext = dbContext;
+        {
+            _dbContext = dbContext;
         }
 
-        public async Task<IEnumerable<DomainOfferDto>> HandleAsync(DomainOffersQuery query, CancellationToken cancellation) =>
-            await GetQuery(query).Skip(query.PageIndex * query.PageSize).Take(query.PageSize).ToListAsync();
+        public async Task<IEnumerable<DomainOfferDto>> HandleAsync(DomainOffersQuery query, CancellationToken cancellation)
+        {
+            return await GetQuery(query).ToListAsync();
+        }
+            
 
         IQueryable<DomainOfferDto> GetQuery(DomainOffersQuery query)
         {
@@ -60,10 +64,10 @@ namespace Vouchers.EntityFramework.QueryHandlers
                 domainOffersQuery = domainOffersQuery.Where(offer => offer.Amount.Amount <= query.MaxAmount);
 
             if (query.MinMaxSubscribersCount != null)
-                domainOffersQuery = domainOffersQuery.Where(offer => offer.MaxSubscribersCount >= query.MinMaxSubscribersCount);
+                domainOffersQuery = domainOffersQuery.Where(offer => offer.MaxMembersCount >= query.MinMaxSubscribersCount);
 
             if (query.MaxMaxSubscribersCount != null)
-                domainOffersQuery = domainOffersQuery.Where(offer => offer.MaxSubscribersCount <= query.MaxMaxSubscribersCount);
+                domainOffersQuery = domainOffersQuery.Where(offer => offer.MaxMembersCount <= query.MaxMaxSubscribersCount);
 
             return domainOffersQuery.Select(domainOffer =>
                 new DomainOfferDto
@@ -73,13 +77,13 @@ namespace Vouchers.EntityFramework.QueryHandlers
                     Description = domainOffer.Description,
                     Amount = domainOffer.Amount.Amount,
                     Currency = domainOffer.Amount.Currency.ToString(),
-                    MaxSubscribersCount = domainOffer.MaxSubscribersCount,
+                    MaxMembersCount = domainOffer.MaxMembersCount,
                     InvoicePeriod = domainOffer.InvoicePeriod.ToString(),
                     ValidFrom = domainOffer.ValidFrom,
                     ValidTo = domainOffer.ValidTo,
                     MaxContractsPerIdentity = domainOffer.MaxContractsPerIdentity,
                 }
-            );
+            ).GetListPageQuery(query);
         }
     }
 }

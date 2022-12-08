@@ -8,29 +8,34 @@ using System.Threading.Tasks;
 using System.Threading;
 using Vouchers.Domains;
 using System.Linq;
+using Vouchers.Application.Services;
 
 namespace Vouchers.Application.UseCases.HolderTransactionRequestCases
 {
-    internal sealed class CreateHolderTransactionRequestCommandHandler : IAuthIdentityHandler<CreateHolderTransactionRequestCommand, Guid>
+    internal sealed class CreateHolderTransactionRequestCommandHandler : IHandler<CreateHolderTransactionRequestCommand, Guid>
     {
+        private readonly IAuthIdentityProvider _authIdentityProvider;
         private readonly IRepository<DomainAccount> _domainAccountRepository;
         private readonly IRepository<Account> _accountRepository;
         private readonly IRepository<UnitType> _unitTypeRepository;
         private readonly IRepository<HolderTransactionRequest> _holderTransactionRequestRepository;
 
-        public CreateHolderTransactionRequestCommandHandler(IRepository<DomainAccount> domainAccountRepository, IRepository<Account> accountRepository, IRepository<UnitType> unitTypeRepository, IRepository<HolderTransactionRequest> holderTransactionRequestRepository)
+        public CreateHolderTransactionRequestCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<DomainAccount> domainAccountRepository, IRepository<Account> accountRepository, IRepository<UnitType> unitTypeRepository, IRepository<HolderTransactionRequest> holderTransactionRequestRepository)
         {
+            _authIdentityProvider = authIdentityProvider;
             _domainAccountRepository = domainAccountRepository;
             _accountRepository = accountRepository;
             _unitTypeRepository = unitTypeRepository;
             _holderTransactionRequestRepository = holderTransactionRequestRepository;
         }
 
-        public async Task<Guid> HandleAsync(CreateHolderTransactionRequestCommand command, Guid authIdentityId, CancellationToken cancellation)
+        public async Task<Guid> HandleAsync(CreateHolderTransactionRequestCommand command, CancellationToken cancellation)
         {
+            var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
+
             var debtorDomainAccount = await _domainAccountRepository.GetByIdAsync(command.DebtorAccountId);
             if (debtorDomainAccount?.IdentityId != authIdentityId)
-                throw new ApplicationException("Operation is not allowed");
+                throw new ApplicationException(Properties.Resources.OperationIsNotAllowed);
 
             var debtorAccount = await _accountRepository.GetByIdAsync(command.DebtorAccountId);
 

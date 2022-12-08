@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Vouchers.Entities;
+using System.Globalization;
 
 namespace Vouchers.Core
 {
@@ -14,10 +15,10 @@ namespace Vouchers.Core
         public Guid IssuerAccountItemId { get; }
         public AccountItem IssuerAccountItem { get; }
 
-        public static IssuerTransaction Create(AccountItem issuerAccountItem, decimal amount) =>
-            new IssuerTransaction(Guid.NewGuid(), DateTime.Now, issuerAccountItem, UnitQuantity.Create(amount, issuerAccountItem.Unit));
+        public static IssuerTransaction Create(AccountItem issuerAccountItem, decimal amount, CultureInfo cultureInfo = null) =>
+            new IssuerTransaction(Guid.NewGuid(), DateTime.Now, issuerAccountItem, UnitQuantity.Create(amount, issuerAccountItem.Unit), cultureInfo);
 
-        internal IssuerTransaction(Guid id, DateTime timestamp, AccountItem issuerAccountItem, UnitQuantity quantity) : base(id)
+        private IssuerTransaction(Guid id, DateTime timestamp, AccountItem issuerAccountItem, UnitQuantity quantity, CultureInfo cultureInfo = null) : base(id)
         {
             Timestamp = timestamp;
 
@@ -25,20 +26,19 @@ namespace Vouchers.Core
             IssuerAccountItem = issuerAccountItem;
             
             Quantity = quantity;
-            //new VoucherQuantity(quantity.Amount, issuerAccount.Unit);
 
             if (Quantity.Unit.ValidTo < DateTime.Today)
-                throw new CoreException($"Voucher {Quantity.Unit.Id} is expired");
+                throw new CoreException("UnitIsExpired", cultureInfo);
 
             if (Quantity.Unit.UnitType.IssuerAccount.NotEquals(IssuerAccountItem.HolderAccount))
-                throw new CoreException($"Account owner {IssuerAccountItem.HolderAccountId} is not issuer of voucher {Quantity.Unit.UnitType.Id}");
+                throw new CoreException("AccountHolderAndUnitTypeIssuerAreDifferent", cultureInfo);
 
             if (Quantity.Unit.NotEquals(IssuerAccountItem.Unit))
-                throw new CoreException($"Account unit {IssuerAccountItem.UnitId} is not voucher {Quantity.Unit.UnitType.Id}");
+                throw new CoreException("AccountItemUnitAndTransactionUnitAreDifferent", cultureInfo);
 
 
             if (Quantity.Amount == 0)
-                throw new CoreException("Transaction cannot have amount 0");
+                throw new CoreException("AmountIsNotPositive", cultureInfo);
 
         }
 

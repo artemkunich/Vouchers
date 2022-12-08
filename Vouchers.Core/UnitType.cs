@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using Vouchers.Entities;
 
 namespace Vouchers.Core
@@ -12,7 +13,7 @@ namespace Vouchers.Core
         public static UnitType Create(Account issuerAccount) =>
             new UnitType(Guid.NewGuid(), issuerAccount);
 
-        internal UnitType(Guid id, Account issuerAccount) : base(id)
+        private UnitType(Guid id, Account issuerAccount) : base(id)
         {
             IssuerAccountId = issuerAccount.Id;
             IssuerAccount = issuerAccount;
@@ -20,21 +21,21 @@ namespace Vouchers.Core
 
         private UnitType() { }
 
-        public void IncreaseSupply(decimal amount)
+        public void IncreaseSupply(decimal amount, CultureInfo cultureInfo = null)
         {
             if (amount <= 0)
-                throw new CoreException($"Supply cannot be changed by 0 or negative amount");
+                throw new CoreException("AmountIsNotPositive", cultureInfo);
             Supply += amount;
 
             IssuerAccount.IncreaseSupply(amount);
         }
 
-        public void ReduceSupply(decimal amount)
+        public void ReduceSupply(decimal amount, CultureInfo cultureInfo = null)
         {
             if (amount <= 0)
-                throw new CoreException($"Supply cannot be changed by 0 or negative amount");
+                throw new CoreException("AmountIsNotPositive", cultureInfo);
             if (Supply < amount)
-                throw new CoreException($"Detected attempt to set negative user's supply");
+                throw new CoreException("AmountIsGreaterThanSupply", cultureInfo);
             Supply -= amount;
 
             IssuerAccount.ReduceSupply(amount);

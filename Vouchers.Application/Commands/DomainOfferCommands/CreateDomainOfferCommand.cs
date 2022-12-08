@@ -14,7 +14,7 @@ namespace Vouchers.Application.Commands.DomainOfferCommands
         public string Description { get; set; }
 
         [Required]
-        public int MaxSubscribersCount { get; set; }
+        public int MaxMembersCount { get; set; }
         [Required]
         public decimal Amount { get; set; }
         [Required]

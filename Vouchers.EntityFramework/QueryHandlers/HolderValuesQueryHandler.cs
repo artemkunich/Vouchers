@@ -8,22 +8,27 @@ using System.Threading;
 using System.Threading.Tasks;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Queries;
+using Vouchers.Application.Services;
 using Vouchers.Application.UseCases;
 using Vouchers.Core;
 
 namespace Vouchers.EntityFramework.QueryHandlers
 {
-    internal sealed class HolderValuesQueryHandler : IAuthIdentityHandler<HolderValuesQuery,IEnumerable<VoucherValueDto>>
+    internal sealed class HolderValuesQueryHandler : IHandler<HolderValuesQuery,IEnumerable<VoucherValueDto>>
     {
-        VouchersDbContext _dbContext;
+        private readonly IAuthIdentityProvider _authIdentityProvider;
+        private readonly VouchersDbContext _dbContext;
 
-        public HolderValuesQueryHandler(VouchersDbContext dbContext)
+        public HolderValuesQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext)
         {
+            _authIdentityProvider = authIdentityProvider;
             _dbContext = dbContext;
         }
 
-        public async Task<IEnumerable<VoucherValueDto>> HandleAsync(HolderValuesQuery query, Guid authIdentityId, CancellationToken cancellation)
+        public async Task<IEnumerable<VoucherValueDto>> HandleAsync(HolderValuesQuery query, CancellationToken cancellation)
         {
+            var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
+
             var authDomainAccounts = await _dbContext.DomainAccounts.Where(a => a.IdentityId == authIdentityId && a.Id == query.HolderId).ToListAsync();
 
             if (!authDomainAccounts.Any())
@@ -77,7 +82,7 @@ namespace Vouchers.EntityFramework.QueryHandlers
                     Balance = accountItemsQuery.Where(acc => acc.Unit.UnitType.Id == o.UnitType.Id).Sum(item => item.Balance),
                     Supply = o.UnitType.Supply,
                 }
-            ).ToListAsync(cancellation);
+            ).GetListPageQuery(query).ToListAsync(cancellation);
         }
     }
 }

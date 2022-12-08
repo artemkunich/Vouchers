@@ -8,11 +8,13 @@ using Vouchers.Core;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Domains;
 using Vouchers.Application.Commands.HolderTransactionCommands;
+using Vouchers.Application.Services;
 
 namespace Vouchers.Application.UseCases.HolderTransactionCases
 {
-    internal sealed class CreateHolderTransactionCommandHandler : IAuthIdentityHandler<CreateHolderTransactionCommand, Guid>
+    internal sealed class CreateHolderTransactionCommandHandler : IHandler<CreateHolderTransactionCommand, Guid>
     {
+        private readonly IAuthIdentityProvider _authIdentityProvider;
         private readonly IRepository<DomainAccount> _domainAccountRepository;
         private readonly IRepository<Account> _accountRepository;
         private readonly IRepository<Unit> _unitRepository;
@@ -21,8 +23,9 @@ namespace Vouchers.Application.UseCases.HolderTransactionCases
         private readonly IRepository<HolderTransaction> _holderTransactionRepository;
         private readonly IRepository<HolderTransactionRequest> _holderTransactionRequestRepository;
 
-        public CreateHolderTransactionCommandHandler(IRepository<DomainAccount> domainAccountRepository, IRepository<Account> accountRepository, IRepository<Unit> unitRepository, IRepository<UnitType> unitTypeRepository, IRepository<AccountItem> accountItemRepository, IRepository<HolderTransaction> holderTransactionRepository, IRepository<HolderTransactionRequest> holderTransactionRequestRepository)
+        public CreateHolderTransactionCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<DomainAccount> domainAccountRepository, IRepository<Account> accountRepository, IRepository<Unit> unitRepository, IRepository<UnitType> unitTypeRepository, IRepository<AccountItem> accountItemRepository, IRepository<HolderTransaction> holderTransactionRepository, IRepository<HolderTransactionRequest> holderTransactionRequestRepository)
         {
+            _authIdentityProvider = authIdentityProvider;
             _domainAccountRepository = domainAccountRepository;
             _accountRepository = accountRepository;
             _unitRepository = unitRepository;
@@ -32,39 +35,41 @@ namespace Vouchers.Application.UseCases.HolderTransactionCases
             _holderTransactionRequestRepository = holderTransactionRequestRepository;
         }
 
-        public async Task<Guid> HandleAsync(CreateHolderTransactionCommand command, Guid authIdentityId, CancellationToken cancellation)
+        public async Task<Guid> HandleAsync(CreateHolderTransactionCommand command, CancellationToken cancellation)
         {
+            var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
+
             var creditorDomainAccount = await _domainAccountRepository.GetByIdAsync(command.CreditorAccountId);
             if (creditorDomainAccount?.IdentityId != authIdentityId)
-                throw new ApplicationException("Operation is not allowed");
+                throw new ApplicationException(Properties.Resources.OperationIsNotAllowed);
             if (!creditorDomainAccount.IsConfirmed)
-                throw new ApplicationException("Creditor account is not activated");
+                throw new ApplicationException(Properties.Resources.CreditorAccountIsNotActivated);
 
             HolderTransactionRequest holderTransactionRequest = null;
             if (command.HolderTransactionRequestId is not null)
             {
                 holderTransactionRequest = await _holderTransactionRequestRepository.GetByIdAsync(command.HolderTransactionRequestId.Value);
                 if(holderTransactionRequest is null)
-                    throw new ApplicationException("Transaction request is not found");
+                    throw new ApplicationException(Properties.Resources.TransactionRequestIsNotFound);
             }
 
             var debtorDomainAccount = await _domainAccountRepository.GetByIdAsync(command.DebtorAccountId);
             if(debtorDomainAccount is null)
-                throw new ApplicationException("Debtor account does not exist");
+                throw new ApplicationException(Properties.Resources.DebtorAccountDoesNotExist);
             if (!debtorDomainAccount.IsConfirmed)
-                throw new ApplicationException("Debtor account is not activated");
+                throw new ApplicationException(Properties.Resources.DebtorAccountIsNotActivated);
 
             var unitType = await _unitTypeRepository.GetByIdAsync(command.UnitTypeId);
             if (unitType is null)
-                throw new ApplicationException("Voucher value does not exist");
+                throw new ApplicationException(Properties.Resources.VoucherValueDoesNotExist);
 
             var creditorAccount = await _accountRepository.GetByIdAsync(command.CreditorAccountId);
             if(creditorAccount is null)
-                throw new ApplicationException("Creditor's account does not exist");
+                throw new ApplicationException(Properties.Resources.CreditorAccountDoesNotExist);
 
             var debtorAccount = await _accountRepository.GetByIdAsync(command.DebtorAccountId);
             if (debtorAccount is null)
-                throw new ApplicationException("Debtor's account does not exist");
+                throw new ApplicationException(Properties.Resources.DebtorAccountDoesNotExist);
 
             HolderTransaction transaction = HolderTransaction.Create(creditorAccount, debtorAccount, unitType, command.Message);
 
@@ -73,7 +78,7 @@ namespace Vouchers.Application.UseCases.HolderTransactionCases
                 var creditAccountItem = (await _accountItemRepository.GetByExpressionAsync(accItem => accItem.HolderAccountId == command.CreditorAccountId && accItem.Unit.Id == item.Item1)).FirstOrDefault();
                 if (creditAccountItem is null)
                 {
-                    throw new ApplicationException($"User {command.CreditorAccountId} does not have account for voucher {item.Item2}");
+                    throw new ApplicationException(Properties.Resources.UserDoesNotHaveAccountForVoucher, command.CreditorAccountId, item.Item2);
                 }
                 var debitAccountItem = (await _accountItemRepository.GetByExpressionAsync(accItem => accItem.HolderAccountId == command.DebtorAccountId && accItem.Unit.Id == item.Item1)).FirstOrDefault();
                 if (debitAccountItem is null)

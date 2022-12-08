@@ -13,17 +13,19 @@ using Vouchers.Application.Services;
 
 namespace Vouchers.Application.UseCases.VoucherValueCases
 {
-    internal sealed class CreateVoucherValueCommandHandler : IAuthIdentityHandler<CreateVoucherValueCommand, Guid>
+    internal sealed class CreateVoucherValueCommandHandler : IHandler<CreateVoucherValueCommand, Guid>
     {
+        private readonly IAuthIdentityProvider _authIdentityProvider;
         private readonly IRepository<DomainAccount> _domainAccountRepository;
         private readonly IRepository<Account> _accountRepository;
         private readonly IRepository<VoucherValue> _voucherValueRepository;
         private readonly IRepository<UnitType> _unitTypeRepository;
-        private readonly AppImageService _appImageService;
+        private readonly IAppImageService _appImageService;
 
-        public CreateVoucherValueCommandHandler(IRepository<DomainAccount> domainAccountRepository, IRepository<Account> accountRepository,
-            IRepository<VoucherValue> voucherValueRepository, IRepository<UnitType> unitTypeRepository, AppImageService appImageService)
+        public CreateVoucherValueCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<DomainAccount> domainAccountRepository, IRepository<Account> accountRepository,
+            IRepository<VoucherValue> voucherValueRepository, IRepository<UnitType> unitTypeRepository, IAppImageService appImageService)
         {
+            _authIdentityProvider = authIdentityProvider;
             _domainAccountRepository = domainAccountRepository;
             _accountRepository = accountRepository;
             _voucherValueRepository = voucherValueRepository;
@@ -31,32 +33,32 @@ namespace Vouchers.Application.UseCases.VoucherValueCases
             _appImageService = appImageService;
         }
 
-        public async Task<Guid> HandleAsync(CreateVoucherValueCommand command, Guid authIdentityId, CancellationToken cancellation)
+        public async Task<Guid> HandleAsync(CreateVoucherValueCommand command, CancellationToken cancellation)
         {
-            var issuerDomainAccount = await _domainAccountRepository.GetByIdAsync(command.IssuerDomainAccountId);
-            if (issuerDomainAccount?.IdentityId != authIdentityId)
-                throw new ApplicationException("Operation is not allowed");
-            if (!issuerDomainAccount.IsConfirmed)
-                throw new ApplicationException("Issuer account is not activated");
-            if (!issuerDomainAccount.IsIssuer)
-                throw new ApplicationException("Issue operations are not allowed");
+            var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
 
-            var detailDto = command.VoucherValueDetail;
+            var issuerDomainAccount = await _domainAccountRepository.GetByIdAsync(command.IssuerAccountId);
+            if (issuerDomainAccount?.IdentityId != authIdentityId)
+                throw new ApplicationException(Properties.Resources.OperationIsNotAllowed);
+            if (!issuerDomainAccount.IsConfirmed)
+                throw new ApplicationException(Properties.Resources.IssuerAccountIsNotActivated);
+            if (!issuerDomainAccount.IsIssuer)
+                throw new ApplicationException(Properties.Resources.IssuerOperationsAreNotAllowed);
 
             CroppedImage image = null;
-            if (command.Image is not null && detailDto.CropParameters is not null)
+            if (command.Image is not null && command.CropParameters is not null)
             {
                 var imageStream = command.Image.OpenReadStream();
-                image = await _appImageService.CreateCroppedImage(imageStream, detailDto.CropParameters);
+                image = await _appImageService.CreateCroppedImage(imageStream, command.CropParameters);
             }
 
-            var account = await _accountRepository.GetByIdAsync(command.IssuerDomainAccountId);
+            var account = await _accountRepository.GetByIdAsync(command.IssuerAccountId);
 
             var unitType = UnitType.Create(account);
             await _unitTypeRepository.AddAsync(unitType);
 
-            var value = VoucherValue.Create(unitType.Id, issuerDomainAccount.Domain.Id, issuerDomainAccount.IdentityId, detailDto.Ticker);
-            value.Description = detailDto.Description;
+            var value = VoucherValue.Create(unitType.Id, issuerDomainAccount.Domain.Id, issuerDomainAccount.IdentityId, command.Ticker);
+            value.Description = command.Description;
             value.ImageId = image?.Id;
 
 

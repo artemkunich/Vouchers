@@ -10,7 +10,7 @@ using Vouchers.Domains;
 
 namespace Vouchers.EntityFramework.Repositories
 {
-    public sealed class DomainAccountRepository : Repository<DomainAccount>
+    internal sealed class DomainAccountRepository : Repository<DomainAccount>
     {
         public DomainAccountRepository(VouchersDbContext dbContext) : base(dbContext)
         { 

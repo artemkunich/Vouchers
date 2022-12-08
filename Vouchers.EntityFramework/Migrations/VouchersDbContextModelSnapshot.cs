@@ -368,7 +368,7 @@ namespace Vouchers.EntityFramework.Migrations
                     b.Property<int?>("MaxContractsPerIdentity")
                         .HasColumnType("int");
 
-                    b.Property<int>("MaxSubscribersCount")
+                    b.Property<int>("MaxMembersCount")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")

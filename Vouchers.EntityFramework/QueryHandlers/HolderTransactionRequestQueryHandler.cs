@@ -8,24 +8,28 @@ using System.Threading.Tasks;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.UseCases;
 using System.Threading;
-
+using Vouchers.Application.Services;
 
 namespace Vouchers.EntityFramework.QueryHandlers
 {
-    internal sealed class HolderTransactionRequestQueryHandler : IAuthIdentityHandler<Guid,HolderTransactionRequestDto>
+    internal sealed class HolderTransactionRequestQueryHandler : IHandler<Guid, HolderTransactionRequestDto>
     {
-        readonly VouchersDbContext _dbContext;
+        private readonly IAuthIdentityProvider _authIdentityProvider;
+        private readonly VouchersDbContext _dbContext;
 
-        public HolderTransactionRequestQueryHandler(VouchersDbContext dbContext)
+        public HolderTransactionRequestQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext)
         {
+            _authIdentityProvider = authIdentityProvider;
             _dbContext = dbContext;
         }
 
         public HolderTransactionRequestDto Handle(Guid transactionRequestId, Guid authIdentityId) =>
             GetQuery(transactionRequestId, authIdentityId).FirstOrDefault();
 
-        public async Task<HolderTransactionRequestDto> HandleAsync(Guid transactionRequestId, Guid authIdentityId, CancellationToken cancellation) =>
-            await GetQuery(transactionRequestId, authIdentityId).FirstOrDefaultAsync();
+        public async Task<HolderTransactionRequestDto> HandleAsync(Guid transactionRequestId, CancellationToken cancellation) {
+            var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
+            return await GetQuery(transactionRequestId, authIdentityId).FirstOrDefaultAsync();
+        }
 
         public IQueryable<HolderTransactionRequestDto> GetQuery(Guid transactionRequestId, Guid authIdentityId) {
 

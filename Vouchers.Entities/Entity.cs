@@ -21,6 +21,8 @@
             return Id.Equals(entity.Id);
         }
 
-        public bool NotEquals(Entity entity) => !Equals(entity as Entity);
+        public bool NotEquals(Entity entity) => !Equals(entity);
+
+        public static implicit operator Guid(Entity entity) => entity.Id;
     }
 }

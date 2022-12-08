@@ -6,22 +6,27 @@ using System.Threading;
 using System.Threading.Tasks;
 using Vouchers.Application.Commands.DomainOfferCommands;
 using Vouchers.Application.Infrastructure;
+using Vouchers.Application.Services;
 using Vouchers.Core;
 using Vouchers.Domains;
 
 namespace Vouchers.Application.UseCases.DomainOfferCases
 {
-    internal sealed class UpdateDomainOfferCommandHandler : IAuthIdentityHandler<UpdateDomainOfferCommand>
+    internal sealed class UpdateDomainOfferCommandHandler : IHandler<UpdateDomainOfferCommand>
     {
+        private readonly IAuthIdentityProvider _authIdentityProvider;
         private readonly IRepository<DomainOffer> _domainOfferRepository;
 
-        public UpdateDomainOfferCommandHandler(IRepository<DomainOffer> domainOfferRepository)
+        public UpdateDomainOfferCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<DomainOffer> domainOfferRepository)
         {
+            _authIdentityProvider = authIdentityProvider;
             _domainOfferRepository = domainOfferRepository;
         }
 
-        public async Task HandleAsync(UpdateDomainOfferCommand command, Guid authIdentityId, CancellationToken cancellation)
+        public async Task HandleAsync(UpdateDomainOfferCommand command, CancellationToken cancellation)
         {
+            var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
+
             var domainOffer = await _domainOfferRepository.GetByIdAsync(command.Id);
 
             if (command.Terminate)
@@ -44,10 +49,10 @@ namespace Vouchers.Application.UseCases.DomainOfferCases
             if (command.ValidFrom is not null && command.ValidFrom != domainOffer.ValidFrom)
             {
                 if (domainOffer.ValidFrom <= DateTime.Now)
-                    throw new ApplicationException("ValidFrom cannot be modified on active offers");
+                    throw new ApplicationException(Properties.Resources.ValidFromCannotBeModifiedOnActiveOffers);
 
                 if (command.ValidFrom < DateTime.Now)
-                    throw new ApplicationException("Cannot set validFrom to past");
+                    throw new ApplicationException(Properties.Resources.ValidFromCannotBeSetToPast);
 
                 domainOffer.ValidFrom = command.ValidFrom.Value;
             }
@@ -55,10 +60,10 @@ namespace Vouchers.Application.UseCases.DomainOfferCases
             if (command.ValidTo is not null && command.ValidTo != domainOffer.ValidTo)
             {
                 if (command.ValidTo < domainOffer.ValidFrom)
-                    throw new ApplicationException("ValidTo cannot be less than ValidFrom");
+                    throw new ApplicationException(Properties.Resources.ValidToCannotBeLessThanValidFrom);
 
                 if (command.ValidTo < DateTime.Now)
-                    throw new ApplicationException("ValidTo cannot be less than now");
+                    throw new ApplicationException(Properties.Resources.ValidToCannotBeLessThanCurrentDatetime);
 
                 domainOffer.ValidTo = command.ValidTo.Value;
 

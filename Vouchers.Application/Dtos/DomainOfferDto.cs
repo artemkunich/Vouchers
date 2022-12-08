@@ -13,7 +13,7 @@ namespace Vouchers.Application.Dtos
 
         public string Description { get; set; }
 
-        public int MaxSubscribersCount { get; set; }
+        public int MaxMembersCount { get; set; }
 
         public decimal Amount { get; set; }
 

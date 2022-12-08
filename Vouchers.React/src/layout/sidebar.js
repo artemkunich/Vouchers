@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { domainAccountSelected } from '../store/domainAccountReducer.js';
+import { domainAccountSelected } from '../store/domainAccountReducer';
 import { Link } from 'react-router-dom'
+import { api } from '../api/api.ts'
 import style from './sidebar.module.css'
 import "bootstrap-icons/font/bootstrap-icons.css";
 
 export const sidebarMaxWidth = 300;
 
-export const Sidebar = ({sideBarWidth, api}) => {
+export const Sidebar = ({sideBarWidth}) => {
 
     const token = useSelector((state) => state.user.token)
     const identityId = useSelector(state => state.user.identityId)
@@ -33,7 +34,6 @@ export const Sidebar = ({sideBarWidth, api}) => {
 
             <div>
                 <hr/>
-
                 {
                     isManager ?
                         <>
@@ -57,7 +57,7 @@ export const Sidebar = ({sideBarWidth, api}) => {
                             <ul className="nav nav-pills flex-column mb-auto">
                                 <li className="nav-item mx-2">
                                     <Link to="/newDomain" className="nav-link">
-                                        <i className="bi bi-card-list me-4"></i>
+                                        <i className="bi bi-plus-square me-4"></i>
                                         New domain
                                     </Link>
                                 </li>
@@ -89,19 +89,19 @@ export const Sidebar = ({sideBarWidth, api}) => {
                         <>
                             <li className="nav-item mx-2">
                                 <Link to="/domainDetail" className="nav-link">
-                                    <i className="bi bi-card-text me-4"></i>
+                                    <i className="bi bi-info-square me-4"></i>
                                     Domain detail
                                 </Link>
                             </li>
                             <li className="nav-item mx-2">
                                 <Link to="/domainMembers" className="nav-link">
-                                    <i className="bi bi-card-text me-4"></i>
+                                    <i className="bi bi-people me-4"></i>
                                     Domain members
                                 </Link>
                             </li>
                             <li className="nav-item mx-2">
                                 <Link to="/domainValues" className="nav-link">
-                                    <i className="bi bi-card-text me-4"></i>
+                                    <i className="bi bi-card-list me-4"></i>
                                     Domain values
                                 </Link>
                             </li>
@@ -112,13 +112,13 @@ export const Sidebar = ({sideBarWidth, api}) => {
                             <>
                                 <li className="nav-item mx-2">
                                     <Link to="/newValue" className="nav-link">
-                                        <i className="bi bi-card-text me-4"></i>
+                                        <i className="bi bi-plus-square me-4"></i>
                                         New value
                                     </Link>
                                 </li>
                                 <li className="nav-item mx-2">
                                     <Link to="/issuerValues" className="nav-link">
-                                        <i className="bi bi-card-text me-4"></i>
+                                        <i className="bi bi-card-list me-4"></i>
                                         Issuer values
                                     </Link>
                                 </li>
@@ -129,23 +129,23 @@ export const Sidebar = ({sideBarWidth, api}) => {
                         currentDomainAccount ?
                             <li className="nav-item mx-2">
                                 <Link to="/holderValues" className="nav-link">
-                                    <i className="bi bi-card-text me-4"></i>
+                                    <i className="bi bi-card-list me-4"></i>
                                     Holder values
                                 </Link>
                                 <Link to="/holderTransactions" className="nav-link">
-                                    <i className="bi bi-card-text me-4"></i>
+                                    <i className="bi bi-card-list me-4"></i>
                                     Holder transfers
                                 </Link>
                                 <Link to="/performRequest" className="nav-link">
-                                    <i className="bi bi-card-text me-4"></i>
+                                    <i className="bi bi-send me-4"></i>
                                     Perform request
                                 </Link>
                                 <Link to="/outgoingRequests" className="nav-link">
-                                    <i className="bi bi-card-text me-4"></i>
+                                    <i className="bi bi-card-list me-4"></i>
                                     Outgoing requests
                                 </Link>
                                 <Link to="/incomingRequests" className="nav-link">
-                                    <i className="bi bi-card-text me-4"></i>
+                                    <i className="bi bi-card-list me-4"></i>
                                     Incoming requests
                                 </Link>
                             </li> : <></>

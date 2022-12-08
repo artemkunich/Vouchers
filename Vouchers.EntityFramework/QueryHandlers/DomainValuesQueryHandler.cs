@@ -8,21 +8,26 @@ using System.Threading;
 using System.Threading.Tasks;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Queries;
+using Vouchers.Application.Services;
 using Vouchers.Application.UseCases;
 
 namespace Vouchers.EntityFramework.QueryHandlers
 {
-    internal sealed class DomainValuesQueryHandler : IAuthIdentityHandler<DomainValuesQuery,IEnumerable<VoucherValueDto>>
+    internal sealed class DomainValuesQueryHandler : IHandler<DomainValuesQuery,IEnumerable<VoucherValueDto>>
     {
-        VouchersDbContext _dbContext;
+        private readonly IAuthIdentityProvider _authIdentityProvider;
+        private readonly VouchersDbContext _dbContext;
 
-        public DomainValuesQueryHandler(VouchersDbContext dbContext)
+        public DomainValuesQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext)
         {
+            _authIdentityProvider = authIdentityProvider;
             _dbContext = dbContext;
         }
 
-        public async Task<IEnumerable<VoucherValueDto>> HandleAsync(DomainValuesQuery query, Guid authIdentityId, CancellationToken cancellation)
+        public async Task<IEnumerable<VoucherValueDto>> HandleAsync(DomainValuesQuery query, CancellationToken cancellation)
         {
+            var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
+
             var authDomainAccounts = await _dbContext.DomainAccounts.Where(a => a.IdentityId == authIdentityId && a.DomainId == query.DomainId).ToListAsync();
 
             if (!authDomainAccounts.Any())
@@ -58,7 +63,7 @@ namespace Vouchers.EntityFramework.QueryHandlers
                     IssuerName = o.Identity.FirstName + " " + o.Identity.LastName,
                     IssuerEmail = o.Identity.Email,
                 }
-            ).ToListAsync(cancellation);
+            ).GetListPageQuery(query).ToListAsync(cancellation);
         }
     }
 }

@@ -11,7 +11,7 @@ using Vouchers.Domains;
 
 namespace Vouchers.EntityFramework.Repositories
 {
-    public sealed class DomainOffersPerIdentityCounterRepository : Repository<DomainOffersPerIdentityCounter>
+    internal sealed class DomainOffersPerIdentityCounterRepository : Repository<DomainOffersPerIdentityCounter>
     {
         public DomainOffersPerIdentityCounterRepository(VouchersDbContext dbContext) : base(dbContext)
         {

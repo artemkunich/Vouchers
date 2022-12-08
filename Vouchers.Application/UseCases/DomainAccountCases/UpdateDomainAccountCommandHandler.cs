@@ -6,33 +6,38 @@ using System.Threading;
 using System.Threading.Tasks;
 using Vouchers.Application.Commands.DomainAccountCommands;
 using Vouchers.Application.Infrastructure;
+using Vouchers.Application.Services;
 using Vouchers.Domains;
 
 namespace Vouchers.Application.UseCases.DomainAccountCases
 {
-    internal sealed class UpdateDomainAccountCommandHandler : IAuthIdentityHandler<UpdateDomainAccountCommand>
+    internal sealed class UpdateDomainAccountCommandHandler : IHandler<UpdateDomainAccountCommand>
     {
+        private readonly IAuthIdentityProvider _authIdentityProvider;
         private readonly IRepository<DomainAccount> _domainAccountRepository;
 
-        public UpdateDomainAccountCommandHandler(IRepository<DomainAccount> domainAccountRepository)
+        public UpdateDomainAccountCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<DomainAccount> domainAccountRepository)
         {
             _domainAccountRepository = domainAccountRepository;
+            _authIdentityProvider = authIdentityProvider;
         }
 
-        public async Task HandleAsync(UpdateDomainAccountCommand command, Guid authIdentityId, CancellationToken cancellation)
+        public async Task HandleAsync(UpdateDomainAccountCommand command, CancellationToken cancellation)
         {
+            var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
+
             var domainAccount = await _domainAccountRepository.GetByIdAsync(command.DomainAccountId);
             if (domainAccount is null)
-                throw new ApplicationException("Domain account does not exist");
+                throw new ApplicationException(Properties.Resources.DomainAccountDoesNotExist);
 
             var authDomainAccount = (await _domainAccountRepository.GetByExpressionAsync(acc => acc.Domain.Id == domainAccount.Domain.Id && acc.IdentityId == authIdentityId)).FirstOrDefault();
             if (authDomainAccount is null)
-                throw new InvalidOperationException("Identity does not have account in domain");    
+                throw new InvalidOperationException(Properties.Resources.IdentityDoesNotHaveAccountInDomain);    
 
             if(command.IsConfirmed is not null && domainAccount.IsConfirmed != command.IsConfirmed)
             {
                 if(!(authDomainAccount.IsAdmin || authDomainAccount.IsOwner))
-                    throw new InvalidOperationException("Operation is not allowed");
+                    throw new InvalidOperationException(Properties.Resources.OperationIsNotAllowed);
 
                 domainAccount.IsConfirmed = command.IsConfirmed.Value;
             }
@@ -40,7 +45,7 @@ namespace Vouchers.Application.UseCases.DomainAccountCases
             if (command.IsIssuer is not null && domainAccount.IsIssuer != command.IsIssuer)
             {
                 if (!(authDomainAccount.IsAdmin || authDomainAccount.IsOwner))
-                    throw new InvalidOperationException("Operation is not allowed");
+                    throw new InvalidOperationException(Properties.Resources.OperationIsNotAllowed);
 
                 domainAccount.IsIssuer = command.IsIssuer.Value;
             }
@@ -48,7 +53,7 @@ namespace Vouchers.Application.UseCases.DomainAccountCases
             if (command.IsAdmin is not null && domainAccount.IsAdmin != command.IsAdmin)
             {
                 if (!authDomainAccount.IsOwner)
-                    throw new InvalidOperationException("Operation is not allowed");
+                    throw new InvalidOperationException(Properties.Resources.OperationIsNotAllowed);
 
                 domainAccount.IsAdmin = command.IsAdmin.Value;
             }

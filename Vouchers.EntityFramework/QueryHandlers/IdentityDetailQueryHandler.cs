@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
+using Vouchers.Application.Services;
 using Vouchers.Application.UseCases;
 using Vouchers.Core;
 using Vouchers.Domains;
@@ -14,11 +15,13 @@ using Vouchers.Files;
 
 namespace Vouchers.EntityFramework.QueryHandlers
 {
-    internal sealed class IdentityDetailQueryHandler : IAuthIdentityHandler<Guid?, IdentityDetailDto>
+    internal sealed class IdentityDetailQueryHandler : IHandler<Guid?, IdentityDetailDto>
     {
+        private readonly IAuthIdentityProvider _authIdentityProvider;
         private readonly VouchersDbContext _dbContext;
-        public IdentityDetailQueryHandler(VouchersDbContext dbContext)
+        public IdentityDetailQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext)
         {
+            _authIdentityProvider = authIdentityProvider;
             _dbContext = dbContext;
         }
 
@@ -30,8 +33,10 @@ namespace Vouchers.EntityFramework.QueryHandlers
             Height = cp.Height,
         };
 
-        public async Task<IdentityDetailDto> HandleAsync(Guid? accountId, Guid authIdentityId, CancellationToken cancellation)
+        public async Task<IdentityDetailDto> HandleAsync(Guid? accountId, CancellationToken cancellation)
         {
+            var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
+
             var identityId = authIdentityId;
             DomainAccount domainAccount = null;
             if (accountId is not null)

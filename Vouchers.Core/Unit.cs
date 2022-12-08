@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using Vouchers.Entities;
 
 namespace Vouchers.Core
@@ -15,16 +16,16 @@ namespace Vouchers.Core
 
         public decimal Supply { get; private set; }
 
-        public static Unit Create(DateTime validFrom, DateTime validTo, bool canBeExchanged, UnitType value) =>
-            new Unit(Guid.NewGuid(), value, validFrom, validTo, canBeExchanged, 0);
+        public static Unit Create(DateTime validFrom, DateTime validTo, bool canBeExchanged, UnitType value, CultureInfo cultureInfo = null) =>
+            new Unit(Guid.NewGuid(), value, validFrom, validTo, canBeExchanged, 0, cultureInfo);
 
-        internal Unit(Guid id, UnitType unitType, DateTime validFrom, DateTime validTo, bool canBeExchanged, decimal supply) : base(id)
+        private Unit(Guid id, UnitType unitType, DateTime validFrom, DateTime validTo, bool canBeExchanged, decimal supply, CultureInfo cultureInfo = null) : base(id)
         {
             if (validTo < DateTime.Today)
-                throw new CoreException("ValidTo can not be before today");
+                throw new CoreException("ValidToIsLessThanToday", cultureInfo);
 
             if (validFrom > validTo)
-                throw new CoreException("ValidFrom can not be after validTo");
+                throw new CoreException("ValidFromIsGreaterThanValidTo", cultureInfo);
 
             ValidFrom = validFrom;
             ValidTo = validTo;
@@ -38,52 +39,52 @@ namespace Vouchers.Core
 
         private Unit() { }
 
-        public void IncreaseSupply(decimal amount)
+        public void IncreaseSupply(decimal amount, CultureInfo cultureInfo = null)
         {
             if (amount <= 0)
-                throw new CoreException($"Supply cannot be changed by 0 or negative amount");
+                throw new CoreException("AmountIsNotPositive", cultureInfo);
             Supply += amount;
 
             UnitType.IncreaseSupply(amount);
         }
 
-        public void ReduceSupply(decimal amount)
+        public void ReduceSupply(decimal amount, CultureInfo cultureInfo = null)
         {
             if (amount <= 0)
-                throw new CoreException($"Supply cannot be changed by 0 or negative amount");
+                throw new CoreException("AmountIsNotPositive", cultureInfo);
             if (Supply < amount)
-                throw new CoreException($"Detected attempt to set negative user's supply");
+                throw new CoreException("AmountIsGreaterThanSupply", cultureInfo);
             Supply -= amount;
 
             UnitType.ReduceSupply(amount);
         }
 
-        public void SetValidFrom(DateTime validFrom)
+        public void SetValidFrom(DateTime validFrom, CultureInfo cultureInfo = null)
         {
             if (validFrom > ValidFrom && Supply != 0)
-                throw new CoreException("New validFrom can not be after current validFrom");
+                throw new CoreException("NewValidFromIsGreaterThanCurrentValidFrom", cultureInfo);
 
             if (validFrom > ValidTo)
-                throw new CoreException("ValidFrom can not be after validTo");
+                throw new CoreException("NewValidFromIsGreaterThanCurrentValidTo", cultureInfo);
 
             ValidFrom = validFrom;
         }
 
-        public void SetValidTo(DateTime validTo)
+        public void SetValidTo(DateTime validTo, CultureInfo cultureInfo = null)
         {
             if (validTo < ValidTo && Supply != 0)
-                throw new CoreException("New validTo can not be before current validFrom");
+                throw new CoreException("NewValidToIsLessThanCurrentValidFrom", cultureInfo);
 
             if (ValidFrom > validTo)
-                throw new CoreException("ValidFrom can not be after validTo");
+                throw new CoreException("CurrentValidFromIsGreaterThanNewValidTo", cultureInfo);
 
             ValidTo = validTo;
         }
 
-        public void SetCanBeExchanged(bool canBeExchanged)
+        public void SetCanBeExchanged(bool canBeExchanged, CultureInfo cultureInfo = null)
         {
             if (!canBeExchanged && CanBeExchanged && Supply != 0)
-                throw new CoreException("It is not allowed to switch off exchangeability");
+                throw new CoreException("CannotDisableExchangeability", cultureInfo);
 
             CanBeExchanged = canBeExchanged;
         }

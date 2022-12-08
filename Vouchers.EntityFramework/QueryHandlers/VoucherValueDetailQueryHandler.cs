@@ -7,17 +7,20 @@ using System.Threading;
 using System.Threading.Tasks;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
+using Vouchers.Application.Services;
 using Vouchers.Application.UseCases;
 using Vouchers.Files;
 
 namespace Vouchers.EntityFramework.QueryHandlers
 {
-    internal sealed class VoucherValueDetailQueryHandler : IAuthIdentityHandler<Guid,VoucherValueDetailDto>
+    internal sealed class VoucherValueDetailQueryHandler : IHandler<Guid,VoucherValueDetailDto>
     {
-        VouchersDbContext _dbContext;
+        private readonly IAuthIdentityProvider _authIdentityProvider;
+        private readonly VouchersDbContext _dbContext;
 
-        public VoucherValueDetailQueryHandler(VouchersDbContext dbContext)
+        public VoucherValueDetailQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext)
         {
+            _authIdentityProvider = authIdentityProvider;
             _dbContext = dbContext;
         }
 
@@ -29,8 +32,10 @@ namespace Vouchers.EntityFramework.QueryHandlers
             Height = cp.Height,
         };
 
-        public async Task<VoucherValueDetailDto> HandleAsync(Guid valueId, Guid authIdentityId, CancellationToken cancellation)
+        public async Task<VoucherValueDetailDto> HandleAsync(Guid valueId, CancellationToken cancellation)
         {
+            var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
+
             var valueWithImage = await _dbContext.VoucherValues.Where(v => v.Id == valueId)
                 .Join(
                 _dbContext.DomainAccounts.Where(acc => acc.IdentityId == authIdentityId),

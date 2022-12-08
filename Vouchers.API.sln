@@ -27,7 +27,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vouchers.Files", "Vouchers.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vouchers.Entities", "Vouchers.Entities\Vouchers.Entities.csproj", "{4B52B694-183C-43EA-996B-A00250B39093}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vouchers.StaticFiles", "Vouchers.StaticFiles\Vouchers.StaticFiles.csproj", "{31910259-DEAA-49A0-A475-00EA199E6A7E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vouchers.StaticFiles", "Vouchers.StaticFiles\Vouchers.StaticFiles.csproj", "{31910259-DEAA-49A0-A475-00EA199E6A7E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -92,6 +92,7 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
+		RESX_ShowErrorsInErrorList = False
 		SolutionGuid = {559C331F-B670-4C6E-8AA9-14C238526424}
 	EndGlobalSection
 EndGlobal

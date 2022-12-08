@@ -47,8 +47,8 @@ services:
       - C:/vouchers/images:/app/images
       - /etc/localtime:/etc/localtime:ro
     ports:
-      - "6000:80"
-      - "6001:443"
+      - "6080:80"
+      - "6443:443"
     build:
       context: .
       dockerfile: Vouchers.API/Dockerfile

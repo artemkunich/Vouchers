@@ -19,6 +19,9 @@ using Vouchers.Application.Infrastructure;
 using Vouchers.API.Services;
 using Microsoft.IdentityModel.Tokens;
 using Application.Infrastructure;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.Extensions.Options;
+using System.Globalization;
 
 namespace Vouchers.API
 {
@@ -35,6 +38,19 @@ namespace Vouchers.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<VouchersDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("VouchersDbContextConnection")));
+
+            services.AddLocalization();
+            services.Configure<RequestLocalizationOptions>(
+                options => {
+
+                    options.DefaultRequestCulture = new RequestCulture(CultureInfo.InvariantCulture);
+
+                    options.SupportedCultures = new[] { CultureInfo.InvariantCulture };
+                    options.SupportedUICultures =  new[] { CultureInfo.InvariantCulture, new CultureInfo("en-US"), new CultureInfo("cs-CZ") };
+
+                    options.RequestCultureProviders = new[] { new AcceptLanguageHeaderRequestCultureProvider() };
+                }
+            );
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer("Bearer", options =>
@@ -82,8 +98,9 @@ namespace Vouchers.API
             services.AddHttpContextAccessor();
 
             services.AddScoped<IDispatcher, Dispatcher>();
-            services.AddScoped<ILoginService, JWTLoginService>();
+            services.AddScoped<ILoginNameProvider, JWTLoginNameProvider>();
             services.AddScoped<IImageService, ImageSharpService>();
+            services.AddScoped<ICultureInfoProvider, CultureInfoProvider>();
 
             services.AddRepositories();
             services.AddCommandHandlers();
@@ -115,7 +132,10 @@ namespace Vouchers.API
             }
 
             app.UseCors("default");
-        
+
+            var localazeOptions = app.ApplicationServices.GetService<IOptions<RequestLocalizationOptions>>();
+            app.UseRequestLocalization(localazeOptions.Value);
+
             app.UseAuthentication();
             app.UseAuthorization();          
 

@@ -8,7 +8,7 @@ using Vouchers.Core;
 
 namespace Vouchers.EntityFramework.Configurations
 {
-    public class IssuerTransactionConfiguration : IEntityTypeConfiguration<IssuerTransaction>
+    internal class IssuerTransactionConfiguration : IEntityTypeConfiguration<IssuerTransaction>
     {
         public void Configure(EntityTypeBuilder<IssuerTransaction> builder)
         {

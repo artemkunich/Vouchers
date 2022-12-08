@@ -9,25 +9,27 @@ using Vouchers.Application.Dtos;
 using Vouchers.Application.Queries;
 using Vouchers.Application.UseCases;
 using System.Threading;
-using Vouchers.Core;
+using Vouchers.Application.Services;
 
 namespace Vouchers.EntityFramework.QueryHandlers
 {
-    internal sealed class IssuerTransactionsQueryHandler : IAuthIdentityHandler<IssuerTransactionsQuery,IEnumerable<IssuerTransactionDto>>
+    internal sealed class IssuerTransactionsQueryHandler : IHandler<IssuerTransactionsQuery,IEnumerable<IssuerTransactionDto>>
     {
-        VouchersDbContext _dbContext;
+        private readonly IAuthIdentityProvider _authIdentityProvider;
+        private readonly VouchersDbContext _dbContext;
 
-        public IssuerTransactionsQueryHandler(VouchersDbContext dbContext)
+        public IssuerTransactionsQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext)
         {
+            _authIdentityProvider = authIdentityProvider;
             _dbContext = dbContext;
         }
 
-        public IEnumerable<IssuerTransactionDto> Handle(IssuerTransactionsQuery query, Guid authIdentityId, CancellationToken cancellation) =>
-            GetQuery(query, authIdentityId).ToList();
-
-        public async Task<IEnumerable<IssuerTransactionDto>> HandleAsync(IssuerTransactionsQuery query, Guid authIdentityId, CancellationToken cancellation) =>
-            await GetQuery(query, authIdentityId).ToListAsync();
-
+        public async Task<IEnumerable<IssuerTransactionDto>> HandleAsync(IssuerTransactionsQuery query, CancellationToken cancellation)
+        {
+            var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
+            return await GetQuery(query, authIdentityId).ToListAsync();
+        }
+            
         IQueryable<IssuerTransactionDto> GetQuery(IssuerTransactionsQuery query, Guid authIdentityId) 
         {
 
@@ -70,7 +72,7 @@ namespace Vouchers.EntityFramework.QueryHandlers
                     },                 
                     Amount = t.Quantity.Amount
                 }
-            );
+            ).GetListPageQuery(query);
         }
     }
 }

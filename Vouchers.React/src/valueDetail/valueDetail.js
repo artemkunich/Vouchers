@@ -1,6 +1,7 @@
 import React, {useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import {useSelector } from 'react-redux'
-import { noprofileImageSrc, getImageSrc } from '../imageSources.js';
+import { noImageFoundSrc, getImageSrc } from '../imageSources.ts';
+import {api} from '../api/api.ts'
 import ReactCrop from 'react-image-crop'
 import "bootstrap-icons/font/bootstrap-icons.css";
 
@@ -9,18 +10,16 @@ import 'react-image-crop/src/ReactCrop.scss'
 
 const maxImageSide = 900;
 
-export const ValueDetail = ({header, valuesItem, api, onCancel}) => {
+export const ValueDetail = ({header, valuesItem, onCancel}) => {
 
     const token = useSelector(state => state.user.token)
     const currentDomainAccount = useSelector(state => state.domainAccount.currentAccount)
 
     const [detail, setDetail] = useState({
-        voucherValueId: valuesItem.id,
+        id: valuesItem.id,
         issuerAccountId: valuesItem.issuerAccountId ?? currentDomainAccount.id,
-        voucherValueDetail: {
-            ticker: valuesItem.ticker,
-            description: valuesItem.description
-        }
+        ticker: valuesItem.ticker,
+        description: valuesItem.description
     })
 
     const [crop, setCrop] = useState()
@@ -41,10 +40,8 @@ export const ValueDetail = ({header, valuesItem, api, onCancel}) => {
 
             setDetail({
                 ...detail,
-                voucherValueDetail: {
-                    ticker: result.ticker,
-                    description: result.description
-                }
+                ticker: result.ticker,
+                description: result.description
             })
             
             if(result.imageId)
@@ -119,29 +116,28 @@ export const ValueDetail = ({header, valuesItem, api, onCancel}) => {
         const formData = new FormData();
 
         console.log(JSON.stringify(detail))
-        console.log(JSON.stringify(detail.voucherValueDetail))
 
-        formData.append('voucherValueDetail.ticker', detail.voucherValueDetail.ticker)
-        formData.append('voucherValueDetail.description', detail.voucherValueDetail.description)
+        formData.append('ticker', detail.ticker)
+        formData.append('description', detail.description)
 
         if(detail.image)
             formData.append('image', detail.image)
         if(crop){
-            formData.append('voucherValueDetail.cropParameters.x', parseFloat(crop.x))
-            formData.append('voucherValueDetail.cropParameters.y', parseFloat(crop.y))
-            formData.append('voucherValueDetail.cropParameters.width', parseFloat(crop.width))
-            formData.append('voucherValueDetail.cropParameters.height', parseFloat(crop.height))
+            formData.append('cropParameters.x', parseFloat(crop.x))
+            formData.append('cropParameters.y', parseFloat(crop.y))
+            formData.append('cropParameters.width', parseFloat(crop.width))
+            formData.append('cropParameters.height', parseFloat(crop.height))
         }
 
 
 
-        if(detail.voucherValueId ){
-            formData.append('voucherValueId', detail.voucherValueId)
+        if(detail.id ){
+            formData.append('id', detail.id)
 
             await api.putValue(token, formData)           
         } else {
             if(currentDomainAccount.id) {
-                formData.append('issuerDomainAccountId', currentDomainAccount.id)
+                formData.append('issuerAccountId', currentDomainAccount.id)
 
                 const newValueId = await api.postValue(token, formData)
                 setDetail({
@@ -189,7 +185,7 @@ export const ValueDetail = ({header, valuesItem, api, onCancel}) => {
             <>
                 <div className="row mb-2">
                     <div className="col-6">
-                        <img style={{maxHeight: maxImageSide, maxWidth: maxImageSide}} src={`${imgSrc ?? noprofileImageSrc}`}></img>
+                        <img style={{maxHeight: maxImageSide, maxWidth: maxImageSide}} src={`${imgSrc ?? noImageFoundSrc}`}></img>
                     </div>
                 </div>
                 { 
@@ -209,13 +205,13 @@ export const ValueDetail = ({header, valuesItem, api, onCancel}) => {
         <div className="row mb-2" >
             <div className="col-12">
                 <label htmlFor="valueTicker" className="form-label">Ticker</label>
-                <input type="text" id="valueTicker" className="form-control" value={detail.voucherValueDetail.ticker} onChange={async (event) => setDetail({...detail, voucherValueDetail: {...detail.voucherValueDetail, ticker: event.target.value}})} disabled={!isEditState}></input>                
+                <input type="text" id="valueTicker" className="form-control" value={detail.ticker} onChange={async (event) => setDetail({...detail, ticker: event.target.value})} disabled={!isEditState}></input>                
             </div>
         </div>
         <div className="row mb-2">
             <div className="col-12">
                 <label  htmlFor="valueDescription" className="form-label">Description</label>
-                <textarea id="valueDescription" className="form-control" rows="auto" value={detail.voucherValueDetail.description} onChange={async (event) => setDetail({...detail, voucherValueDetail: { ...detail.voucherValueDetail, description: event.target.value }})} disabled={!isEditState}></textarea>                         
+                <textarea id="valueDescription" className="form-control" rows="auto" value={detail.description} onChange={async (event) => setDetail({...detail, description: event.target.value })} disabled={!isEditState}></textarea>                         
             </div>
         </div>
         <div className="row mb-2 mt-5">

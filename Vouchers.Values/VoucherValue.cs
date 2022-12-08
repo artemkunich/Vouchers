@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Vouchers.Entities;
+using Vouchers.Values.Properties;
 
 namespace Vouchers.Values
 {
@@ -19,7 +20,7 @@ namespace Vouchers.Values
             IssuerIdentityId = issuerIdentityId;
 
             if (string.IsNullOrEmpty(ticker))
-                throw new VoucherValueException("Ticker must be specified");
+                throw new VoucherValueException(Resources.TickerIsNotSpecified);
             Ticker = ticker;
         }
 

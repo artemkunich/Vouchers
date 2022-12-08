@@ -8,14 +8,16 @@ using System.Threading.Tasks;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Queries;
+using Vouchers.Application.Services;
 using Vouchers.Application.UseCases;
 using Vouchers.Core;
 using Vouchers.Files;
 
 namespace Vouchers.EntityFramework.QueryHandlers
 {
-    internal sealed class DomainDetailQueryHandler : IAuthIdentityHandler<Guid, DomainDetailDto>
+    internal sealed class DomainDetailQueryHandler : IHandler<Guid, DomainDetailDto>
     {
+        private readonly IAuthIdentityProvider _authIdentityProvider;
         private readonly VouchersDbContext _dbContext;
 
         Func<CropParameters, CropParametersDto> mapCropParameters = (CropParameters cp) => cp is null ? null : new CropParametersDto
@@ -26,13 +28,16 @@ namespace Vouchers.EntityFramework.QueryHandlers
             Height = cp.Height,
         };
 
-        public DomainDetailQueryHandler(VouchersDbContext dbContext)
+        public DomainDetailQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext)
         {
+            _authIdentityProvider = authIdentityProvider;
             _dbContext = dbContext;
         }
 
-        public async Task<DomainDetailDto> HandleAsync(Guid domainId, Guid authIdentityId, CancellationToken cancellation)
+        public async Task<DomainDetailDto> HandleAsync(Guid domainId, CancellationToken cancellation)
         {
+            var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
+
             var domainAccountsQuery = _dbContext.DomainAccounts.Where(account => account.DomainId == domainId && account.IdentityId == authIdentityId);
 
             var domainWithImage = await _dbContext.Domains.Join(domainAccountsQuery, domain => domain.Id, account => account.DomainId, (domain, account) => domain)

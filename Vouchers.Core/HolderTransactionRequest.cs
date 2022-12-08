@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Vouchers.Entities;
+using System.Globalization;
 
 namespace Vouchers.Core
 {
@@ -29,10 +30,10 @@ namespace Vouchers.Core
 
         private HolderTransactionRequest() { }
 
-        public HolderTransactionRequest (Guid id, DateTime dueDate, Account creditorAccount, Account debtorAccount, UnitTypeQuantity quantity, TimeSpan maxDurationBeforeValidityStart, TimeSpan minDurationBeforeValidityEnd, bool mustBeExchangeable, string message) : base(id)
+        private HolderTransactionRequest (Guid id, DateTime dueDate, Account creditorAccount, Account debtorAccount, UnitTypeQuantity quantity, TimeSpan maxDurationBeforeValidityStart, TimeSpan minDurationBeforeValidityEnd, bool mustBeExchangeable, string message, CultureInfo cultureInfo = null) : base(id)
         {
             if (quantity.Amount <= 0)
-                throw new CoreException("Amount must be greater than 0");
+                throw new CoreException("AmountIsNotPositive", cultureInfo);
 
             DueDate = dueDate;
 
@@ -44,13 +45,13 @@ namespace Vouchers.Core
             if (quantity.UnitType.IssuerAccount.Equals(DebtorAccount))
             {
                 if (maxDurationBeforeValidityStart != TimeSpan.Zero)
-                    throw new CoreException("Issuer can not set maxDurationBeforeValidityStart");
+                    throw new CoreException("IssuerCannotSetMaxDurationBeforeValidityStart", cultureInfo);
 
                 if (minDurationBeforeValidityEnd != TimeSpan.Zero)
-                    throw new CoreException("Issuer can not set minDurationBeforeValidityEnd");
+                    throw new CoreException("IssuerCannotSetMinDurationBeforeValidityEnd", cultureInfo);
 
                 if (mustBeExchangeable)
-                    throw new CoreException("Issuer can not require exchangeability");
+                    throw new CoreException("IssuerCannotRequireExchangeability", cultureInfo);
             }
 
             MaxDurationBeforeValidityStart = maxDurationBeforeValidityStart;
@@ -63,7 +64,7 @@ namespace Vouchers.Core
                 return;
 
             if (creditorAccount.Equals(debtorAccount))
-                throw new CoreException("Creditor and debtor can not be the same");
+                throw new CoreException("CreditorAndDebtorAreTheSame", cultureInfo);
 
             CreditorAccountId = creditorAccount.Id;
             CreditorAccount = creditorAccount;
@@ -71,39 +72,39 @@ namespace Vouchers.Core
             
         }
 
-        public static HolderTransactionRequest Create(DateTime validTo, Account creditorAccount, Account debtorAccount, UnitTypeQuantity quantity, TimeSpan maxDurationBeforeValidityStart, TimeSpan minDurationBeforeValidityEnd, bool mustBeExchangeable, string message) =>
-            new HolderTransactionRequest(Guid.NewGuid(), validTo, creditorAccount, debtorAccount, quantity, maxDurationBeforeValidityStart, minDurationBeforeValidityEnd, mustBeExchangeable, message);
+        public static HolderTransactionRequest Create(DateTime validTo, Account creditorAccount, Account debtorAccount, UnitTypeQuantity quantity, TimeSpan maxDurationBeforeValidityStart, TimeSpan minDurationBeforeValidityEnd, bool mustBeExchangeable, string message, CultureInfo cultureInfo = null) =>
+            new HolderTransactionRequest(Guid.NewGuid(), validTo, creditorAccount, debtorAccount, quantity, maxDurationBeforeValidityStart, minDurationBeforeValidityEnd, mustBeExchangeable, message, cultureInfo);
 
-        public void Perform(HolderTransaction transaction)
+        public void Perform(HolderTransaction transaction, CultureInfo cultureInfo = null)
         {
             if(Transaction != null)
-                throw new CoreException($"Transaction is already performed");
+                throw new CoreException("TransactionIsAlreadyPerformed", cultureInfo);
 
             if (CreditorAccount != null && CreditorAccount.NotEquals(transaction.CreditorAccount))
-                throw new CoreException($"Request's creditor is not satisfied by transaction");
+                throw new CoreException("RequestCreditorIsNotSatisfiedByTransaction", cultureInfo);
 
             if (DebtorAccount.NotEquals(transaction.DebtorAccount))
-                throw new CoreException($"Request's debtor is not satisfied by transaction");
+                throw new CoreException("RequestDebtorIsNotSatisfiedByTransaction", cultureInfo);
 
             if (Quantity.UnitType.NotEquals(transaction.Quantity.UnitType))
-                throw new CoreException($"Request's unit is not satisfied by transaction");
+                throw new CoreException("RequestUnitIsNotSatisfiedByTransaction", cultureInfo);
 
             if (Quantity.Amount != transaction.Quantity.Amount)
-                throw new CoreException($"Request's amount is not satisfied by transaction");
+                throw new CoreException("RequestAmountIsNotSatisfiedByTransaction", cultureInfo);
 
             foreach (var item in transaction.TransactionItems)
             {
                 if (MaxDurationBeforeValidityStart is not null && item.Quantity.Unit.ValidFrom > DateTime.Now.Add(MaxDurationBeforeValidityStart.Value))
-                    throw new CoreException($"Request's maxValidFrom is not satisfied by transaction");
+                    throw new CoreException("RequestMaxValidFromIsNotSatisfiedByTransaction", cultureInfo);
 
                 if (MinDurationBeforeValidityEnd is not null && item.Quantity.Unit.ValidTo < DateTime.Now.Add(MinDurationBeforeValidityEnd.Value))
-                    throw new CoreException($"Request's minValidTo is not satisfied by transaction");
+                    throw new CoreException("RequestMinValidToIsNotSatisfiedByTransaction", cultureInfo);
 
                 if (MustBeExchangeable && !item.Quantity.Unit.CanBeExchanged)
-                    throw new CoreException($"Request's mustBeExchangeable is not satisfied by transaction");
+                    throw new CoreException("RequestMustBeExchangeableIsNotSatisfiedByTransaction", cultureInfo);
             }
 
-            transaction.Perform();
+            transaction.Perform(cultureInfo);
             TransactionId = transaction.Id;
             Transaction = transaction;
         }

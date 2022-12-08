@@ -13,6 +13,7 @@ using Vouchers.Application.Commands.VoucherCommands;
 using Vouchers.Application.Commands.VoucherValueCommands;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Queries;
+using Vouchers.Application.ServiceProviders;
 using Vouchers.Application.Services;
 using Vouchers.Application.UseCases;
 using Vouchers.Application.UseCases.DomainAccountCases;
@@ -30,8 +31,9 @@ namespace Application.Infrastructure
     public static class IServiceCollectionExtension
     {        
         public static void AddCommandHandlers(this IServiceCollection services)
-        {
-            services.AddScoped<AppImageService>();
+        {         
+            services.AddScoped<IAuthIdentityProvider, AuthIdentityProvider>();
+            services.AddScoped<IAppImageService, AppImageService>();
             services.AddIdentityHandlers();
             services.AddDomainOfferHandlers();
             services.AddDomainHandlers();
@@ -45,65 +47,52 @@ namespace Application.Infrastructure
 
         public static void AddIdentityHandlers(this IServiceCollection services)
         {
-            services.AddHandler<CreateIdentityCommand, CreateIdentityCommandHandler>();
-            services.AddAuthIdentityHandler<UpdateIdentityCommand, UpdateIdentityCommandHandler>();
+            services.AddHandler<CreateIdentityCommand, Guid, CreateIdentityCommandHandler>();
+            services.AddHandler<UpdateIdentityCommand, UpdateIdentityCommandHandler>();
         }
 
         public static void AddDomainOfferHandlers(this IServiceCollection services)
         {
-            services.AddAuthIdentityHandler<CreateDomainOfferCommand, Guid, CreateDomainOfferCommandHandler>();
-            services.AddAuthIdentityHandler<UpdateDomainOfferCommand, UpdateDomainOfferCommandHandler>();
+            services.AddHandler<CreateDomainOfferCommand, Guid, CreateDomainOfferCommandHandler>();
+            services.AddHandler<UpdateDomainOfferCommand, UpdateDomainOfferCommandHandler>();
         }
 
         public static void AddDomainHandlers(this IServiceCollection services)
         {
-            services.AddAuthIdentityHandler<CreateDomainCommand, Guid?, CreateDomainCommandHandler>();
-            services.AddAuthIdentityHandler<UpdateDomainDetailCommand, UpdateDomainDetailCommandHandler>();
+            services.AddHandler<CreateDomainCommand, Guid?, CreateDomainCommandHandler>();
+            services.AddHandler<UpdateDomainDetailCommand, UpdateDomainDetailCommandHandler>();
         }
 
         public static void AddDomainAccountHandlers(this IServiceCollection services)
         {
-            services.AddAuthIdentityHandler<CreateDomainAccountCommand, Guid, CreateDomainAccountCommandHandler>();
-            services.AddAuthIdentityHandler<UpdateDomainAccountCommand, UpdateDomainAccountCommandHandler>();
+            services.AddHandler<CreateDomainAccountCommand, Guid, CreateDomainAccountCommandHandler>();
+            services.AddHandler<UpdateDomainAccountCommand, UpdateDomainAccountCommandHandler>();
         }
 
         public static void AddIssuerValueHandlers(this IServiceCollection services)
         {
-            services.AddAuthIdentityHandler<CreateVoucherValueCommand, Guid, CreateVoucherValueCommandHandler>();
-            services.AddAuthIdentityHandler<UpdateVoucherValueCommand, UpdateVoucherValueCommandHandler>();
+            services.AddHandler<CreateVoucherValueCommand, Guid, CreateVoucherValueCommandHandler>();
+            services.AddHandler<UpdateVoucherValueCommand, UpdateVoucherValueCommandHandler>();
         }
 
         public static void AddIssuerVoucherHandlers(this IServiceCollection services)
         {
-            services.AddAuthIdentityHandler<CreateVoucherCommand, Guid, CreateVoucherCommandHandler>();
-            services.AddAuthIdentityHandler<UpdateVoucherCommand, UpdateVoucherCommandHandler>();
+            services.AddHandler<CreateVoucherCommand, Guid, CreateVoucherCommandHandler>();
+            services.AddHandler<UpdateVoucherCommand, UpdateVoucherCommandHandler>();
         }
 
         public static void AddIssuerTransactionHandlers(this IServiceCollection services)
         {
-            services.AddAuthIdentityHandler<CreateIssuerTransactionCommand, Guid, CreateIssuerTransactionCommandHandler>();
+            services.AddHandler<CreateIssuerTransactionCommand, Guid, CreateIssuerTransactionCommandHandler>();
         }
 
         public static void AddHolderTransactionHandlers(this IServiceCollection services)
         {
-            services.AddAuthIdentityHandler<CreateHolderTransactionCommand, Guid, CreateHolderTransactionCommandHandler>();
-            services.AddAuthIdentityHandler<CreateHolderTransactionRequestCommand, Guid, CreateHolderTransactionRequestCommandHandler>();
-            services.AddAuthIdentityHandler<DeleteHolderTransactionRequestCommand, DeleteHolderTransactionRequestCommandHandler>();
+            services.AddHandler<CreateHolderTransactionCommand, Guid, CreateHolderTransactionCommandHandler>();
+            services.AddHandler<CreateHolderTransactionRequestCommand, Guid, CreateHolderTransactionRequestCommandHandler>();
+            services.AddHandler<DeleteHolderTransactionRequestCommand, DeleteHolderTransactionRequestCommandHandler>();
         }
 
-
-
-        public static void AddAuthIdentityHandler<TReq, TRes, THandler>(this IServiceCollection services) where THandler : class, IAuthIdentityHandler<TReq, TRes>
-        {
-            services.AddScoped<IAuthIdentityHandler<TReq, TRes>, THandler>();
-            services.AddScoped<IHandler<TReq, TRes>, AuthIdentityHandler<TReq, TRes>>();
-        }
-
-        public static void AddAuthIdentityHandler<TReq, THandler>(this IServiceCollection services) where THandler : class, IAuthIdentityHandler<TReq>
-        {
-            services.AddScoped<IAuthIdentityHandler<TReq>, THandler>();
-            services.AddScoped<IHandler<TReq>, AuthIdentityHandler<TReq>>();
-        }
 
         public static void AddHandler<TReq, TRes, THandler>(this IServiceCollection services) where THandler : class, IHandler<TReq, TRes>
         {

@@ -8,7 +8,7 @@ using Vouchers.Core;
 
 namespace Vouchers.EntityFramework.Configurations
 {
-    public class UnitTypeConfiguration : IEntityTypeConfiguration<UnitType>
+    internal class UnitTypeConfiguration : IEntityTypeConfiguration<UnitType>
     {
         public void Configure(EntityTypeBuilder<UnitType> builder)
         {

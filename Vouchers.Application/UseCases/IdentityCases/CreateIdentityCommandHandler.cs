@@ -13,33 +13,36 @@ using Vouchers.Identities;
 
 namespace Vouchers.Application.UseCases.IdentityCases
 {
-    internal sealed class CreateIdentityCommandHandler : IHandler<CreateIdentityCommand>
+    internal sealed class CreateIdentityCommandHandler : IHandler<CreateIdentityCommand, Guid>
     {
+        private readonly ILoginNameProvider _loginNameProvider;
         private readonly IRepository<Login> _loginRepository;
-        private readonly AppImageService _appImageService;
-
-        public CreateIdentityCommandHandler(IRepository<Login> loginRepository, AppImageService appImageService)
+        private readonly IAppImageService _appImageService;
+        
+        public CreateIdentityCommandHandler(ILoginNameProvider loginNameProvider, IRepository<Login> loginRepository, IAppImageService appImageService)
         {
+            _loginNameProvider = loginNameProvider;
             _loginRepository = loginRepository;
             _appImageService = appImageService;
         }
 
-        public async Task HandleAsync(CreateIdentityCommand command, CancellationToken cancellation)
+        public async Task<Guid> HandleAsync(CreateIdentityCommand command, CancellationToken cancellation)
         {
-            var identityDetailDto = command.IdentityDetail;
-            
+            var loginName = _loginNameProvider.CurrentLoginName;
             CroppedImage image = null;
-            if (identityDetailDto.Image is not null && identityDetailDto.CropParameters is not null)
+            if (command.Image is not null && command.CropParameters is not null)
             {
-                var imageStream = identityDetailDto.Image.OpenReadStream();
-                image = await _appImageService.CreateCroppedImage(imageStream, identityDetailDto.CropParameters);
+                var imageStream = command.Image.OpenReadStream();
+                image = await _appImageService.CreateCroppedImage(imageStream, command.CropParameters);
             }
 
-            var identity = Identity.Create(identityDetailDto.Email, identityDetailDto.FirstName, identityDetailDto.LastName);
-            var login = Login.Create(command.LoginName, identity);
+            var identity = Identity.Create(command.Email, command.FirstName, command.LastName);
+            var login = Login.Create(loginName, identity);
             identity.ImageId = image?.Id;
 
             await _loginRepository.AddAsync(login);
+
+            return identity.Id;
         }
     }
 }

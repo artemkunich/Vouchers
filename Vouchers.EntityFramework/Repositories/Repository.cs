@@ -10,7 +10,7 @@ using Vouchers.Entities;
 
 namespace Vouchers.EntityFramework.Repositories
 {
-    public abstract class Repository<TEntity> : IRepository<TEntity> where TEntity : Entity
+    internal abstract class Repository<TEntity> : IRepository<TEntity> where TEntity : Entity
     {
         VouchersDbContext _dbContext;
         protected VouchersDbContext DbContext => _dbContext;

@@ -14,20 +14,27 @@ using Vouchers.Domains;
 using Vouchers.Application.Queries;
 using Vouchers.Application.UseCases;
 using System.Threading;
+using Vouchers.Application.Services;
 
 namespace Vouchers.EntityFramework.QueryHandlers
 {
-    internal sealed class IdentityDomainOffersQueryHandler : IAuthIdentityHandler<IdentityDomainOffersQuery, IEnumerable<DomainOfferDto>>
+    internal sealed class IdentityDomainOffersQueryHandler : IHandler<IdentityDomainOffersQuery, IEnumerable<DomainOfferDto>>
     {
-        VouchersDbContext _dbContext;
+        private readonly IAuthIdentityProvider _authIdentityProvider;
+        private readonly VouchersDbContext _dbContext;
 
-        public IdentityDomainOffersQueryHandler(VouchersDbContext dbContext)
+        public IdentityDomainOffersQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext)
         {           
+            _authIdentityProvider = authIdentityProvider;
             _dbContext = dbContext;
         }
 
-        public async Task<IEnumerable<DomainOfferDto>> HandleAsync(IdentityDomainOffersQuery query, Guid authIdentityId, CancellationToken cancellation) =>
-            await GetQuery(query, authIdentityId).Skip(query.PageIndex * query.PageSize).Take(query.PageSize).ToListAsync();
+        public async Task<IEnumerable<DomainOfferDto>> HandleAsync(IdentityDomainOffersQuery query, CancellationToken cancellation)
+        {
+            var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
+            return await GetQuery(query, authIdentityId).ToListAsync();
+        }
+            
 
         IQueryable<DomainOfferDto> GetQuery(IdentityDomainOffersQuery query, Guid authIdentityId)
         {
@@ -49,14 +56,16 @@ namespace Vouchers.EntityFramework.QueryHandlers
                     Description = result.Offer.Description,
                     Amount = result.Offer.Amount.Amount,
                     Currency = result.Offer.Amount.Currency.ToString(),
-                    MaxSubscribersCount = result.Offer.MaxSubscribersCount,
+                    MaxMembersCount = result.Offer.MaxMembersCount,
                     InvoicePeriod = result.Offer.InvoicePeriod.ToString(),
                     ValidFrom = result.Offer.ValidFrom,
                     ValidTo = result.Offer.ValidTo,
                     MaxContractsPerIdentity = result.Offer.MaxContractsPerIdentity,
                     ContractsPerIdentity = counter.Counter
                 }
-            ).Where(offer => offer.MaxContractsPerIdentity == null && offer.ContractsPerIdentity == null || offer.MaxContractsPerIdentity != offer.ContractsPerIdentity);
+            ).Where(
+                offer => offer.MaxContractsPerIdentity == null && offer.ContractsPerIdentity == null || offer.MaxContractsPerIdentity != offer.ContractsPerIdentity
+            ).GetListPageQuery(query);
         }
     }
 }

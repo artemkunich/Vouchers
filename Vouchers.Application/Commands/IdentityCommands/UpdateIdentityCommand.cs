@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
@@ -8,11 +9,17 @@ namespace Vouchers.Application.Commands.IdentityCommands
 {
     public sealed class UpdateIdentityCommand
     {
-        [Required]
-        public Guid IdentityId { get; set; }
+        public string LoginName { get; set; }
 
-        [Required]
-        public IdentityDetailDto IdentityDetail { get; set; }
+        public string FirstName { get; set; }
+
+        public string LastName { get; set; }
+
+        public string Email { get; set; }
+
+        public IFormFile Image { get; set; }
+
+        public CropParametersDto CropParameters { get; set; }
 
     }
 }

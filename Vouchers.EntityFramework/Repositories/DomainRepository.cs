@@ -11,7 +11,7 @@ using Vouchers.Domains;
 
 namespace Vouchers.EntityFramework.Repositories
 {
-    public sealed class DomainRepository : Repository<Domain>
+    internal sealed class DomainRepository : Repository<Domain>
     {
         public DomainRepository(VouchersDbContext dbContext) : base(dbContext)
         {

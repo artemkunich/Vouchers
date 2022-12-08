@@ -9,7 +9,7 @@ using Vouchers.Identities;
 
 namespace Vouchers.EntityFramework.Configurations
 {
-    public class LoginConfiguration : IEntityTypeConfiguration<Login>
+    internal class LoginConfiguration : IEntityTypeConfiguration<Login>
     {
         public void Configure(EntityTypeBuilder<Login> builder)
         {

@@ -1,9 +1,10 @@
-import React, {useState, useEffect, useRef, useMemo, useCallback } from 'react'
-import {useSelector, useDispatch} from 'react-redux'
-import {ListElement} from '../list/listElement.js'
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import { HolderTransactionDetailItem } from './holderTransactionDetailItem.js'
+import { api } from '../api/api.ts'
 import "bootstrap-icons/font/bootstrap-icons.css";
 
-export const HolderTransactionDetail = ({transaction, transactionRequest, api, onCancel}) => {
+export const HolderTransactionDetail = ({transaction, transactionRequest, handleCancel}) => {
     
     const token = useSelector(state => state.user.token)
     const currentDomainAccount = useSelector(state => state.domainAccount.currentAccount)
@@ -44,7 +45,7 @@ export const HolderTransactionDetail = ({transaction, transactionRequest, api, o
         })
     }, [items,currentTransaction])
 
-    const loadHolderVouchersAsync = async (query) => {
+    const loadHolderVouchers = async (query) => {
         let vouchers = transaction.items.map(item => {return { ...item.unit, initialAmount: item.amount}})
         
         if(vouchers.length == 0)
@@ -52,9 +53,6 @@ export const HolderTransactionDetail = ({transaction, transactionRequest, api, o
         
         if(!vouchers)
             vouchers = []
-
-        // if(transaction.items?.length > 0)
-        //     vouchers.filter(v => transaction.items.map(item => item.item1).includes(v.id))
 
         if(![currentTransaction.debtorAccountId, currentTransaction.creditorAccountId].includes(currentTransaction.unitIssuerAccountId))
             vouchers = vouchers.filter(v => v.canBeExchanged)
@@ -79,7 +77,7 @@ export const HolderTransactionDetail = ({transaction, transactionRequest, api, o
             const sum = vouchers.reduce((sum, voucher) => sum + voucher.balance, 0)
             if(sum < transactionRequest.amount){
                 alert(`Request can not be performed, max amount you can transfer is ${sum}`)
-                onCancel()
+                handleCancel()
                 return;
             }
 
@@ -103,7 +101,7 @@ export const HolderTransactionDetail = ({transaction, transactionRequest, api, o
         setVouchers(vouchers)
     }
 
-    const postHolderTransactionAsync = async (transaction) => {
+    const postHolderTransaction = async (transaction) => {
         const transactionId = await api.postHolderTransaction(token, transaction) 
         if(transactionId){
             setCurrentTransaction({
@@ -115,13 +113,13 @@ export const HolderTransactionDetail = ({transaction, transactionRequest, api, o
 
     useEffect(() => {
         const effectAsync = async () => {
-            await loadHolderVouchersAsync({valueId: transaction.unitTypeId})
+            await loadHolderVouchers({valueId: transaction.unitTypeId})
         }
 
         effectAsync()
     },[])
 
-    return <div className="container">
+    return <>
             <div className="row">
                 <div className='col-2 me-auto'><h3>Transfer id:</h3></div><div className='col-10'><h3>{currentTransaction.id}</h3></div>
             </div>
@@ -138,7 +136,7 @@ export const HolderTransactionDetail = ({transaction, transactionRequest, api, o
                 <div className='col-2 me-auto'><h3>Vouchers:</h3></div>
             </div>
             {
-                vouchers.map((voucher, i) => <ListElement key={voucher.id}><HolderTransactionItem transaction={currentTransaction} voucher={voucher} setItem={setItem}/></ListElement>)
+                vouchers.map((voucher, i) => <HolderTransactionDetailItem key={voucher.id} transaction={currentTransaction} voucher={voucher} setItem={setItem}/>)
             }
             <div className="row mb-2">
                 <div className="col-12">
@@ -149,48 +147,13 @@ export const HolderTransactionDetail = ({transaction, transactionRequest, api, o
             <div className="row mb-2">
                 {
                     !currentTransaction.id &&
-                    <div className="col-2 d-grid mt-2 mb-2" >
-                        <button className="btn" style={{backgroundColor: '#59a8fc', color: 'white'}} onClick={async () => await postHolderTransactionAsync(currentTransaction)}>Send</button>
+                    <div className="col-2 d-grid mt-2 mb-2">
+                        <button className="btn" style={{backgroundColor: '#59a8fc', color: 'white'}} onClick={async () => await postHolderTransaction(currentTransaction)}>Send</button>
                     </div>
                 }
-                <div className="col-2 d-grid mt-2 mb-2" >
-                    <button className="btn" style={{backgroundColor: '#59a8fc', color: 'white'}} onClick={onCancel}>Cancel</button>
-                </div> 
+                <div className="col-2 d-grid mt-2 mb-2">
+                    <button className="btn" style={{backgroundColor: '#59a8fc', color: 'white'}} onClick={handleCancel}>Cancel</button>
+                </div>
             </div>
-        </div>
-}
-
-const HolderTransactionItem = ({transaction, voucher, setItem}) => {
-
-    const [amount, setAmountTemp] = useState(voucher.initialAmount);
-
-    const setAmount = (value) => {
-
-        if(value > voucher.balance)
-            value = voucher.balance
-
-        setItem({
-            voucherId: voucher.id,
-            amount: value
-        })
-
-        setAmountTemp(value)           
-    }
-
-    return <div className="container">
-        <div className="row">
-            <div className="col-5 align-middle"><p className="fs-5">{voucher.validFrom.substring(0,10).replaceAll('-', '.')}-{voucher.validTo.substring(0,10).replaceAll('-', '.')}</p></div>
-            <div className="col-3 align-middle">
-                { voucher.canBeExchanged ? "Exchangeable" : "Nonexchangeable" }
-            </div>
-
-            <div className="col-2 align-middle">
-                <input type="number" className="form-control" value={amount ?? 0} onChange={(event) => setAmount(event.target.value == NaN ? 0 : event.target.value)} disabled={transaction.id}></input>           
-            </div>
-            {
-                !transaction.id &&
-                <div className="col-2 align-middle"><p className="fs-5">{voucher.balance}</p></div>
-            }
-        </div>
-    </div>
+        </>
 }

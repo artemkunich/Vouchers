@@ -10,7 +10,7 @@ namespace Vouchers.Domains
         public string Name { get; }
         public string Description { get; set; }
 
-        public int MaxSubscribersCount { get; }
+        public int MaxMembersCount { get; }
         public CurrencyAmount Amount { get; }
         public InvoicePeriod InvoicePeriod { get; }
 
@@ -28,11 +28,11 @@ namespace Vouchers.Domains
         public static DomainOffer Create(string name, string description, int maxMembersCount, CurrencyAmount amount, InvoicePeriod period, DateTime validFrom, DateTime validTo, Guid recipientId, int? maxContractsPerIdentity) =>
             new DomainOffer(Guid.NewGuid(), name, description, maxMembersCount, amount, period, validFrom, validTo, recipientId, maxContractsPerIdentity);
 
-        public DomainOffer(Guid id, string name, string description, int maxSubscribersCount, CurrencyAmount amount, InvoicePeriod period, DateTime validFrom, DateTime validTo, int? maxContractsPerIdentity) : base(id)
+        public DomainOffer(Guid id, string name, string description, int maxMembersCount, CurrencyAmount amount, InvoicePeriod period, DateTime validFrom, DateTime validTo, int? maxContractsPerIdentity) : base(id)
         {
             Name = name;
             Description = description;
-            MaxSubscribersCount = maxSubscribersCount;
+            MaxMembersCount = maxMembersCount;
             Amount = amount;
             InvoicePeriod = period;
             ValidFrom = validFrom;
@@ -40,8 +40,8 @@ namespace Vouchers.Domains
             MaxContractsPerIdentity = maxContractsPerIdentity;
         }
 
-        public DomainOffer(Guid id, string name, string description, int maxSubscribersCount, CurrencyAmount amount, InvoicePeriod period, DateTime validFrom, DateTime validTo, Guid recipientId, int? maxContractsPerIdentity)
-            : this(id, name, description, maxSubscribersCount, amount, period, validFrom, validTo, maxContractsPerIdentity) =>
+        public DomainOffer(Guid id, string name, string description, int maxMembersCount, CurrencyAmount amount, InvoicePeriod period, DateTime validFrom, DateTime validTo, Guid recipientId, int? maxContractsPerIdentity)
+            : this(id, name, description, maxMembersCount, amount, period, validFrom, validTo, maxContractsPerIdentity) =>
             RecipientId = recipientId;
 
 

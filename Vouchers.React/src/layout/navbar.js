@@ -1,8 +1,8 @@
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { logout } from '../infrastructure/userManager.js'
-import { noprofileImageSrc, getImageSrc } from '../imageSources.js';
+import { logout } from '../api/userManager.js'
+import { noprofileImageSrc, getImageSrc } from '../imageSources.ts';
 
 import "bootstrap-icons/font/bootstrap-icons.css";
 import style from './navbar.module.css'

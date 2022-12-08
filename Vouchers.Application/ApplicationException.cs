@@ -9,5 +9,9 @@ namespace Vouchers.Application
         internal ApplicationException(string message) : base(message)
         {
         }
+
+        internal ApplicationException(string message, params object[] formatParams) : base(string.Format(message, formatParams))
+        {
+        }
     }
 }

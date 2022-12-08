@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Vouchers.Entities;
+using Vouchers.Domains.Properties;
 
 namespace Vouchers.Domains
 {
@@ -37,13 +38,17 @@ namespace Vouchers.Domains
 
         private Domain() { }
 
-        public void IncreaseMembersCount() =>
-            MembersCount++;
+        public void IncreaseMembersCount()
+        {
+            if (Contract.Offer.MaxMembersCount > MembersCount + 1)
+                throw new DomainsException("Domain max members count exceeded");
 
+            MembersCount++;
+        }
         public void DecreaseMembersCount()
         {
             if (MembersCount <= 0)
-                throw new DomainsException("Domain has not any member");
+                throw new DomainsException(Resources.DomainHasNotAnyMember);
 
             MembersCount--;
         }

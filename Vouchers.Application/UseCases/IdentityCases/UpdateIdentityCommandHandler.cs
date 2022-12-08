@@ -14,43 +14,63 @@ using Vouchers.Identities;
 
 namespace Vouchers.Application.UseCases.IdentityCases
 {
-    internal sealed class UpdateIdentityCommandHandler : IAuthIdentityHandler<UpdateIdentityCommand>
+    internal sealed class UpdateIdentityCommandHandler : IHandler<UpdateIdentityCommand>
     {
+        private readonly IAuthIdentityProvider _authIdentityProvider;
         private readonly IRepository<Identity> _identityRepository;
-        private readonly AppImageService _appImageService;
+        private readonly IAppImageService _appImageService;
 
-        public UpdateIdentityCommandHandler(IRepository<Identity> identityRepository, AppImageService appImageService)
+        public UpdateIdentityCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<Identity> identityRepository, IAppImageService appImageService)
         {
+            _authIdentityProvider = authIdentityProvider;
             _identityRepository = identityRepository;
             _appImageService = appImageService;
         }
 
-        public async Task HandleAsync(UpdateIdentityCommand command, Guid authIdentityId, CancellationToken cancellation)
+        public async Task HandleAsync(UpdateIdentityCommand command, CancellationToken cancellation)
         {
+            var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
             var identity = await _identityRepository.GetByIdAsync(authIdentityId);
             if (identity is null)
-                throw new ApplicationException("Identity does not exist");
+                throw new ApplicationException(Properties.Resources.IdentityDoesNotExist);
 
-            var identityDetailDto = command.IdentityDetail;
+            var requireUpdate = false;
 
-            if (identityDetailDto.Image is not null && identityDetailDto.CropParameters is not null)
+            if (command.Image is not null && command.CropParameters is not null)
             {
-                var imageStream = identityDetailDto.Image.OpenReadStream();
-                var image = await _appImageService.CreateCroppedImage(imageStream, identityDetailDto.CropParameters);
+                var imageStream = command.Image.OpenReadStream();
+                var image = await _appImageService.CreateCroppedImage(imageStream, command.CropParameters);
                 identity.ImageId = image.Id;
+                requireUpdate = true;
             }
 
-            if (identityDetailDto.Image is null && identity.ImageId is not null && identityDetailDto.CropParameters is not null)
+            if (command.Image is null && identity.ImageId is not null && command.CropParameters is not null)
             {
-                var image = await _appImageService.CreateCroppedImage(identity.ImageId.Value, identityDetailDto.CropParameters);
+                var image = await _appImageService.CreateCroppedImage(identity.ImageId.Value, command.CropParameters);
                 identity.ImageId = image.Id;
+                requireUpdate = true;
             }
 
-            identity.FirstName = identityDetailDto.FirstName;
-            identity.LastName = identityDetailDto.LastName;
-            identity.Email = identityDetailDto.Email;  
+            if (identity.FirstName != command.FirstName)
+            {
+                identity.FirstName = command.FirstName;
+                requireUpdate = true;
+            }
 
-            _identityRepository.Update(identity);
+            if (identity.LastName != command.LastName)
+            {
+                identity.LastName = command.LastName;
+                requireUpdate = true;
+            }
+
+            if (identity.Email != command.Email)
+            {
+                identity.Email = command.Email;
+                requireUpdate = true;
+            }
+
+            if(requireUpdate)
+                await _identityRepository.UpdateAsync(identity);
         }
     }
 }

@@ -8,25 +8,28 @@ using System.Threading.Tasks;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Queries;
 using Vouchers.Application.UseCases;
+using Vouchers.Application.Services;
 using System.Threading;
 using Vouchers.Core;
 
 namespace Vouchers.EntityFramework.QueryHandlers
 {
-    internal sealed class HolderTransactionRequestsQueryHandler : IAuthIdentityHandler<HolderTransactionRequestsQuery,IEnumerable<HolderTransactionRequestDto>>
+    internal sealed class HolderTransactionRequestsQueryHandler : IHandler<HolderTransactionRequestsQuery,IEnumerable<HolderTransactionRequestDto>>
     {
-        readonly VouchersDbContext _dbContext;
+        private readonly IAuthIdentityProvider _authIdentityProvider;
+        private readonly VouchersDbContext _dbContext;
 
-        public HolderTransactionRequestsQueryHandler(VouchersDbContext dbContext)
+        public HolderTransactionRequestsQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext)
         {
+            _authIdentityProvider = authIdentityProvider;
             _dbContext = dbContext;
         }
 
-        public IEnumerable<HolderTransactionRequestDto> Handle(HolderTransactionRequestsQuery query, Guid authIdentityId) =>
-            GetQuery(query, authIdentityId).ToList();
-
-        public async Task<IEnumerable<HolderTransactionRequestDto>> HandleAsync(HolderTransactionRequestsQuery query, Guid authIdentityId, CancellationToken cancellation) =>
-            await GetQuery(query, authIdentityId).ToListAsync();
+        public async Task<IEnumerable<HolderTransactionRequestDto>> HandleAsync(HolderTransactionRequestsQuery query, CancellationToken cancellation)
+        {
+            var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
+            return await GetQuery(query, authIdentityId).ToListAsync();
+        }
 
         public IQueryable<HolderTransactionRequestDto> GetQuery(HolderTransactionRequestsQuery query, Guid authIdentityId) {
 
@@ -37,7 +40,7 @@ namespace Vouchers.EntityFramework.QueryHandlers
                 .Include(req => req.Transaction)
                 .Join(
                     _dbContext.DomainAccounts.Join(_dbContext.Identities, a => a.IdentityId, i => i.Id, (a, i) => new { a.Id, DomainAccount = a, Identity = i }),
-                    req => req.DebtorAccountId,
+                    req => req.Transaction == null ? req.DebtorAccountId : req.Transaction.DebtorAccountId,
                     debtor => debtor.Id,
                     (req, debtor) => new
                     {
@@ -47,7 +50,7 @@ namespace Vouchers.EntityFramework.QueryHandlers
                     }
                 ).GroupJoin(
                     _dbContext.DomainAccounts.Join(_dbContext.Identities, a => a.IdentityId, i => i.Id, (a, i) => new { a.Id, DomainAccount = a, Identity = i }),
-                    o => o.TransactionRequest.CreditorAccountId,
+                    o => o.TransactionRequest.Transaction == null ? o.TransactionRequest.CreditorAccountId : o.TransactionRequest.Transaction.CreditorAccountId,
                     creditor => creditor.Id,
                     (req, creditors) => new
                     {
@@ -59,20 +62,11 @@ namespace Vouchers.EntityFramework.QueryHandlers
                 ).SelectMany(
                     req => req.CreditorDomainAccounts.DefaultIfEmpty(),
                     (req, o) => new { req.TransactionRequest, req.DebtorDomainAccount, req.DebtorIdentity, CreditorDomainAccount = o.DomainAccount, CreditorIdentity = o.Identity }
-                ).GroupJoin(
-                    _dbContext.HolderTransactions.Join(_dbContext.DomainAccounts, tr => tr.CreditorAccountId, acc => acc.Id, (tr, acc) => new { tr.Id, CreditorDomainAccount = acc }),
-                    req => req.TransactionRequest.TransactionId,
-                    t => t.Id,
-                    (req, ts) => new { req.TransactionRequest, req.DebtorDomainAccount, req.DebtorIdentity, req.CreditorDomainAccount, req.CreditorIdentity, Transactions = ts }
-                ).SelectMany(
-                    req => req.Transactions.DefaultIfEmpty(),
-                    (req, t) => new { req.TransactionRequest, req.DebtorDomainAccount, req.DebtorIdentity, req.CreditorDomainAccount, req.CreditorIdentity, Transaction = t }
                 );
 
             holderTransactionRequestsWithDomainAccountsQuery = holderTransactionRequestsWithDomainAccountsQuery.Where(
                 o => o.DebtorDomainAccount.IdentityId == authIdentityId 
                 || o.CreditorDomainAccount != null && o.CreditorDomainAccount.IdentityId == authIdentityId 
-                || o.Transaction.CreditorDomainAccount.IdentityId == authIdentityId
             );
 
             if (!query.IncludeIncoming)
@@ -83,20 +77,17 @@ namespace Vouchers.EntityFramework.QueryHandlers
             if (!query.IncludeOutgoing)
                 holderTransactionRequestsWithDomainAccountsQuery = holderTransactionRequestsWithDomainAccountsQuery.Where(
                     o => o.CreditorDomainAccount != null && o.CreditorDomainAccount.IdentityId == authIdentityId
-                    || o.Transaction.CreditorDomainAccount.IdentityId == authIdentityId
                 );
 
-            if (!query.IncludePaid)
+            if (!query.IncludePerformed)
                 holderTransactionRequestsWithDomainAccountsQuery = holderTransactionRequestsWithDomainAccountsQuery.Where(
                     o => o.TransactionRequest.TransactionId == null
                 );
 
-            if (!query.IncludeUnpaid)
+            if (!query.IncludeNotPerformed)
                 holderTransactionRequestsWithDomainAccountsQuery = holderTransactionRequestsWithDomainAccountsQuery.Where(
                     o => o.TransactionRequest.TransactionId != null
                 );
-
-            //var holderTransactionRequestsQuery = holderTransactionRequestsWithDomainAccountsQuery.Select(o => o.TransactionRequest);
 
             if (query.MinAmount != null)
                 holderTransactionRequestsWithDomainAccountsQuery = holderTransactionRequestsWithDomainAccountsQuery.Where(req => req.TransactionRequest.Quantity.Amount >= query.MinAmount);
@@ -160,7 +151,7 @@ namespace Vouchers.EntityFramework.QueryHandlers
             if (query.IssuerName is not null)
                 holderTransactionRequestsWithDomainAccountsAndUnitAndUnitImageQuery = holderTransactionRequestsWithDomainAccountsAndUnitAndUnitImageQuery.Where(o => (o.UnitIssuer.FirstName + o.UnitIssuer.LastName).Contains(query.IssuerName));
 
-            return holderTransactionRequestsWithDomainAccountsAndUnitAndUnitImageQuery.Select(req =>
+            var resultQuery = holderTransactionRequestsWithDomainAccountsAndUnitAndUnitImageQuery.Select(req =>
                 new HolderTransactionRequestDto
                 {
                     Id = req.TransactionRequest.Id,
@@ -184,6 +175,11 @@ namespace Vouchers.EntityFramework.QueryHandlers
                     TransactionId = req.TransactionRequest.TransactionId,
                 }
             );
+
+            if (query.CounterpartyName is not null)
+                resultQuery = resultQuery.Where(o => o.CounterpartyName.Contains(query.CounterpartyName) || o.CounterpartyEmail.Contains(query.CounterpartyName));
+
+            return resultQuery.OrderByDescending(request => request.DueDate).GetListPageQuery(query);
         }
     }
 }

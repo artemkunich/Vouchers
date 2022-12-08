@@ -10,24 +10,27 @@ using Vouchers.Application.Queries;
 using Vouchers.Application.UseCases;
 using System.Threading;
 using Vouchers.Core;
+using Vouchers.Application.Services;
 
 namespace Vouchers.EntityFramework.QueryHandlers
 {
-    internal sealed class HolderTransactionsQueryHandler : IAuthIdentityHandler<HolderTransactionsQuery,IEnumerable<HolderTransactionDto>>
+    internal sealed class HolderTransactionsQueryHandler : IHandler<HolderTransactionsQuery,IEnumerable<HolderTransactionDto>>
     {
-        VouchersDbContext _dbContext;
+        private readonly IAuthIdentityProvider _authIdentityProvider;
+        private readonly VouchersDbContext _dbContext;
 
-        public HolderTransactionsQueryHandler(VouchersDbContext dbContext)
+        public HolderTransactionsQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext)
         {
+            _authIdentityProvider = authIdentityProvider;
             _dbContext = dbContext;
         }
 
-        public IEnumerable<HolderTransactionDto> Handle(HolderTransactionsQuery query, Guid authIdentityId) =>
-            GetQuery(query, authIdentityId).ToList();
-
-        public async Task<IEnumerable<HolderTransactionDto>> HandleAsync(HolderTransactionsQuery query, Guid authIdentityId, CancellationToken cancellation) =>
-            await GetQuery(query, authIdentityId).ToListAsync();
-
+        public async Task<IEnumerable<HolderTransactionDto>> HandleAsync(HolderTransactionsQuery query, CancellationToken cancellation)
+        {
+            var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
+            return await GetQuery(query, authIdentityId).ToListAsync();
+        }
+            
         public IQueryable<HolderTransactionDto> GetQuery(HolderTransactionsQuery query, Guid authIdentityId) {
 
             var holderTransactionsQuery = _dbContext.HolderTransactions
@@ -87,8 +90,8 @@ namespace Vouchers.EntityFramework.QueryHandlers
                 i => i.DomainAccountId,
                 (t, i) => new
                 {
-                    Transaction = t.Transaction,
-                    Value = t.Value,
+                    t.Transaction,
+                    t.Value,
                     Creditor = i.Identity
                 }
             ).Join(
@@ -156,11 +159,7 @@ namespace Vouchers.EntityFramework.QueryHandlers
                     }
                 })
             }
-            ).OrderByDescending(value => value.Timestamp);
-
-            
-
-            
+            ).OrderByDescending(value => value.Timestamp).GetListPageQuery(query);         
         }
     }
 }

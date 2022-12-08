@@ -9,7 +9,7 @@ using Vouchers.Core;
 
 namespace Vouchers.EntityFramework.Repositories
 {
-    public sealed class UnitTypeRepository : Repository<UnitType>
+    internal sealed class UnitTypeRepository : Repository<UnitType>
     {
         public UnitTypeRepository(VouchersDbContext dbContext) : base(dbContext)
         {

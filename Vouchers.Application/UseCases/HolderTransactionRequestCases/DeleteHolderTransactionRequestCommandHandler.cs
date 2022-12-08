@@ -8,32 +8,37 @@ using System.Threading;
 using Vouchers.Domains;
 using System.Linq;
 using Vouchers.Application.Commands.HolderTransactionRequestCommands;
+using Vouchers.Application.Services;
 
 namespace Vouchers.Application.UseCases.HolderTransactionRequestCases
 {
-    internal sealed class DeleteHolderTransactionRequestCommandHandler : IAuthIdentityHandler<DeleteHolderTransactionRequestCommand>
+    internal sealed class DeleteHolderTransactionRequestCommandHandler : IHandler<DeleteHolderTransactionRequestCommand>
     {
+        private readonly IAuthIdentityProvider _authIdentityProvider;
         private readonly IRepository<DomainAccount> _domainAccountRepository;
         private readonly IRepository<HolderTransactionRequest> _holderTransactionRequestRepository;
 
-        public DeleteHolderTransactionRequestCommandHandler(IRepository<DomainAccount> domainAccountRepository, IRepository<HolderTransactionRequest> holderTransactionRequestRepository)
+        public DeleteHolderTransactionRequestCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<DomainAccount> domainAccountRepository, IRepository<HolderTransactionRequest> holderTransactionRequestRepository)
         {
+            _authIdentityProvider = authIdentityProvider;
             _domainAccountRepository = domainAccountRepository;
             _holderTransactionRequestRepository = holderTransactionRequestRepository;
         }
 
-        public async Task HandleAsync(DeleteHolderTransactionRequestCommand command, Guid authIdentityId, CancellationToken cancellation)
+        public async Task HandleAsync(DeleteHolderTransactionRequestCommand command, CancellationToken cancellation)
         {
+            var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
+
             var transactionRequest = await _holderTransactionRequestRepository.GetByIdAsync(command.HolderTransactionRequestId);
             if (transactionRequest is null)
-                throw new ApplicationException("Transaction request is not found");
+                throw new ApplicationException(Properties.Resources.TransactionRequestIsNotFound);
 
             if (transactionRequest.TransactionId is not null)
-                throw new ApplicationException("Transaction request is already performed");
+                throw new ApplicationException(Properties.Resources.TransactionRequestIsAlreadyPerformed);
 
             var debtorDomainAccount = await _domainAccountRepository.GetByIdAsync(transactionRequest.DebtorAccountId);
             if(debtorDomainAccount?.IdentityId != authIdentityId)
-                throw new ApplicationException("Operation is not allowed");
+                throw new ApplicationException(Properties.Resources.OperationIsNotAllowed);
 
             await _holderTransactionRequestRepository.RemoveAsync(transactionRequest);
         }

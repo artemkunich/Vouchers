@@ -13,53 +13,56 @@ using Vouchers.Application.Services;
 
 namespace Vouchers.Application.UseCases.VoucherValueCases
 {
-    internal sealed class UpdateVoucherValueCommandHandler : IAuthIdentityHandler<UpdateVoucherValueCommand>
+    internal sealed class UpdateVoucherValueCommandHandler : IHandler<UpdateVoucherValueCommand>
     {
+        private readonly IAuthIdentityProvider _authIdentityProvider;
         private readonly IRepository<VoucherValue> _voucherValueRepository;
-        private readonly AppImageService _appImageService;
+        private readonly IAppImageService _appImageService;
 
-        public UpdateVoucherValueCommandHandler(IRepository<VoucherValue> voucherValueRepository, AppImageService appImageService)
+        public UpdateVoucherValueCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<VoucherValue> voucherValueRepository, IAppImageService appImageService)
         {
+            _authIdentityProvider = authIdentityProvider;
             _voucherValueRepository = voucherValueRepository;
             _appImageService = appImageService;
         }
 
-        public async Task HandleAsync(UpdateVoucherValueCommand command, Guid authIdentityId, CancellationToken cancellation)
+        public async Task HandleAsync(UpdateVoucherValueCommand command, CancellationToken cancellation)
         {
-            var value = await _voucherValueRepository.GetByIdAsync(command.VoucherValueId);
+            var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
+
+            var value = await _voucherValueRepository.GetByIdAsync(command.Id);
             if (value is null)
-                throw new ApplicationException("Voucher's value does not exist");
+                throw new ApplicationException(Properties.Resources.VoucherValueDoesNotExist);
 
             if (value.IssuerIdentityId != authIdentityId)
-                throw new ApplicationException("Operation is not allowed");
+                throw new ApplicationException(Properties.Resources.OperationIsNotAllowed);
 
             var requireUpdate = false;
-            var valueDetailDto = command.VoucherValueDetail;
 
-            if (command.Image is not null && valueDetailDto.CropParameters is not null)
+            if (command.Image is not null && command.CropParameters is not null)
             {
                 var imageStream = command.Image.OpenReadStream();
-                var image = await _appImageService.CreateCroppedImage(imageStream, valueDetailDto.CropParameters);
+                var image = await _appImageService.CreateCroppedImage(imageStream, command.CropParameters);
                 value.ImageId = image.Id;
                 requireUpdate = true;
             }
                 
-            if (command.Image is null && value.ImageId is not null && valueDetailDto.CropParameters is not null)
+            if (command.Image is null && value.ImageId is not null && command.CropParameters is not null)
             {
-                var image = await _appImageService.CreateCroppedImage(value.ImageId.Value, valueDetailDto.CropParameters);
+                var image = await _appImageService.CreateCroppedImage(value.ImageId.Value, command.CropParameters);
                 value.ImageId = image.Id;
                 requireUpdate = true;
             }
 
-            if (valueDetailDto.Ticker is not null && value.Ticker != valueDetailDto.Ticker)
+            if (command.Ticker is not null && value.Ticker != command.Ticker)
             {
-                value.Ticker = valueDetailDto.Ticker;
+                value.Ticker = command.Ticker;
                 requireUpdate = true;
             }
 
-            if (value.Description != valueDetailDto.Description)
+            if (value.Description != command.Description)
             { 
-                value.Description = valueDetailDto.Description;
+                value.Description = command.Description;
                 requireUpdate = true;
             }
 

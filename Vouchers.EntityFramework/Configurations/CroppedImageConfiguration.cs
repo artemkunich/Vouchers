@@ -8,7 +8,7 @@ using Vouchers.Files;
 
 namespace Vouchers.EntityFramework.Configurations
 {
-    public class CroppedImageConfiguration : IEntityTypeConfiguration<CroppedImage>
+    internal class CroppedImageConfiguration : IEntityTypeConfiguration<CroppedImage>
     {
         public void Configure(EntityTypeBuilder<CroppedImage> builder)
         {
