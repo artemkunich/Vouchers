@@ -17,7 +17,7 @@ namespace Vouchers.Domains
         public int Counter { get; private set; }
 
         private DomainOffersPerIdentityCounter() { }
-        internal DomainOffersPerIdentityCounter(Guid id, DomainOffer offer, Guid identityId, int counter) : base(id)
+        private DomainOffersPerIdentityCounter(Guid id, DomainOffer offer, Guid identityId, int counter) : base(id)
         { 
             OfferId = offer.Id;
             Offer = offer;

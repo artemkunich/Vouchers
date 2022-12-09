@@ -54,7 +54,7 @@ namespace Vouchers.Application.UseCases.DomainCases
                 requireUpdate = true;
             }
 
-            if (domain.Description != command.Description)
+            if (command.Description is not null && domain.Description != command.Description)
             {
                 domain.Description = command.Description;
                 requireUpdate = true;
@@ -67,7 +67,7 @@ namespace Vouchers.Application.UseCases.DomainCases
             }
 
             if (requireUpdate)
-                _domainRepository.Update(domain);
+                await _domainRepository.UpdateAsync(domain);
         }
     }
 }

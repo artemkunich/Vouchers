@@ -20,7 +20,7 @@ namespace Vouchers.EntityFramework.QueryHandlers
         private readonly IAuthIdentityProvider _authIdentityProvider;
         private readonly VouchersDbContext _dbContext;
 
-        Func<CropParameters, CropParametersDto> mapCropParameters = (CropParameters cp) => cp is null ? null : new CropParametersDto
+        Func<CropParameters, CropParametersDto> _mapCropParameters = (CropParameters cp) => cp is null ? null : new CropParametersDto
         {
             X = cp.X,
             Y = cp.Y,
@@ -64,12 +64,13 @@ namespace Vouchers.EntityFramework.QueryHandlers
 
             return new DomainDetailDto
             {
+                Id = domainWithImage.Domain.Id,
                 Name = domainWithImage.Domain.Contract.DomainName,
                 Description = domainWithImage.Domain.Description,
                 IsPublic = domainWithImage.Domain.IsPublic,
                 MembersCount = domainWithImage.Domain.MembersCount,
                 ImageId = domainWithImage.Image == null ? null : domainWithImage.Image.ImageId,
-                CropParameters = mapCropParameters(cropParameters)
+                CropParameters = _mapCropParameters(cropParameters)
             };
         }
     }

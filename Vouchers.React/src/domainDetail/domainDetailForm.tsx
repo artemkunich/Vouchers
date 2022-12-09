@@ -1,13 +1,28 @@
-import React, {useState, useEffect } from 'react'
+import * as React from 'react'
+import {DomainDetailDto, DomainAccountDto} from '../types/dtos'
 
-export const DomainDetailForm = ({detail, currentAccount, isEditState, setIsEditState, handleSubmit, handleCancel}) => {
+interface DomainDetailFormProps {
+    detail: DomainDetailDto, 
+    currentAccount: DomainAccountDto, 
+    isEditState: boolean, 
+    setIsEditState: (isEdit: boolean) => void, 
+    handleSubmit: (form: DomainDetailFormData) => void 
+    handleCancel: VoidFunction
+}
 
-    const [formData, setFormData] = useState({
+export interface DomainDetailFormData {
+    name: string,
+    description?: string,
+}
+
+export const DomainDetailForm = ({detail, currentAccount, isEditState, setIsEditState, handleSubmit, handleCancel} : DomainDetailFormProps) => {
+
+    const [formData, setFormData] = React.useState<DomainDetailFormData>({
         name: detail.name,
         description: detail.description
     })
 
-    useEffect(() => {
+    React.useEffect(() => {
         setFormData({
             name: detail.name,
             description: detail.description
@@ -24,7 +39,7 @@ export const DomainDetailForm = ({detail, currentAccount, isEditState, setIsEdit
         <div className="row mb-2">
             <div className='col-12'>
                 <label  htmlFor="domainDescription" className="form-label">Description</label>
-                <textarea id="domainDescription" className="form-control" rows="auto" value={formData.description} onChange={async (event) => setFormData({...formData, description: event.target.value })} disabled={!isEditState}></textarea>                         
+                <textarea id="domainDescription" className="form-control" value={formData.description} onChange={async (event) => setFormData({...formData, description: event.target.value })} disabled={!isEditState}></textarea>                         
             </div>
         </div>
         <div className="row mb-2 mt-5">
@@ -34,7 +49,7 @@ export const DomainDetailForm = ({detail, currentAccount, isEditState, setIsEdit
                 <div className="d-grid col-3" >
                     <button className="btn btn-primary" title="Save" onClick={() => handleSubmit(formData)}>Save</button>
                 </div>
-                : (currentAccount.isAdmin || currentAccount.isOwner) && <div className="d-grid col-3">
+            : (currentAccount.isAdmin || currentAccount.isOwner) && <div className="d-grid col-3">
                     <button className="btn btn-primary" title="Edit" onClick={() => setIsEditState(true)}>Edit</button>
                 </div>
         }

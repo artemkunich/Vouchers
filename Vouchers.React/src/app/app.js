@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux'
 import { Routes, Route, Link, useSearchParams } from 'react-router-dom';
-import { login, mgr } from '../api/userManager.js'
+import { login, mgr } from '../api/userManager.ts'
 
 import { store } from '../store/store.ts'
 import { userSigned, identityDefined } from '../store/userReducer.ts'

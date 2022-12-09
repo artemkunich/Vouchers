@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { FetchingListItemsInfo } from '../components/fetchingListItemsInfo/fetchingListItemsInfo'
-import { DomainAccountsListFilter, Filter} from './domainAccountsListFilter'
+import { DomainAccountsListFilter, DomainAccountsListFilterData} from './domainAccountsListFilter'
 import { DomainAccountsListElement } from './domainAccountsListElement'
 import { useLoadOnScroll} from '../api/helpers'
 import { DomainAccountsQuery } from '../types/queries'
@@ -37,10 +37,10 @@ export const DomainAccountsList = ({selectDomainAccount, handleCancel}: DomainAc
         setDomainAccounts([])
     }, [currentAccount, token])
 
-    const getDomainAccounts = React.useCallback(async (query: DomainAccountsQuery): Promise<DomainAccountDto[]> => token && currentAccount? await api.getDomainAccounts(token, {...query, domainId: currentAccount?.domainId}) : [], [api, token, currentAccount])
+    const getDomainAccounts = React.useCallback(async (query: DomainAccountsQuery): Promise<DomainAccountDto[]> => token && currentAccount ? await api.getDomainAccounts(token, {...query, domainId: currentAccount?.domainId}) : [], [api, token, currentAccount])
     const {isFetching, resetPageIndex} = useLoadOnScroll<DomainAccountsQuery,DomainAccountDto>(domainAccountsQuery, getDomainAccounts, setDomainAccounts)
 
-    const handleSearch = React.useCallback((filter: Filter) => {
+    const handleSearch = React.useCallback((filter: DomainAccountsListFilterData) => {
         if(domainAccountsQuery)
             setDomainAccountsQuery({...domainAccountsQuery, ...filter})
         

@@ -26,7 +26,7 @@ namespace Vouchers.Domains
         public static DomainAccount Create(Guid accountId, Guid identityId, Domain domain) =>
             new DomainAccount(accountId, identityId, domain, DateTime.Now);
 
-        internal DomainAccount(Guid accountId, Guid identityId, Domain domain, DateTime createdDateTime) : base(accountId)
+        private DomainAccount(Guid accountId, Guid identityId, Domain domain, DateTime createdDateTime) : base(accountId)
         {
             IdentityId = identityId;
 

@@ -28,7 +28,7 @@ namespace Vouchers.Domains
         public static DomainOffer Create(string name, string description, int maxMembersCount, CurrencyAmount amount, InvoicePeriod period, DateTime validFrom, DateTime validTo, Guid recipientId, int? maxContractsPerIdentity) =>
             new DomainOffer(Guid.NewGuid(), name, description, maxMembersCount, amount, period, validFrom, validTo, recipientId, maxContractsPerIdentity);
 
-        public DomainOffer(Guid id, string name, string description, int maxMembersCount, CurrencyAmount amount, InvoicePeriod period, DateTime validFrom, DateTime validTo, int? maxContractsPerIdentity) : base(id)
+        private DomainOffer(Guid id, string name, string description, int maxMembersCount, CurrencyAmount amount, InvoicePeriod period, DateTime validFrom, DateTime validTo, int? maxContractsPerIdentity) : base(id)
         {
             Name = name;
             Description = description;

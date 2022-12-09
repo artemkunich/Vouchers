@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useRef, useCallback } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { DomainMembersListFilter } from './domainMembersListFilter.js'
+import { DomainMembersListFilter } from './domainMembersListFilter.tsx'
 import { DomainMembersListElement } from './domainMembersListElement.js'
 import { FetchingListItemsInfo } from '../components/fetchingListItemsInfo/fetchingListItemsInfo.tsx'
 import { useLoadOnScroll } from '../api/helpers.ts'

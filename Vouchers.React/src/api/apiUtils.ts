@@ -1,4 +1,4 @@
-import { login } from './userManager.js'
+import { login } from './userManager'
 
 const apiHost = 'http://localhost:6080'
 

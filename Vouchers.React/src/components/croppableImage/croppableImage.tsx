@@ -5,9 +5,9 @@ import { ImageCrop } from '../imageCrop/imageCrop'
 
 interface CroppableImageProps {
     isEditState: boolean,
-    initImgSrc: string,
+    initImgSrc: string | undefined,
     setImage(image: File): void,
-    crop: PercentCrop,
+    crop: PercentCrop | undefined,
     setCrop(crop?: PercentCrop): void,
 }
 
@@ -27,11 +27,16 @@ export const CroppableImage = ({isEditState, initImgSrc, setImage, crop, setCrop
     }
 
     React.useEffect(() => {
-        setImgSrc(initImgSrc)
+        setImgSrc(initImgSrc ?? "")
     }, [initImgSrc])
 
-    return isEditState && isCropState ?
-    <ImageCrop imgSrc={imgSrc} initCrop={crop} saveCrop={saveCrop}/>
-    :
-    <Image imgSrc={imgSrc} setImgSrc={setImgSrc} isEditState={isEditState} setIsCropState={setIsCropState} saveImage={saveImage}/>
+    return<>
+        <div style={{display: isEditState && isCropState ? "block" : "none"}}>
+            <ImageCrop imgSrc={imgSrc} initCrop={crop} saveCrop={saveCrop}/>
+        </div>  
+        <div style={{display: isEditState && isCropState ? "none" : "block"}}>
+            <Image imgSrc={imgSrc} setImgSrc={setImgSrc} isEditState={isEditState} setIsCropState={setIsCropState} saveImage={saveImage}/>
+        </div>
+    </>
+    
 }

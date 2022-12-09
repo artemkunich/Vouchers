@@ -1,3 +1,5 @@
+import { PercentCrop } from 'react-image-crop'
+
 export interface DomainAccountDto {
 
     id: string,
@@ -17,3 +19,20 @@ export interface DomainAccountDto {
 
     imageId?: string
 }
+
+export interface DomainDetailDto
+    {
+        id: string,
+
+        name: string,
+
+        description?: string,
+
+        isPublic: boolean,
+
+        membersCount: number
+
+        imageId?: string
+
+        cropParameters?: PercentCrop
+    }

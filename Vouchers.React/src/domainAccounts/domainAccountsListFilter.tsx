@@ -2,18 +2,18 @@ import * as React from 'react'
 import { ListElement } from '../components/list/list'
 
 interface DomainAccountsListFilterProps {
-    handleSearch: (filter: Filter) => void,
+    handleSearch: (filter: DomainAccountsListFilterData) => void,
     handleCancel: () => {}
 }
 
-export interface Filter {
+export interface DomainAccountsListFilterData {
     email: string,
     name: string,
 }
 
 export const DomainAccountsListFilter = ({handleSearch, handleCancel} : DomainAccountsListFilterProps) => {
 
-    const [filter, setFilter] = React.useState<Filter>({
+    const [filter, setFilter] = React.useState<DomainAccountsListFilterData>({
         email: "",
         name: "",
     })

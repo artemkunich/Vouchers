@@ -8,7 +8,7 @@ const maxImageSide = 900;
 
 interface ImageCropProps {
     imgSrc: string,
-    initCrop: PercentCrop,
+    initCrop: PercentCrop | undefined,
     saveCrop(crop: PercentCrop): void
 }
 
@@ -17,7 +17,7 @@ export const ImageCrop = ({imgSrc, initCrop, saveCrop}: ImageCropProps) => {
     const [crop, setCrop] = React.useState(initCrop)
 
     const onImageLoad = async (e: React.FormEvent<HTMLImageElement>) => {
-
+        //React.FormEvent<HTMLImageElement>
         if(crop)
             return
 
@@ -53,7 +53,7 @@ export const ImageCrop = ({imgSrc, initCrop, saveCrop}: ImageCropProps) => {
         </div>
         <div className="row mb-2">
             <div className="d-grid col-3">
-                <button className="btn btn-primary" onClick={() => saveCrop(crop)}>Save</button>
+                <button className="btn btn-primary" onClick={() => crop && saveCrop(crop)}>Save</button>
             </div>
         </div>
     </>

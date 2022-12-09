@@ -33,7 +33,7 @@ namespace Vouchers.Domains
         public static UpdateDomainContractRequest CreateUpdateDomainContractRequest(Domain domain, DomainOffer offer) =>
            new UpdateDomainContractRequest(Guid.NewGuid(), domain, offer, DateTime.Now);
 
-        public UpdateDomainContractRequest(Guid id, Domain domain, DomainOffer offer, DateTime createdDateTime)
+        private UpdateDomainContractRequest(Guid id, Domain domain, DomainOffer offer, DateTime createdDateTime)
         {
             Id = id;
 

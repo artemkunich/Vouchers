@@ -1,9 +1,23 @@
-import React, { useState } from 'react'
-import { ListElement } from '../components/list/list.tsx'
+import * as React from 'react'
+import { ListElement } from '../components/list/list'
+import { DomainAccountsQuery } from '../types/queries'
 
-export const DomainMembersListFilter = ({initFilter, handleSearch, handleCancel}) => {
+interface DomainMembersListFilterProps {
+    initFilter: DomainAccountsQuery,
+    handleSearch: (filter: DomainMembersListFilterData) => void,
+    handleCancel: VoidFunction,
+}
 
-    const [filter, setFilter] = useState(initFilter ?? {
+interface DomainMembersListFilterData {
+    email: string,
+    name: string,
+    includeConfirmed: boolean,
+    includeNotConfirmed: boolean,
+}
+
+export const DomainMembersListFilter = ({initFilter, handleSearch, handleCancel}: DomainMembersListFilterProps) => {
+
+    const [filter, setFilter] = React.useState<DomainMembersListFilterData>({
         email: "",
         name: "",
         includeConfirmed: true,

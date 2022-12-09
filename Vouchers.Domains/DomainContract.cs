@@ -22,7 +22,7 @@ namespace Vouchers.Domains
         public static DomainContract Create(DomainOffer offer, DomainOffersPerIdentityCounter offersPerIdentityCounter, Guid partyId, string domainName) =>
             new DomainContract(Guid.NewGuid(), offer, offersPerIdentityCounter, partyId, domainName, DateTime.Now);
 
-        internal DomainContract(Guid id, DomainOffer offer, DomainOffersPerIdentityCounter offersPerIdentityCounter, Guid partyId, string domainName, DateTime createdDate) : base(id)
+        private DomainContract(Guid id, DomainOffer offer, DomainOffersPerIdentityCounter offersPerIdentityCounter, Guid partyId, string domainName, DateTime createdDate) : base(id)
         {
             OfferId = offer.Id;
             Offer = offer;
