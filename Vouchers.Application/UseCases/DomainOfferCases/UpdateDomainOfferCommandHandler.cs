@@ -29,7 +29,7 @@ namespace Vouchers.Application.UseCases.DomainOfferCases
 
             var domainOffer = await _domainOfferRepository.GetByIdAsync(command.Id);
 
-            if (command.Terminate)
+            if (command.Terminate == true)
             {
                 if(domainOffer.ValidFrom <= DateTime.Now)
                     domainOffer.ValidTo = DateTime.Now;
@@ -40,7 +40,7 @@ namespace Vouchers.Application.UseCases.DomainOfferCases
                 return;
             } 
 
-            if(command.Description != domainOffer.Description)
+            if(command.Description is not null && command.Description != domainOffer.Description)
             {
                 domainOffer.Description = command.Description;
                 await _domainOfferRepository.UpdateAsync(domainOffer);

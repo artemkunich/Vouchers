@@ -21,18 +21,43 @@ export interface DomainAccountDto {
 }
 
 export interface DomainDetailDto
-    {
-        id: string,
+{
+    id: string,
 
-        name: string,
+    name: string,
 
-        description?: string,
+    description?: string,
 
-        isPublic: boolean,
+    isPublic: boolean,
 
-        membersCount: number
+    membersCount: number
 
-        imageId?: string
+    imageId?: string
 
-        cropParameters?: PercentCrop
-    }
+    cropParameters?: PercentCrop
+}
+
+export interface DomainOfferDto
+{
+    id: string
+
+    name: string
+
+    description?: string
+
+    maxMembersCount: number
+
+    amount: number
+
+    currency: string
+
+    invoicePeriod: string
+
+    validFrom: string
+
+    validTo: string
+
+    maxContractsPerIdentity?: number
+
+    contractsPerIdentity?: number
+}

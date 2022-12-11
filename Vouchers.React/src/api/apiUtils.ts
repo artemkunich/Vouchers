@@ -113,7 +113,7 @@ export const getByQuery = async (path: string, query: string, token: string) => 
     }
 }
 
-export const postJson = async (path: string, command: JSON, token: string) => {
+export const postJson = async (path: string, command: any, token: string) => {
     try {
         const headers = new Headers()
 
@@ -140,7 +140,7 @@ export const postJson = async (path: string, command: JSON, token: string) => {
     }
 }
 
-export const putJson = async (path: string, command: JSON, token: string) => {
+export const putJson = async (path: string, command: any, token: string) => {
     try {
 
         const headers = new Headers()

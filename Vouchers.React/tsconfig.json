@@ -5,7 +5,10 @@
     "target": "es5",
     "jsx": "react",
     "strict": true,
-    "plugins": [{ "name": "typescript-plugin-css-modules" }]
+    "plugins": [{ "name": "typescript-plugin-css-modules" }],
+    // "lib": [
+    //   "ES2021.String"
+    // ]
   },
   "include": ["./src/**/*"],
 

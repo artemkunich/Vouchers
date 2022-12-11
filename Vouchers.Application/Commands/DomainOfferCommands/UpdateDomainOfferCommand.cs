@@ -11,7 +11,7 @@ namespace Vouchers.Application.Commands.DomainOfferCommands
         [Required]
         public Guid Id { get; set; }
 
-        public bool Terminate { get; set; }
+        public bool? Terminate { get; set; }
 
         public string Description { get; set; }
 

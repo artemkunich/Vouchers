@@ -3,7 +3,7 @@ import { DomainAccountDto, DomainDetailDto } from '../types/dtos'
 import { DomainAccountsQuery } from '../types/queries'
 import { getById, getByQuery, postJson, putJson, postForm, putForm, deleteById, serializeToQuery } from './apiUtils'
 
-import { UpdateDomainDetailCommand } from '../types/commands'
+import { UpdateDomainAccountCommand, UpdateDomainDetailCommand } from '../types/commands'
 
 export const api = {
     getIdentityDetail: (token: User, query: any) => getByQuery("IdentityDetail", serializeToQuery(query), token.access_token),
@@ -26,7 +26,7 @@ export const api = {
 
     getDomainAccounts: (token: User, query: DomainAccountsQuery): Promise<DomainAccountDto[]> => getByQuery("DomainAccounts", serializeToQuery(query), token.access_token) as Promise<DomainAccountDto[]>,
     postDomainAccount: (token: User, domainAccount: any) => postJson("DomainAccounts", domainAccount, token.access_token),
-    putDomainAccount: (token: User, domainAccount: any) =>putJson("DomainAccounts", domainAccount, token.access_token),
+    putDomainAccount: (token: User, command: UpdateDomainAccountCommand): Promise<boolean | undefined> => putJson("DomainAccounts", command, token.access_token),
 
     getValues: (token: User, query: any) => getByQuery("IssuerValues", serializeToQuery(query), token.access_token),
     postValue: (token: User, form: FormData) => postForm("IssuerValues", form, token.access_token),
