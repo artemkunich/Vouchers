@@ -402,6 +402,7 @@ FodyWeavers.xsd
 .vscode/
 node_modules/
 build/
+dist/
 .DS_Store
 *.tgz
 my-app*
