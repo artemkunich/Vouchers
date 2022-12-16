@@ -51,7 +51,7 @@ services:
       - "6443:443"
     build:
       context: .
-      dockerfile: Vouchers.API/Dockerfile
+      dockerfile: Vouchers.MinimalAPI/Dockerfile
     depends_on:
       - db
       - vouchers.staticfiles

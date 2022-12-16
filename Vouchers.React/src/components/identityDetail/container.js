@@ -49,7 +49,7 @@ export const IdentityDetailContainer = ({accountId, handleCancel}) => {
         else
             await api.postIdentityDetail(token, formData) 
         
-        var idDetail = await api.getIdentityDetail()
+        var idDetail = await api.getIdentityDetail(token)
 
         if(idDetail) {
             dispatch(identityDefined(idDetail))
