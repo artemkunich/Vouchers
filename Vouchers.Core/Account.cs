@@ -6,7 +6,7 @@ using System.Globalization;
 
 namespace Vouchers.Core
 {
-    public sealed class Account : Entity
+    public sealed class Account : Entity<Guid>
     {
         public DateTime CreatedDateTime { get; }
         public decimal Supply { get; private set; }

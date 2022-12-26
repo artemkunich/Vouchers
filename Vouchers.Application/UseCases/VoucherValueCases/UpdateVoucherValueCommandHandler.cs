@@ -16,10 +16,11 @@ namespace Vouchers.Application.UseCases.VoucherValueCases
     internal sealed class UpdateVoucherValueCommandHandler : IHandler<UpdateVoucherValueCommand>
     {
         private readonly IAuthIdentityProvider _authIdentityProvider;
-        private readonly IRepository<VoucherValue> _voucherValueRepository;
+        private readonly IRepository<VoucherValue,Guid> _voucherValueRepository;
         private readonly IAppImageService _appImageService;
 
-        public UpdateVoucherValueCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<VoucherValue> voucherValueRepository, IAppImageService appImageService)
+        public UpdateVoucherValueCommandHandler(IAuthIdentityProvider authIdentityProvider, IAppImageService appImageService,
+            IRepository<VoucherValue,Guid> voucherValueRepository)
         {
             _authIdentityProvider = authIdentityProvider;
             _voucherValueRepository = voucherValueRepository;
@@ -42,14 +43,14 @@ namespace Vouchers.Application.UseCases.VoucherValueCases
             if (command.Image is not null && command.CropParameters is not null)
             {
                 var imageStream = command.Image.OpenReadStream();
-                var image = await _appImageService.CreateCroppedImage(imageStream, command.CropParameters);
+                var image = await _appImageService.CreateCroppedImageAsync(imageStream, command.CropParameters);
                 value.ImageId = image.Id;
                 requireUpdate = true;
             }
                 
             if (command.Image is null && value.ImageId is not null && command.CropParameters is not null)
             {
-                var image = await _appImageService.CreateCroppedImage(value.ImageId.Value, command.CropParameters);
+                var image = await _appImageService.CreateCroppedImageAsync(value.ImageId.Value, command.CropParameters);
                 value.ImageId = image.Id;
                 requireUpdate = true;
             }

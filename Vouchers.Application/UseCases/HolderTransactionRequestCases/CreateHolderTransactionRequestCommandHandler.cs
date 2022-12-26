@@ -15,12 +15,14 @@ namespace Vouchers.Application.UseCases.HolderTransactionRequestCases
     internal sealed class CreateHolderTransactionRequestCommandHandler : IHandler<CreateHolderTransactionRequestCommand, Guid>
     {
         private readonly IAuthIdentityProvider _authIdentityProvider;
-        private readonly IRepository<DomainAccount> _domainAccountRepository;
-        private readonly IRepository<Account> _accountRepository;
-        private readonly IRepository<UnitType> _unitTypeRepository;
-        private readonly IRepository<HolderTransactionRequest> _holderTransactionRequestRepository;
+        private readonly IRepository<DomainAccount,Guid> _domainAccountRepository;
+        private readonly IRepository<Account,Guid> _accountRepository;
+        private readonly IRepository<UnitType,Guid> _unitTypeRepository;
+        private readonly IRepository<HolderTransactionRequest,Guid> _holderTransactionRequestRepository;
 
-        public CreateHolderTransactionRequestCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<DomainAccount> domainAccountRepository, IRepository<Account> accountRepository, IRepository<UnitType> unitTypeRepository, IRepository<HolderTransactionRequest> holderTransactionRequestRepository)
+        public CreateHolderTransactionRequestCommandHandler(IAuthIdentityProvider authIdentityProvider, 
+            IRepository<DomainAccount,Guid> domainAccountRepository, IRepository<Account,Guid> accountRepository, 
+            IRepository<UnitType,Guid> unitTypeRepository, IRepository<HolderTransactionRequest,Guid> holderTransactionRequestRepository)
         {
             _authIdentityProvider = authIdentityProvider;
             _domainAccountRepository = domainAccountRepository;

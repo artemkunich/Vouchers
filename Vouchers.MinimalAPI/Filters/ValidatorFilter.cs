@@ -2,7 +2,7 @@ using FluentValidation;
 
 namespace Vouchers.MinimalAPI.Filters;
 
-internal class ValidatorFilter<T>: IEndpointFilter where T: class
+internal sealed class ValidatorFilter<T>: IEndpointFilter where T: class
 {
     private readonly IValidator<T> _validator;
 

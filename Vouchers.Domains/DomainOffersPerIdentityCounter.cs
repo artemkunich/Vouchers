@@ -8,7 +8,7 @@ using Vouchers.Domains.Properties;
 
 namespace Vouchers.Domains
 {
-    public sealed class DomainOffersPerIdentityCounter : Entity
+    public sealed class DomainOffersPerIdentityCounter : Entity<Guid>
     {
         public Guid OfferId { get; private set; }
         public DomainOffer Offer { get; private set; }

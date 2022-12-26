@@ -11,35 +11,35 @@ using Vouchers.Domains;
 
 namespace Vouchers.EntityFramework.Repositories
 {
-    internal sealed class DomainRepository : Repository<Domain>
+    internal sealed class DomainRepository : Repository<Domain, Guid>
     {
         public DomainRepository(VouchersDbContext dbContext) : base(dbContext)
         {
         }
 
-        public override async Task<Domain> GetByIdAsync(Guid id) => await DbContext.Domains
-            .Include(domain => domain.Contract).ThenInclude(contract => contract.Offer)
-            .Include(domain => domain.Contract).ThenInclude(contract => contract.OffersPerIdentityCounter)
-            .Where(domain => domain.Id == id)
-            .FirstOrDefaultAsync();
+        public override async Task<Domain> GetByIdAsync(Guid id) => 
+            await GetByIdQueryable(id).FirstOrDefaultAsync();
 
-        public override Domain GetById(Guid id) => DbContext.Domains
-            .Include(domain => domain.Contract).ThenInclude(contract => contract.Offer)
-            .Include(domain => domain.Contract).ThenInclude(contract => contract.OffersPerIdentityCounter)
-            .Where(domain => domain.Id == id)
-            .FirstOrDefault();
+        public override Domain GetById(Guid id) => 
+            GetByIdQueryable(id).FirstOrDefault();
 
-        public override async Task<IEnumerable<Domain>> GetByExpressionAsync(Expression<Func<Domain,bool>> expression) => await DbContext.Domains
-            .Include(domain => domain.Contract).ThenInclude(contract => contract.Offer)
-            .Include(domain => domain.Contract).ThenInclude(contract => contract.OffersPerIdentityCounter)
-            .Where(expression)
-            .ToListAsync();
+        private IQueryable<Domain> GetByIdQueryable(Guid id) =>
+            DbContext.Domains
+                .Include(domain => domain.Contract).ThenInclude(contract => contract.Offer)
+                .Include(domain => domain.Contract).ThenInclude(contract => contract.OffersPerIdentityCounter)
+                .Where(domain => domain.Id == id);
 
-        public override IEnumerable<Domain> GetByExpression(Expression<Func<Domain, bool>> expression) => DbContext.Domains
-            .Include(domain => domain.Contract).ThenInclude(contract => contract.Offer)
-            .Include(domain => domain.Contract).ThenInclude(contract => contract.OffersPerIdentityCounter)
-            .Where(expression)
-            .ToList();
+        public override async Task<IEnumerable<Domain>> GetByExpressionAsync(Expression<Func<Domain,bool>> expression) => 
+            await GetByExpressionQueryable(expression).ToListAsync();
+
+        public override IEnumerable<Domain> GetByExpression(Expression<Func<Domain, bool>> expression) => 
+            GetByExpressionQueryable(expression).ToList();
+
+        private IQueryable<Domain> GetByExpressionQueryable(Expression<Func<Domain, bool>> expression) =>
+            DbContext.Domains
+                .Include(domain => domain.Contract).ThenInclude(contract => contract.Offer)
+                .Include(domain => domain.Contract).ThenInclude(contract => contract.OffersPerIdentityCounter)
+                .Where(expression);
 
     }
 }

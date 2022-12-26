@@ -6,7 +6,7 @@ using Vouchers.Values.Properties;
 
 namespace Vouchers.Values
 {
-    public sealed class VoucherValue : Entity
+    public sealed class VoucherValue : Entity<Guid>
     {
         public Guid DomainId { get; }
         public Guid IssuerIdentityId { get; }

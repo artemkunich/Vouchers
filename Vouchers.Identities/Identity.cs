@@ -5,7 +5,7 @@ using Vouchers.Entities;
 
 namespace Vouchers.Identities
 {
-    public sealed class Identity : Entity
+    public sealed class Identity : Entity<Guid>
     {
         public string FirstName { get; set; }
 

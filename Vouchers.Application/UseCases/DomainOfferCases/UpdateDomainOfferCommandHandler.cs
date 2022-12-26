@@ -15,9 +15,9 @@ namespace Vouchers.Application.UseCases.DomainOfferCases
     internal sealed class UpdateDomainOfferCommandHandler : IHandler<UpdateDomainOfferCommand>
     {
         private readonly IAuthIdentityProvider _authIdentityProvider;
-        private readonly IRepository<DomainOffer> _domainOfferRepository;
+        private readonly IRepository<DomainOffer,Guid> _domainOfferRepository;
 
-        public UpdateDomainOfferCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<DomainOffer> domainOfferRepository)
+        public UpdateDomainOfferCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<DomainOffer,Guid> domainOfferRepository)
         {
             _authIdentityProvider = authIdentityProvider;
             _domainOfferRepository = domainOfferRepository;

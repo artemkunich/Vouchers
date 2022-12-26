@@ -10,30 +10,32 @@ using Vouchers.Domains;
 
 namespace Vouchers.EntityFramework.Repositories
 {
-    internal sealed class DomainAccountRepository : Repository<DomainAccount>
+    internal sealed class DomainAccountRepository : Repository<DomainAccount, Guid>
     {
         public DomainAccountRepository(VouchersDbContext dbContext) : base(dbContext)
         { 
         }
 
-        public override async Task<DomainAccount> GetByIdAsync(Guid id) => await DbContext.DomainAccounts
-            .Include(acc => acc.Domain).ThenInclude(domain => domain.Contract)
-            .Where(acc => acc.Id == id)
-            .FirstOrDefaultAsync();
+        public override async Task<DomainAccount> GetByIdAsync(Guid id) => 
+            await GetByIdQueryable(id).FirstOrDefaultAsync();
 
-        public override DomainAccount GetById(Guid id) => DbContext.DomainAccounts
-            .Include(acc => acc.Domain).ThenInclude(domain => domain.Contract)
-            .Where(acc => acc.Id == id)
-            .FirstOrDefault();
+        public override DomainAccount GetById(Guid id) => 
+            GetByIdQueryable(id).FirstOrDefault();
 
-        public override async Task<IEnumerable<DomainAccount>> GetByExpressionAsync(Expression<Func<DomainAccount,bool>> expression) => await DbContext.DomainAccounts
-            .Include(acc => acc.Domain).ThenInclude(domain => domain.Contract)
-            .Where(expression)
-            .ToListAsync();
+        private IQueryable<DomainAccount> GetByIdQueryable(Guid id) =>
+            DbContext.DomainAccounts
+                .Include(acc => acc.Domain).ThenInclude(domain => domain.Contract)
+                .Where(acc => acc.Id == id);
 
-        public override IEnumerable<DomainAccount> GetByExpression(Expression<Func<DomainAccount, bool>> expression) => DbContext.DomainAccounts
-            .Include(acc => acc.Domain).ThenInclude(domain => domain.Contract)
-            .Where(expression)
-            .ToList();
+        public override async Task<IEnumerable<DomainAccount>> GetByExpressionAsync(Expression<Func<DomainAccount,bool>> expression) => 
+            await GetByExpressionQueryable(expression).ToListAsync();
+
+        public override IEnumerable<DomainAccount> GetByExpression(Expression<Func<DomainAccount, bool>> expression) => 
+            GetByExpressionQueryable(expression).ToList();
+
+        private IQueryable<DomainAccount> GetByExpressionQueryable(Expression<Func<DomainAccount, bool>> expression) =>
+            DbContext.DomainAccounts
+                .Include(acc => acc.Domain).ThenInclude(domain => domain.Contract)
+                .Where(expression);
     }
 }

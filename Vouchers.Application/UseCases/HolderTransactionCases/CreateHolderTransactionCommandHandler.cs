@@ -15,15 +15,18 @@ namespace Vouchers.Application.UseCases.HolderTransactionCases
     internal sealed class CreateHolderTransactionCommandHandler : IHandler<CreateHolderTransactionCommand, Guid>
     {
         private readonly IAuthIdentityProvider _authIdentityProvider;
-        private readonly IRepository<DomainAccount> _domainAccountRepository;
-        private readonly IRepository<Account> _accountRepository;
-        private readonly IRepository<Unit> _unitRepository;
-        private readonly IRepository<UnitType> _unitTypeRepository;
-        private readonly IRepository<AccountItem> _accountItemRepository;
-        private readonly IRepository<HolderTransaction> _holderTransactionRepository;
-        private readonly IRepository<HolderTransactionRequest> _holderTransactionRequestRepository;
+        private readonly IRepository<DomainAccount,Guid> _domainAccountRepository;
+        private readonly IRepository<Account,Guid> _accountRepository;
+        private readonly IRepository<Unit,Guid> _unitRepository;
+        private readonly IRepository<UnitType,Guid> _unitTypeRepository;
+        private readonly IRepository<AccountItem,Guid> _accountItemRepository;
+        private readonly IRepository<HolderTransaction,Guid> _holderTransactionRepository;
+        private readonly IRepository<HolderTransactionRequest,Guid> _holderTransactionRequestRepository;
 
-        public CreateHolderTransactionCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<DomainAccount> domainAccountRepository, IRepository<Account> accountRepository, IRepository<Unit> unitRepository, IRepository<UnitType> unitTypeRepository, IRepository<AccountItem> accountItemRepository, IRepository<HolderTransaction> holderTransactionRepository, IRepository<HolderTransactionRequest> holderTransactionRequestRepository)
+        public CreateHolderTransactionCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<DomainAccount,Guid> domainAccountRepository, 
+            IRepository<Account,Guid> accountRepository, IRepository<Unit,Guid> unitRepository, 
+            IRepository<UnitType,Guid> unitTypeRepository, IRepository<AccountItem,Guid> accountItemRepository, 
+            IRepository<HolderTransaction,Guid> holderTransactionRepository, IRepository<HolderTransactionRequest,Guid> holderTransactionRequestRepository)
         {
             _authIdentityProvider = authIdentityProvider;
             _domainAccountRepository = domainAccountRepository;

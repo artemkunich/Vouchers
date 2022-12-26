@@ -3,7 +3,7 @@ using Vouchers.MinimalAPI.Validation;
 
 namespace Vouchers.MinimalAPI.Filters;
 
-internal class FormValidatorFilter<T>: IEndpointFilter where T: class
+internal sealed class FormValidatorFilter<T>: IEndpointFilter where T: class
 {
     private readonly IFormValidator<T> _validator;
 

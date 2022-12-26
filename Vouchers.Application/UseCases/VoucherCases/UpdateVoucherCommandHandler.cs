@@ -15,10 +15,11 @@ namespace Vouchers.Application.UseCases.VoucherCases
     {
         private readonly IAuthIdentityProvider _authIdentityProvider;
         private readonly ICultureInfoProvider _cultureInfoProvider;
-        private readonly IRepository<Unit> _unitRepository;
-        private readonly IRepository<VoucherValue> _voucherValueRepository;
+        private readonly IRepository<Unit,Guid> _unitRepository;
+        private readonly IRepository<VoucherValue,Guid> _voucherValueRepository;
 
-        public UpdateVoucherCommandHandler(IAuthIdentityProvider authIdentityProvider, ICultureInfoProvider cultureInfoProvider, IRepository<Unit> unitRepository, IRepository<VoucherValue> voucherValueRepository)
+        public UpdateVoucherCommandHandler(IAuthIdentityProvider authIdentityProvider, ICultureInfoProvider cultureInfoProvider, 
+            IRepository<Unit,Guid> unitRepository, IRepository<VoucherValue,Guid> voucherValueRepository)
         {
             _authIdentityProvider = authIdentityProvider;
             _cultureInfoProvider = cultureInfoProvider;

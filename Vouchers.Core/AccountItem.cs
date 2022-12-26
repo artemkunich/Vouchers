@@ -4,7 +4,7 @@ using System.Globalization;
 
 namespace Vouchers.Core
 {
-    public sealed class AccountItem : Entity
+    public sealed class AccountItem : Entity<Guid>
     {
         public Guid HolderAccountId { get; }
         public Account HolderAccount { get; }

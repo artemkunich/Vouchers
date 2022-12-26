@@ -1,16 +1,16 @@
 ﻿namespace Vouchers.Entities
 {
-    public abstract class Entity
+    public abstract class Entity<TKey>
     {
-        public Guid Id { get; }
+        public TKey Id { get; }
 
-        protected Entity(Guid id)
+        protected Entity(TKey id)
         {
             Id = id;
         }
         protected Entity() { }
 
-        public bool Equals(Entity entity)
+        public bool Equals(Entity<TKey> entity)
         {
             if (ReferenceEquals(this, entity))
                 return true;
@@ -21,8 +21,8 @@
             return Id.Equals(entity.Id);
         }
 
-        public bool NotEquals(Entity entity) => !Equals(entity);
+        public bool NotEquals(Entity<TKey> entity) => !Equals(entity);
 
-        public static implicit operator Guid(Entity entity) => entity.Id;
+        public static implicit operator TKey(Entity<TKey> entity) => entity.Id;
     }
 }

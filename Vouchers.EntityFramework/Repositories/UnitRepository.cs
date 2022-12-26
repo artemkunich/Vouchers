@@ -10,28 +10,34 @@ using Vouchers.Core;
 
 namespace Vouchers.EntityFramework.Repositories
 {
-    internal sealed class UnitRepository : Repository<Unit>
+    internal sealed class UnitRepository : Repository<Unit, Guid>
     {
 
         public UnitRepository(VouchersDbContext dbContext) : base(dbContext)
         {
         }
 
-        public override async Task<Unit> GetByIdAsync(Guid id) => await DbContext.Units
-                .Include(unit => unit.UnitType).ThenInclude(unitType => unitType.IssuerAccount)
-                .FirstOrDefaultAsync(unit => unit.Id == id);
+        public override async Task<Unit> GetByIdAsync(Guid id) => 
+                await GetByIdQueryable(id).FirstOrDefaultAsync();
 
-        public override Unit GetById(Guid id) => DbContext.Units
-                .Include(unit => unit.UnitType).ThenInclude(unitType => unitType.IssuerAccount)
-                .FirstOrDefault(unit => unit.Id == id);
+        public override Unit GetById(Guid id) => 
+                GetByIdQueryable(id).FirstOrDefault();
 
-        public override async Task<IEnumerable<Unit>> GetByExpressionAsync(Expression<Func<Unit,bool>> expression) => await DbContext.Units
-                .Include(unit => unit.UnitType).ThenInclude(unitType => unitType.IssuerAccount)
-                .Where(expression).ToListAsync();
+        private IQueryable<Unit> GetByIdQueryable(Guid id) =>
+                DbContext.Units
+                        .Include(unit => unit.UnitType).ThenInclude(unitType => unitType.IssuerAccount)
+                        .Where(unit => unit.Id == id);
 
-        public override IEnumerable<Unit> GetByExpression(Expression<Func<Unit, bool>> expression) => DbContext.Units
-                .Include(unit => unit.UnitType).ThenInclude(unitType => unitType.IssuerAccount)
-                .Where(expression).ToList();
+        public override async Task<IEnumerable<Unit>> GetByExpressionAsync(Expression<Func<Unit,bool>> expression) => 
+                await GetByExpressionQueryable(expression).ToListAsync();
+
+        public override IEnumerable<Unit> GetByExpression(Expression<Func<Unit, bool>> expression) =>
+                GetByExpressionQueryable(expression).ToList();
+
+        private IQueryable<Unit> GetByExpressionQueryable(Expression<Func<Unit, bool>> expression) =>
+                DbContext.Units
+                        .Include(unit => unit.UnitType).ThenInclude(unitType => unitType.IssuerAccount)
+                        .Where(expression);
 
     }
 }

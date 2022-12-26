@@ -4,7 +4,7 @@ using Vouchers.Entities;
 
 namespace Vouchers.Core
 {
-    public sealed class UnitType : Entity
+    public sealed class UnitType : Entity<Guid>
     {
         public Guid IssuerAccountId { get; }
         public Account IssuerAccount { get; }

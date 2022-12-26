@@ -15,14 +15,15 @@ namespace Vouchers.Application.UseCases.DomainCases
     internal sealed class CreateDomainCommandHandler : IHandler<CreateDomainCommand, Guid?>
     {
         private readonly IAuthIdentityProvider _authIdentityProvider;
-        private readonly IRepository<DomainOffer> _domainOfferRepository;
-        private readonly IRepository<DomainOffersPerIdentityCounter> _domainOffersPerIdentityCounterRepository;
-        private readonly IRepository<DomainContract> _domainContractRepository;
-        private readonly IRepository<DomainAccount> _domainAccountRepository;
-        private readonly IRepository<Account> _accountRepository;
+        private readonly IRepository<DomainOffer,Guid> _domainOfferRepository;
+        private readonly IRepository<DomainOffersPerIdentityCounter,Guid> _domainOffersPerIdentityCounterRepository;
+        private readonly IRepository<DomainContract,Guid> _domainContractRepository;
+        private readonly IRepository<DomainAccount,Guid> _domainAccountRepository;
+        private readonly IRepository<Account,Guid> _accountRepository;
 
-        public CreateDomainCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<DomainOffer> domainOfferRepository, IRepository<DomainOffersPerIdentityCounter> domainOffersPerIdentityCounterRepository, 
-            IRepository<DomainContract> domainContractRepository, IRepository<DomainAccount> domainAccountRepository, IRepository<Account> accountRepository)
+        public CreateDomainCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<DomainOffer,Guid> domainOfferRepository, 
+            IRepository<DomainOffersPerIdentityCounter,Guid> domainOffersPerIdentityCounterRepository, IRepository<DomainContract,Guid> domainContractRepository, 
+            IRepository<DomainAccount,Guid> domainAccountRepository, IRepository<Account,Guid> accountRepository)
         {
             _authIdentityProvider = authIdentityProvider;
             _domainOfferRepository = domainOfferRepository;

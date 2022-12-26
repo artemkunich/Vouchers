@@ -6,7 +6,7 @@ using Vouchers.Domains.Properties;
 
 namespace Vouchers.Domains
 {
-    public sealed class Domain : Entity
+    public sealed class Domain : Entity<Guid>
     {
         public Guid ContractId { get; }
         public DomainContract Contract { get; }

@@ -19,24 +19,24 @@ namespace Vouchers.EntityFramework
     {
         public static void AddRepositories(this IServiceCollection services)
         {
-            services.AddScoped<IRepository<AccountItem>, AccountItemRepository>();
-            services.AddScoped<IRepository<HolderTransactionRequest>, HolderTransactionRequestRepository>();
-            services.AddScoped<IRepository<DomainAccount>, DomainAccountRepository>();
-            services.AddScoped<IRepository<DomainContract>, DomainContractRepository>();
-            services.AddScoped<IRepository<DomainOffersPerIdentityCounter>, DomainOffersPerIdentityCounterRepository>();
-            services.AddScoped<IRepository<Domain>, DomainRepository>();
-            services.AddScoped<IRepository<Login>, LoginRepository>();
-            services.AddScoped<IRepository<Unit>, UnitRepository>();
-            services.AddScoped<IRepository<UnitType>, UnitTypeRepository>();
+            services.AddScoped<IRepository<AccountItem,Guid>, AccountItemRepository>();
+            services.AddScoped<IRepository<HolderTransactionRequest,Guid>, HolderTransactionRequestRepository>();
+            services.AddScoped<IRepository<DomainAccount,Guid>, DomainAccountRepository>();
+            services.AddScoped<IRepository<DomainContract,Guid>, DomainContractRepository>();
+            services.AddScoped<IRepository<DomainOffersPerIdentityCounter,Guid>, DomainOffersPerIdentityCounterRepository>();
+            services.AddScoped<IRepository<Domain,Guid>, DomainRepository>();
+            services.AddScoped<IRepository<Login,Guid>, LoginRepository>();
+            services.AddScoped<IRepository<Unit,Guid>, UnitRepository>();
+            services.AddScoped<IRepository<UnitType,Guid>, UnitTypeRepository>();
 
-            services.AddScoped<IRepository<Account>, GenericRepository<Account>>();
-            services.AddScoped<IRepository<HolderTransaction>, GenericRepository<HolderTransaction>>();
-            services.AddScoped<IRepository<HolderTransactionItem>, GenericRepository<HolderTransactionItem>>();
-            services.AddScoped<IRepository<IssuerTransaction>, GenericRepository<IssuerTransaction>>();
-            services.AddScoped<IRepository<DomainOffer>, GenericRepository<DomainOffer>>();
-            services.AddScoped<IRepository<VoucherValue>, GenericRepository<VoucherValue>>();
-            services.AddScoped<IRepository<Identity>, GenericRepository<Identity>>();
-            services.AddScoped<IRepository<CroppedImage>, GenericRepository<CroppedImage>>();
+            services.AddScoped<IRepository<Account,Guid>, GenericRepository<Account,Guid>>();
+            services.AddScoped<IRepository<HolderTransaction,Guid>, GenericRepository<HolderTransaction,Guid>>();
+            services.AddScoped<IRepository<HolderTransactionItem,Guid>, GenericRepository<HolderTransactionItem,Guid>>();
+            services.AddScoped<IRepository<IssuerTransaction,Guid>, GenericRepository<IssuerTransaction,Guid>>();
+            services.AddScoped<IRepository<DomainOffer,Guid>, GenericRepository<DomainOffer,Guid>>();
+            services.AddScoped<IRepository<VoucherValue,Guid>, GenericRepository<VoucherValue,Guid>>();
+            services.AddScoped<IRepository<Identity,Guid>, GenericRepository<Identity,Guid>>();
+            services.AddScoped<IRepository<CroppedImage,Guid>, GenericRepository<CroppedImage,Guid>>();
         }
 
         public static void AddQueryHandlers(this IServiceCollection services)

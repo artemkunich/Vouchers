@@ -16,14 +16,15 @@ namespace Vouchers.Application.UseCases.VoucherValueCases
     internal sealed class CreateVoucherValueCommandHandler : IHandler<CreateVoucherValueCommand, Guid>
     {
         private readonly IAuthIdentityProvider _authIdentityProvider;
-        private readonly IRepository<DomainAccount> _domainAccountRepository;
-        private readonly IRepository<Account> _accountRepository;
-        private readonly IRepository<VoucherValue> _voucherValueRepository;
-        private readonly IRepository<UnitType> _unitTypeRepository;
+        private readonly IRepository<DomainAccount,Guid> _domainAccountRepository;
+        private readonly IRepository<Account,Guid> _accountRepository;
+        private readonly IRepository<VoucherValue,Guid> _voucherValueRepository;
+        private readonly IRepository<UnitType,Guid> _unitTypeRepository;
         private readonly IAppImageService _appImageService;
 
-        public CreateVoucherValueCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<DomainAccount> domainAccountRepository, IRepository<Account> accountRepository,
-            IRepository<VoucherValue> voucherValueRepository, IRepository<UnitType> unitTypeRepository, IAppImageService appImageService)
+        public CreateVoucherValueCommandHandler(IAuthIdentityProvider authIdentityProvider, IAppImageService appImageService,
+            IRepository<DomainAccount,Guid> domainAccountRepository, IRepository<Account,Guid> accountRepository,
+            IRepository<VoucherValue,Guid> voucherValueRepository, IRepository<UnitType,Guid> unitTypeRepository)
         {
             _authIdentityProvider = authIdentityProvider;
             _domainAccountRepository = domainAccountRepository;
@@ -49,7 +50,7 @@ namespace Vouchers.Application.UseCases.VoucherValueCases
             if (command.Image is not null && command.CropParameters is not null)
             {
                 var imageStream = command.Image.OpenReadStream();
-                image = await _appImageService.CreateCroppedImage(imageStream, command.CropParameters);
+                image = await _appImageService.CreateCroppedImageAsync(imageStream, command.CropParameters);
             }
 
             var account = await _accountRepository.GetByIdAsync(command.IssuerAccountId);

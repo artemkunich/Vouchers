@@ -15,11 +15,12 @@ namespace Vouchers.Application.UseCases.DomainAccountCases
     internal sealed class CreateDomainAccountCommandHandler : IHandler<CreateDomainAccountCommand, Guid>
     {
         private readonly IAuthIdentityProvider _authIdentityProvider;
-        private readonly IRepository<Domain> _domainRepository;
-        private readonly IRepository<DomainAccount> _domainAccountRepository;
-        private readonly IRepository<Account> _accountRepository;
+        private readonly IRepository<Domain,Guid> _domainRepository;
+        private readonly IRepository<DomainAccount,Guid> _domainAccountRepository;
+        private readonly IRepository<Account,Guid> _accountRepository;
 
-        public CreateDomainAccountCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<Domain> domainRepository, IRepository<DomainAccount> domainAccountRepository, IRepository<Account> accountRepository)
+        public CreateDomainAccountCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<Domain,Guid> domainRepository, 
+            IRepository<DomainAccount,Guid> domainAccountRepository, IRepository<Account,Guid> accountRepository)
         {
             _authIdentityProvider = authIdentityProvider;
             _domainRepository = domainRepository;

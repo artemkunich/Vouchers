@@ -5,7 +5,7 @@ namespace Vouchers.MinimalAPI.Binding;
 
 public class UpdateDomainDetailCommandProvider : IFormParameterProvider<UpdateDomainDetailCommand>
 {
-    private readonly IHttpContextAccessor _ctxAccessor;
+    readonly IHttpContextAccessor _ctxAccessor;
     readonly IFormParameterProvider<CropParametersDto> _formToCropParametersParameterProvider;
 
     public UpdateDomainDetailCommandProvider(IHttpContextAccessor ctxAccessor, IFormParameterProvider<CropParametersDto> formToCropParametersParameterProvider)

@@ -10,7 +10,7 @@ using Vouchers.Entities;
 
 namespace Vouchers.EntityFramework.Repositories
 {
-    internal sealed class GenericRepository<TEntity> : Repository<TEntity> where TEntity : Entity
+    internal sealed class GenericRepository<TEntity, TKey> : Repository<TEntity, TKey> where TEntity : Entity<TKey>
     {
         public GenericRepository(VouchersDbContext context) : base(context)
         {

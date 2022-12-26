@@ -174,8 +174,6 @@ export const postForm = async (path: string, command: FormData, token: string) =
         const headers = new Headers()
         if(token)
             headers.set("Authorization", "Bearer " + token)
-        
-        headers.set("Content-Type", "application/json")
             
         const request = {
             method: 'POST',

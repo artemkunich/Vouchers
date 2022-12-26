@@ -2,7 +2,7 @@
 
 namespace Vouchers.Files
 {
-    public sealed class CroppedImage : Entity
+    public sealed class CroppedImage : Entity<Guid>
     {
         public Guid ImageId { get; }
         public CropParameters CropParameters { get; set; }

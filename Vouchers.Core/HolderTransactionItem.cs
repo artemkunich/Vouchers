@@ -6,7 +6,7 @@ using System.Globalization;
 
 namespace Vouchers.Core
 {
-    public sealed class HolderTransactionItem : Entity
+    public sealed class HolderTransactionItem : Entity<Guid>
     {
         public UnitQuantity Quantity { get; }
 

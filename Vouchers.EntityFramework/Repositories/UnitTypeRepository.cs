@@ -9,31 +9,33 @@ using Vouchers.Core;
 
 namespace Vouchers.EntityFramework.Repositories
 {
-    internal sealed class UnitTypeRepository : Repository<UnitType>
+    internal sealed class UnitTypeRepository : Repository<UnitType, Guid>
     {
         public UnitTypeRepository(VouchersDbContext dbContext) : base(dbContext)
         {
         }
 
         public override async Task<UnitType> GetByIdAsync(Guid id) =>
-            await DbContext.UnitTypes
-                .Include(unitType => unitType.IssuerAccount)
-                .FirstOrDefaultAsync(unitType => unitType.Id == id);
+            await GetByIdQueryable(id).FirstOrDefaultAsync();
 
         public override UnitType GetById(Guid id) =>
+            GetByIdQueryable(id).FirstOrDefault();
+
+        private IQueryable<UnitType> GetByIdQueryable(Guid id) =>
             DbContext.UnitTypes
                 .Include(unitType => unitType.IssuerAccount)
-                .FirstOrDefault(unitType => unitType.Id == id);
-
+                .Where(unitType => unitType.Id == id);
+        
         public override async Task<IEnumerable<UnitType>> GetByExpressionAsync(Expression<Func<UnitType,bool>> expression) =>
-            await DbContext.UnitTypes
-                .Include(unitType => unitType.IssuerAccount)
-                .Where(expression).ToListAsync();
+            await GetByExpressionQueryable(expression).ToListAsync();
 
         public override IEnumerable<UnitType> GetByExpression(Expression<Func<UnitType, bool>> expression) =>
+            GetByExpressionQueryable(expression).ToList();
+        
+        private IQueryable<UnitType> GetByExpressionQueryable(Expression<Func<UnitType, bool>> expression) =>
             DbContext.UnitTypes
                 .Include(unitType => unitType.IssuerAccount)
-                .Where(expression).ToList();
+                .Where(expression);
 
     }
 }

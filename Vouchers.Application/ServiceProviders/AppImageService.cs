@@ -13,16 +13,16 @@ namespace Vouchers.Application.ServiceProviders
 {
     internal sealed class AppImageService : IAppImageService
     {
-        private readonly IRepository<CroppedImage> _croppedRepository;
+        private readonly IRepository<CroppedImage, Guid> _croppedRepository;
         private readonly IImageService _imageService;
 
-        public AppImageService(IRepository<CroppedImage> appImageRepository, IImageService imageService)
+        public AppImageService(IRepository<CroppedImage, Guid> appImageRepository, IImageService imageService)
         {
             _croppedRepository = appImageRepository;
             _imageService = imageService;
         }
 
-        public async Task<CroppedImage> CreateCroppedImage(Stream imageStream, CropParametersDto cropParametersDto)
+        public async Task<CroppedImage> CreateCroppedImageAsync(Stream imageStream, CropParametersDto cropParametersDto)
         {
             var croppedContent = await _imageService.CropImageAsync(imageStream, cropParametersDto);
             var cropParameters = CropParameters.Create(cropParametersDto.X, cropParametersDto.Y, cropParametersDto.Width, cropParametersDto.Height);
@@ -48,7 +48,7 @@ namespace Vouchers.Application.ServiceProviders
 
         }
 
-        public async Task<CroppedImage> CreateCroppedImage(Guid croppedImageId, CropParametersDto cropParametersDto)
+        public async Task<CroppedImage> CreateCroppedImageAsync(Guid croppedImageId, CropParametersDto cropParametersDto)
         {
             var croppedImage = await _croppedRepository.GetByIdAsync(croppedImageId);
             if (croppedImage is null)

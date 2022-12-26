@@ -12,9 +12,9 @@ namespace Vouchers.Application.ServiceProviders
     public class AuthIdentityProvider : IAuthIdentityProvider
     {
         private readonly ILoginNameProvider _loginNameProvider;
-        private readonly IRepository<Login> _loginRepository;
+        private readonly IRepository<Login, Guid> _loginRepository;
 
-        public AuthIdentityProvider(ILoginNameProvider loginNameProvider, IRepository<Login> loginRepository)
+        public AuthIdentityProvider(ILoginNameProvider loginNameProvider, IRepository<Login, Guid> loginRepository)
         {
             _loginNameProvider = loginNameProvider;
             _loginRepository = loginRepository;

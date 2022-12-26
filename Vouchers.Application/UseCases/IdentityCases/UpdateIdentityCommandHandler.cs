@@ -17,10 +17,11 @@ namespace Vouchers.Application.UseCases.IdentityCases
     internal sealed class UpdateIdentityCommandHandler : IHandler<UpdateIdentityCommand>
     {
         private readonly IAuthIdentityProvider _authIdentityProvider;
-        private readonly IRepository<Identity> _identityRepository;
+        private readonly IRepository<Identity,Guid> _identityRepository;
         private readonly IAppImageService _appImageService;
 
-        public UpdateIdentityCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<Identity> identityRepository, IAppImageService appImageService)
+        public UpdateIdentityCommandHandler(IAuthIdentityProvider authIdentityProvider, 
+            IRepository<Identity,Guid> identityRepository, IAppImageService appImageService)
         {
             _authIdentityProvider = authIdentityProvider;
             _identityRepository = identityRepository;
@@ -39,14 +40,14 @@ namespace Vouchers.Application.UseCases.IdentityCases
             if (command.Image is not null && command.CropParameters is not null)
             {
                 var imageStream = command.Image.OpenReadStream();
-                var image = await _appImageService.CreateCroppedImage(imageStream, command.CropParameters);
+                var image = await _appImageService.CreateCroppedImageAsync(imageStream, command.CropParameters);
                 identity.ImageId = image.Id;
                 requireUpdate = true;
             }
 
             if (command.Image is null && identity.ImageId is not null && command.CropParameters is not null)
             {
-                var image = await _appImageService.CreateCroppedImage(identity.ImageId.Value, command.CropParameters);
+                var image = await _appImageService.CreateCroppedImageAsync(identity.ImageId.Value, command.CropParameters);
                 identity.ImageId = image.Id;
                 requireUpdate = true;
             }

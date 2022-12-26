@@ -6,7 +6,7 @@ using System.Globalization;
 
 namespace Vouchers.Core
 {
-    public sealed class HolderTransaction : Entity
+    public sealed class HolderTransaction : Entity<Guid>
     {
         public DateTime Timestamp { get; private set; }
 

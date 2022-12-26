@@ -11,27 +11,33 @@ using Vouchers.Identities;
 
 namespace Vouchers.EntityFramework.Repositories
 {
-    internal sealed class LoginRepository : Repository<Login>
+    internal sealed class LoginRepository : Repository<Login, Guid>
     {
         public LoginRepository(VouchersDbContext dbContext) : base(dbContext)
         {
         }
 
-        public override async Task<Login> GetByIdAsync(Guid id) => await DbContext.Logins
-            .Include(login => login.Identity)
-            .Where(login => login.Id == id).FirstOrDefaultAsync();
+        public override async Task<Login> GetByIdAsync(Guid id) => 
+            await GetByIdQueryable(id).FirstOrDefaultAsync();
 
-        public override Login GetById(Guid id) => DbContext.Logins
-            .Include(login => login.Identity)
-            .Where(login => login.Id == id).FirstOrDefault();
+        public override Login GetById(Guid id) => 
+            GetByIdQueryable(id).FirstOrDefault();
 
-        public override async Task<IEnumerable<Login>> GetByExpressionAsync(Expression<Func<Login,bool>> expression) => await DbContext.Logins
-            .Include(login => login.Identity)
-            .Where(expression).ToListAsync();
+        private IQueryable<Login> GetByIdQueryable(Guid id) =>
+            DbContext.Logins
+                .Include(login => login.Identity)
+                .Where(login => login.Id == id);
+            
+        public override async Task<IEnumerable<Login>> GetByExpressionAsync(Expression<Func<Login,bool>> expression) => 
+            await GetByExpressionQueryable(expression).ToListAsync();
 
-        public override IEnumerable<Login> GetByExpression(Expression<Func<Login, bool>> expression) => DbContext.Logins
-            .Include(login => login.Identity)
-            .Where(expression).ToList();
+        public override IEnumerable<Login> GetByExpression(Expression<Func<Login, bool>> expression) => 
+            GetByExpressionQueryable(expression).ToList();
+        
+        private IQueryable<Login> GetByExpressionQueryable(Expression<Func<Login, bool>> expression) =>
+            DbContext.Logins
+                .Include(login => login.Identity)
+                .Where(expression);
 
     }
 }

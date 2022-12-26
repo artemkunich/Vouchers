@@ -16,10 +16,10 @@ namespace Vouchers.Application.UseCases.IdentityCases
     internal sealed class CreateIdentityCommandHandler : IHandler<CreateIdentityCommand, Guid>
     {
         private readonly ILoginNameProvider _loginNameProvider;
-        private readonly IRepository<Login> _loginRepository;
+        private readonly IRepository<Login,Guid> _loginRepository;
         private readonly IAppImageService _appImageService;
         
-        public CreateIdentityCommandHandler(ILoginNameProvider loginNameProvider, IRepository<Login> loginRepository, IAppImageService appImageService)
+        public CreateIdentityCommandHandler(ILoginNameProvider loginNameProvider, IRepository<Login,Guid> loginRepository, IAppImageService appImageService)
         {
             _loginNameProvider = loginNameProvider;
             _loginRepository = loginRepository;
@@ -33,7 +33,7 @@ namespace Vouchers.Application.UseCases.IdentityCases
             if (command.Image is not null && command.CropParameters is not null)
             {
                 var imageStream = command.Image.OpenReadStream();
-                image = await _appImageService.CreateCroppedImage(imageStream, command.CropParameters);
+                image = await _appImageService.CreateCroppedImageAsync(imageStream, command.CropParameters);
             }
 
             var identity = Identity.Create(command.Email, command.FirstName, command.LastName);

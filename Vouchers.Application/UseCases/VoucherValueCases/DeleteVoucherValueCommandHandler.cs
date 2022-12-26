@@ -14,10 +14,11 @@ namespace Vouchers.Application.UseCases.VoucherValueCases
     internal sealed class DeleteVoucherValueCommandHandler : IHandler<DeleteVoucherValueCommand>
     {
         private readonly IAuthIdentityProvider _authIdentityProvider;
-        private readonly IRepository<VoucherValue> _valueRepository;
-        private readonly IRepository<UnitType> _unitTypeRepository;
+        private readonly IRepository<VoucherValue,Guid> _valueRepository;
+        private readonly IRepository<UnitType,Guid> _unitTypeRepository;
 
-        public DeleteVoucherValueCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<VoucherValue> valueRepository, IRepository<UnitType> unitTypeRepository)
+        public DeleteVoucherValueCommandHandler(IAuthIdentityProvider authIdentityProvider, 
+            IRepository<VoucherValue,Guid> valueRepository, IRepository<UnitType,Guid> unitTypeRepository)
         {
             _authIdentityProvider = authIdentityProvider;
             _valueRepository = valueRepository;
