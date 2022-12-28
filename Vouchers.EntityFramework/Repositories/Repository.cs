@@ -48,42 +48,86 @@ namespace Vouchers.EntityFramework.Repositories
         {
             var dbSet = DbContext.Set<TEntity>();
             dbSet.Update(entity);
+
+            if (entity.OutboxEvents.Any())
+                AddOutboxEvents(entity.OutboxEvents);
+
             await DbContext.SaveChangesAsync();
+            
+            entity.OutboxEvents.Clear();
         }
 
         public virtual void Update(TEntity entity)
         {
             var dbSet = DbContext.Set<TEntity>();
             dbSet.Update(entity);
+            
+            if (entity.OutboxEvents.Any())
+                AddOutboxEvents(entity.OutboxEvents);
+            
             DbContext.SaveChanges();
+            
+            entity.OutboxEvents.Clear();
         }
 
         public virtual async Task AddAsync(TEntity entity)
         {
             var dbSet = DbContext.Set<TEntity>();
             await dbSet.AddAsync(entity);
+            
+            if (entity.OutboxEvents.Any())
+                AddOutboxEvents(entity.OutboxEvents);
+            
             await DbContext.SaveChangesAsync();
+            
+            entity.OutboxEvents.Clear();
         }
 
         public virtual void Add(TEntity entity)
         {
             var dbSet = DbContext.Set<TEntity>();
             dbSet.Add(entity);
+            
+            if (entity.OutboxEvents.Any())
+                AddOutboxEvents(entity.OutboxEvents);
+            
             DbContext.SaveChanges();
+            
+            entity.OutboxEvents.Clear();
         }
 
         public virtual async Task RemoveAsync(TEntity entity)
         {
             var dbSet = DbContext.Set<TEntity>();
             dbSet.Remove(entity);
+            
+            if (entity.OutboxEvents.Any())
+                AddOutboxEvents(entity.OutboxEvents);
+            
             await DbContext.SaveChangesAsync();
+            
+            entity.OutboxEvents.Clear();
         }
 
         public virtual void Remove(TEntity entity)
         {
             var dbSet = DbContext.Set<TEntity>();
             dbSet.Remove(entity);
+            
+            if (entity.OutboxEvents.Any())
+                AddOutboxEvents(entity.OutboxEvents);
+            
             DbContext.SaveChanges();
+            
+            entity.OutboxEvents.Clear();
+        }
+
+        protected void AddOutboxEvents(IEnumerable<OutboxEvent> outboxEvents)
+        {
+            foreach (var outboxEvent in outboxEvents)
+            {
+                DbContext.Set<OutboxEvent>().Add(outboxEvent);
+            }
         }
     }
 }

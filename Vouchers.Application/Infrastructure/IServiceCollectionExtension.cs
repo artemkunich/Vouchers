@@ -12,6 +12,7 @@ using Vouchers.Application.Commands.IssuerTransactionCommands;
 using Vouchers.Application.Commands.VoucherCommands;
 using Vouchers.Application.Commands.VoucherValueCommands;
 using Vouchers.Application.Dtos;
+using Vouchers.Application.Events.IdentityEvents;
 using Vouchers.Application.Queries;
 using Vouchers.Application.ServiceProviders;
 using Vouchers.Application.Services;
@@ -34,6 +35,7 @@ namespace Application.Infrastructure
         {         
             services.AddScoped<IAuthIdentityProvider, AuthIdentityProvider>();
             services.AddScoped<IAppImageService, AppImageService>();
+            services.AddScoped<IOutboxEventFactory, OutboxEventFactory>();
             services.AddIdentityHandlers();
             services.AddDomainOfferHandlers();
             services.AddDomainHandlers();
@@ -49,6 +51,7 @@ namespace Application.Infrastructure
         {
             services.AddHandler<CreateIdentityCommand, Guid, CreateIdentityCommandHandler>();
             services.AddHandler<UpdateIdentityCommand, UpdateIdentityCommandHandler>();
+            services.AddHandler<IdentityUpdatedEvent, IdentityUpdatedEventHandler>();
         }
 
         public static void AddDomainOfferHandlers(this IServiceCollection services)

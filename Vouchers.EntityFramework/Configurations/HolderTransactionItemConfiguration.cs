@@ -37,6 +37,8 @@ namespace Vouchers.EntityFramework.Configurations
                 .HasOne(item => item.DebitAccountItem)
                 .WithMany().HasForeignKey(item => item.DebitAccountItemId)
                 .OnDelete(DeleteBehavior.Restrict);
+            
+            builder.Ignore(x => x.OutboxEvents);
         }
     }
 }

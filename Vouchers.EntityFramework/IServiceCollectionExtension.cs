@@ -7,6 +7,7 @@ using Vouchers.Application.Queries;
 using Vouchers.Application.UseCases;
 using Vouchers.Core;
 using Vouchers.Domains;
+using Vouchers.Entities;
 using Vouchers.EntityFramework.QueryHandlers;
 using Vouchers.EntityFramework.Repositories;
 using Vouchers.Files;
@@ -37,6 +38,8 @@ namespace Vouchers.EntityFramework
             services.AddScoped<IRepository<VoucherValue,Guid>, GenericRepository<VoucherValue,Guid>>();
             services.AddScoped<IRepository<Identity,Guid>, GenericRepository<Identity,Guid>>();
             services.AddScoped<IRepository<CroppedImage,Guid>, GenericRepository<CroppedImage,Guid>>();
+            
+            services.AddScoped<IRepository<OutboxEvent,Guid>, GenericRepository<OutboxEvent,Guid>>();
         }
 
         public static void AddQueryHandlers(this IServiceCollection services)

@@ -8,6 +8,7 @@ using System.Text;
 
 using Vouchers.Core;
 using Vouchers.Domains;
+using Vouchers.Entities;
 using Vouchers.EntityFramework.Configurations;
 using Vouchers.Files;
 using Vouchers.Identities;
@@ -50,6 +51,10 @@ namespace Vouchers.EntityFramework
             modelBuilder.ApplyConfiguration(new DomainAccountConfiguration());
 
             modelBuilder.ApplyConfiguration(new CroppedImageConfiguration());
+            
+            modelBuilder.ApplyConfiguration(new OutboxEventConfiguration());
+            
+            
 
         }
 
@@ -96,6 +101,10 @@ namespace Vouchers.EntityFramework
 
         #region Images
         public DbSet<CroppedImage> CroppedImages { get; set; }
+        #endregion
+        
+        #region Outbox
+        public DbSet<OutboxEvent> OutboxEvents { get; set; }   
         #endregion
     }
 }

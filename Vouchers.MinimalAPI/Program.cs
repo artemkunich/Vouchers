@@ -6,10 +6,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Tokens;
+using Vouchers.Application.Events.IdentityEvents;
 using Vouchers.MinimalAPI.Endpoints;
 using Vouchers.Application.Infrastructure;
 using Vouchers.EntityFramework;
 using Vouchers.MinimalAPI.Binding;
+using Vouchers.MinimalAPI.EventRouters;
 using Vouchers.MinimalAPI.Services;
 using Vouchers.MinimalAPI.Validation;
 
@@ -78,6 +80,11 @@ builder.Services.AddScoped<IDispatcher, Dispatcher>();
 builder.Services.AddScoped<ILoginNameProvider, JWTLoginNameProvider>();
 builder.Services.AddScoped<IImageService, ImageSharpService>();
 builder.Services.AddScoped<ICultureInfoProvider, CultureInfoProvider>();
+
+builder.Services.AddEventRouter<GenericEventRouter<IdentityUpdatedEvent>>(nameof(IdentityUpdatedEvent));
+builder.Services.AddScoped<IEventDataSerializer, EventDataSerializer>();
+builder.Services.AddHostedService<EventProcessingService>();
+
 
 builder.Services.AddRepositories();
 builder.Services.AddCommandHandlers();
