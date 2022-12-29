@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
-        <Nullable>enable</Nullable>
+        <Nullable>disable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <RootNamespace>Vouchers.MinimalAPI</RootNamespace>
@@ -26,6 +26,7 @@
       <ProjectReference Include="..\Vouchers.Application\Vouchers.Application.csproj" />
       <ProjectReference Include="..\Vouchers.Auth\Vouchers.Auth.csproj" />
       <ProjectReference Include="..\Vouchers.EntityFramework\Vouchers.EntityFramework.csproj" />
+      <ProjectReference Include="..\Vouchers.Infrastructure\Vouchers.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>

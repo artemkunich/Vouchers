@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.UseCases;
 
-namespace Vouchers.API.Services
+namespace Vouchers.Infrastructure
 {
     public sealed class Dispatcher : IDispatcher
     {

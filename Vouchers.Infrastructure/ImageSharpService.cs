@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
 
-namespace Vouchers.MinimalAPI.Services
+namespace Vouchers.Infrastructure
 {
     public sealed class ImageSharpService : IImageService
     {

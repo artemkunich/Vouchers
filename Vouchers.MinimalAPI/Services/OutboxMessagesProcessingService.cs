@@ -1,12 +1,7 @@
-using System.Text.Json;
-using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Vouchers.Application.Infrastructure;
-using Vouchers.Application.UseCases;
-using Vouchers.Application.UseCases.LoginCommands;
-using Vouchers.Entities;
 using Vouchers.InterCommunication;
 using Vouchers.MinimalAPI.EventRouters;
 
@@ -44,9 +39,8 @@ public class OutboxMessagesProcessingService : BackgroundService
         
         if (outboxMessages.IsNullOrEmpty())
             return processedMessagesCount;
-
         
-            
+        
         foreach (var outboxMessage in outboxMessages)
         {
             try

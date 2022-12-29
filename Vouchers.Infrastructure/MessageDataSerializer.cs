@@ -1,8 +1,7 @@
 using System.Text.Json;
-using Vouchers.Application.Events.IdentityEvents;
 using Vouchers.Application.Infrastructure;
 
-namespace Vouchers.MinimalAPI.Services;
+namespace Vouchers.Infrastructure;
 
 public class MessageDataSerializer : IMessageDataSerializer
 {

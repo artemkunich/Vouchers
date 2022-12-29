@@ -22,6 +22,7 @@ using Application.Infrastructure;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Options;
 using System.Globalization;
+using Vouchers.Infrastructure;
 
 namespace Vouchers.API
 {

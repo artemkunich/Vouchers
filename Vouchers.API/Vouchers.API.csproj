@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <UserSecretsId>c48fea90-7517-4ad9-a128-3cadb640a9fd</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
@@ -27,6 +27,7 @@
     <ProjectReference Include="..\Vouchers.Auth\Vouchers.Auth.csproj" />
     <ProjectReference Include="..\Vouchers.Core\Vouchers.Core.csproj" />
     <ProjectReference Include="..\Vouchers.EntityFramework\Vouchers.EntityFramework.csproj" />
+    <ProjectReference Include="..\Vouchers.Infrastructure\Vouchers.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

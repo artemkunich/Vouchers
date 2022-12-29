@@ -10,6 +10,7 @@ using Vouchers.Application.Events.IdentityEvents;
 using Vouchers.MinimalAPI.Endpoints;
 using Vouchers.Application.Infrastructure;
 using Vouchers.EntityFramework;
+using Vouchers.Infrastructure;
 using Vouchers.MinimalAPI.Binding;
 using Vouchers.MinimalAPI.EventRouters;
 using Vouchers.MinimalAPI.Services;
