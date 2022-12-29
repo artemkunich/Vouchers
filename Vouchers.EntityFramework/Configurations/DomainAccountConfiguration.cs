@@ -32,8 +32,6 @@ namespace Vouchers.EntityFramework.Configurations
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Property<byte[]>("RowVersion").IsRowVersion();
-
-            builder.Ignore(x => x.OutboxEvents);
         }
     }
 }

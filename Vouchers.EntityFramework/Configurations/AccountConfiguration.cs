@@ -23,8 +23,6 @@ namespace Vouchers.EntityFramework.Configurations
                 .HasDefaultValue(0);
 
             builder.Property<byte[]>("RowVersion").IsRowVersion();
-
-            builder.Ignore(x => x.OutboxEvents);
         }
     }
 }

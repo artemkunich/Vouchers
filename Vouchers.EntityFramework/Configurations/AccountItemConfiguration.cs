@@ -36,8 +36,6 @@ namespace Vouchers.EntityFramework.Configurations
                 .WithMany()
                 .HasForeignKey(account => account.UnitId)
                 .OnDelete(DeleteBehavior.Restrict);
-            
-            builder.Ignore(x => x.OutboxEvents);
         }
             
     }

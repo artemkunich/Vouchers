@@ -40,8 +40,6 @@ namespace Vouchers.EntityFramework.Configurations
                 .HasPrecision(18, 15);
 
             builder.Property<byte[]>("RowVersion").IsRowVersion();
-            
-            builder.Ignore(x => x.OutboxEvents);
         }
     }
 }

@@ -31,8 +31,7 @@ namespace Vouchers.EntityFramework.Configurations
                 .HasOne(transaction => transaction.IssuerAccountItem)
                 .WithMany()
                 .OnDelete(DeleteBehavior.Restrict);
-            
-            builder.Ignore(x => x.OutboxEvents);
+
         }
     }
 }

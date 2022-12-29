@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using Vouchers.Entities;
+using Vouchers.InterCommunication;
 
 namespace Vouchers.Application.Infrastructure
 {
@@ -16,13 +17,13 @@ namespace Vouchers.Application.Infrastructure
         Task<IEnumerable<TEntity>> GetByExpressionAsync(Expression<Func<TEntity, bool>> expression);
         IEnumerable<TEntity> GetByExpression(Expression<Func<TEntity,bool>> expression);
 
-        Task UpdateAsync(TEntity entity);
-        void Update(TEntity entity);
+        Task UpdateAsync(TEntity entity, IEnumerable<OutboxMessage> outboxMessages = null, IEnumerable<InboxMessage> inboxMessages = null);
+        void Update(TEntity entity, IEnumerable<OutboxMessage> outboxMessages = null, IEnumerable<InboxMessage> inboxMessages = null);
 
-        Task AddAsync(TEntity entity);
-        void Add(TEntity entity);
+        Task AddAsync(TEntity entity, IEnumerable<OutboxMessage> outboxMessages = null, IEnumerable<InboxMessage> inboxMessages = null);
+        void Add(TEntity entity, IEnumerable<OutboxMessage> outboxMessages = null, IEnumerable<InboxMessage> inboxMessages = null);
 
-        Task RemoveAsync(TEntity entity);
-        void Remove(TEntity entity);
+        Task RemoveAsync(TEntity entity, IEnumerable<OutboxMessage> outboxMessages = null, IEnumerable<InboxMessage> inboxMessages = null);
+        void Remove(TEntity entity, IEnumerable<OutboxMessage> outboxMessages = null, IEnumerable<InboxMessage> inboxMessages = null);
     }
 }

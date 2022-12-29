@@ -49,8 +49,7 @@ namespace Vouchers.EntityFramework.Configurations
             builder.Property(request => request.DueDate);
 
             builder.Property(request => request.Message);
-            
-            builder.Ignore(x => x.OutboxEvents);
+
         }
     }
 }

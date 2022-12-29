@@ -12,6 +12,7 @@ using Vouchers.Entities;
 using Vouchers.EntityFramework.Configurations;
 using Vouchers.Files;
 using Vouchers.Identities;
+using Vouchers.InterCommunication;
 using Vouchers.Values;
 
 namespace Vouchers.EntityFramework
@@ -52,8 +53,8 @@ namespace Vouchers.EntityFramework
 
             modelBuilder.ApplyConfiguration(new CroppedImageConfiguration());
             
-            modelBuilder.ApplyConfiguration(new OutboxEventConfiguration());
-            
+            modelBuilder.ApplyConfiguration(new OutboxMessageConfiguration());
+            modelBuilder.ApplyConfiguration(new InboxMessageConfiguration());
             
 
         }
@@ -103,8 +104,9 @@ namespace Vouchers.EntityFramework
         public DbSet<CroppedImage> CroppedImages { get; set; }
         #endregion
         
-        #region Outbox
-        public DbSet<OutboxEvent> OutboxEvents { get; set; }   
+        #region InterCommunication
+        public DbSet<OutboxMessage> OutboxMessages { get; set; }
+        public DbSet<InboxMessage> InboxMessages { get; set; } 
         #endregion
     }
 }

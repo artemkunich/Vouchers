@@ -46,8 +46,7 @@ namespace Vouchers.EntityFramework.Configurations
             builder.Property(transaction => transaction.IsPerformed);
 
             builder.Property(transaction => transaction.Message);
-            
-            builder.Ignore(x => x.OutboxEvents);
+
         }
     }
 }

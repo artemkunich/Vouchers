@@ -35,7 +35,7 @@ namespace Application.Infrastructure
         {         
             services.AddScoped<IAuthIdentityProvider, AuthIdentityProvider>();
             services.AddScoped<IAppImageService, AppImageService>();
-            services.AddScoped<IOutboxEventFactory, OutboxEventFactory>();
+            services.AddScoped<IMessageFactory, MessageFactory>();
             services.AddIdentityHandlers();
             services.AddDomainOfferHandlers();
             services.AddDomainHandlers();
@@ -47,49 +47,49 @@ namespace Application.Infrastructure
         }
 
 
-        public static void AddIdentityHandlers(this IServiceCollection services)
+        private static void AddIdentityHandlers(this IServiceCollection services)
         {
             services.AddHandler<CreateIdentityCommand, Guid, CreateIdentityCommandHandler>();
             services.AddHandler<UpdateIdentityCommand, UpdateIdentityCommandHandler>();
             services.AddHandler<IdentityUpdatedEvent, IdentityUpdatedEventHandler>();
         }
 
-        public static void AddDomainOfferHandlers(this IServiceCollection services)
+        private static void AddDomainOfferHandlers(this IServiceCollection services)
         {
             services.AddHandler<CreateDomainOfferCommand, Guid, CreateDomainOfferCommandHandler>();
             services.AddHandler<UpdateDomainOfferCommand, UpdateDomainOfferCommandHandler>();
         }
 
-        public static void AddDomainHandlers(this IServiceCollection services)
+        private static void AddDomainHandlers(this IServiceCollection services)
         {
             services.AddHandler<CreateDomainCommand, Guid?, CreateDomainCommandHandler>();
             services.AddHandler<UpdateDomainDetailCommand, UpdateDomainDetailCommandHandler>();
         }
 
-        public static void AddDomainAccountHandlers(this IServiceCollection services)
+        private static void AddDomainAccountHandlers(this IServiceCollection services)
         {
             services.AddHandler<CreateDomainAccountCommand, Guid, CreateDomainAccountCommandHandler>();
             services.AddHandler<UpdateDomainAccountCommand, UpdateDomainAccountCommandHandler>();
         }
 
-        public static void AddIssuerValueHandlers(this IServiceCollection services)
+        private static void AddIssuerValueHandlers(this IServiceCollection services)
         {
             services.AddHandler<CreateVoucherValueCommand, Guid, CreateVoucherValueCommandHandler>();
             services.AddHandler<UpdateVoucherValueCommand, UpdateVoucherValueCommandHandler>();
         }
 
-        public static void AddIssuerVoucherHandlers(this IServiceCollection services)
+        private static void AddIssuerVoucherHandlers(this IServiceCollection services)
         {
             services.AddHandler<CreateVoucherCommand, Guid, CreateVoucherCommandHandler>();
             services.AddHandler<UpdateVoucherCommand, UpdateVoucherCommandHandler>();
         }
 
-        public static void AddIssuerTransactionHandlers(this IServiceCollection services)
+        private static void AddIssuerTransactionHandlers(this IServiceCollection services)
         {
             services.AddHandler<CreateIssuerTransactionCommand, Guid, CreateIssuerTransactionCommandHandler>();
         }
 
-        public static void AddHolderTransactionHandlers(this IServiceCollection services)
+        private static void AddHolderTransactionHandlers(this IServiceCollection services)
         {
             services.AddHandler<CreateHolderTransactionCommand, Guid, CreateHolderTransactionCommandHandler>();
             services.AddHandler<CreateHolderTransactionRequestCommand, Guid, CreateHolderTransactionRequestCommandHandler>();
@@ -97,12 +97,12 @@ namespace Application.Infrastructure
         }
 
 
-        public static void AddHandler<TReq, TRes, THandler>(this IServiceCollection services) where THandler : class, IHandler<TReq, TRes>
+        private static void AddHandler<TReq, TRes, THandler>(this IServiceCollection services) where THandler : class, IHandler<TReq, TRes>
         {
             services.AddScoped<IHandler<TReq, TRes>, THandler>();
         }
 
-        public static void AddHandler<TReq, THandler>(this IServiceCollection services) where THandler : class, IHandler<TReq>
+        private static void AddHandler<TReq, THandler>(this IServiceCollection services) where THandler : class, IHandler<TReq>
         {
             services.AddScoped<IHandler<TReq>, THandler>();
         }

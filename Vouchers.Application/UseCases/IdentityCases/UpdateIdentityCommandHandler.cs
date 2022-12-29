@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Vouchers.Application.Commands.IdentityCommands;
-using Vouchers.Application.Dtos;
 using Vouchers.Application.Events.IdentityEvents;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Services;
@@ -21,15 +20,15 @@ namespace Vouchers.Application.UseCases.IdentityCases
         private readonly IAuthIdentityProvider _authIdentityProvider;
         private readonly IRepository<Identity,Guid> _identityRepository;
         private readonly IAppImageService _appImageService;
-        private readonly IOutboxEventFactory _outboxEventFactory;
+        private readonly IMessageFactory _messageFactory;
 
         public UpdateIdentityCommandHandler(IAuthIdentityProvider authIdentityProvider, 
-            IRepository<Identity,Guid> identityRepository, IAppImageService appImageService, IOutboxEventFactory outboxEventFactory)
+            IRepository<Identity,Guid> identityRepository, IAppImageService appImageService, IMessageFactory messageFactory)
         {
             _authIdentityProvider = authIdentityProvider;
             _identityRepository = identityRepository;
             _appImageService = appImageService;
-            _outboxEventFactory = outboxEventFactory;
+            _messageFactory = messageFactory;
         }
 
         public async Task HandleAsync(UpdateIdentityCommand command, CancellationToken cancellation)
@@ -92,8 +91,9 @@ namespace Vouchers.Application.UseCases.IdentityCases
 
             if (requireUpdate)
             {
-                await _outboxEventFactory.CreateAsync(identityUpdatedEvent, identity);
-                await _identityRepository.UpdateAsync(identity);
+                identityUpdatedEvent.EventId = Guid.NewGuid();
+                var outboxMessage = await _messageFactory.CreateOutboxAsync(identityUpdatedEvent);
+                await _identityRepository.UpdateAsync(identity, new []{outboxMessage});
             }
                 
         }

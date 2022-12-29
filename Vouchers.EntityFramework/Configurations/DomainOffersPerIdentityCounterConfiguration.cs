@@ -40,8 +40,7 @@ namespace Vouchers.EntityFramework.Configurations
             builder.HasIndex(counter => new { counter.OfferId, counter.IdentityId });
 
             builder.Property<byte[]>("RowVersion").IsRowVersion();
-          
-            builder.Ignore(x => x.OutboxEvents);
+            
         }
     }
 }

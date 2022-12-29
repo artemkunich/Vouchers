@@ -82,8 +82,8 @@ builder.Services.AddScoped<IImageService, ImageSharpService>();
 builder.Services.AddScoped<ICultureInfoProvider, CultureInfoProvider>();
 
 builder.Services.AddEventRouter<GenericEventRouter<IdentityUpdatedEvent>>(nameof(IdentityUpdatedEvent));
-builder.Services.AddScoped<IEventDataSerializer, EventDataSerializer>();
-builder.Services.AddHostedService<EventProcessingService>();
+builder.Services.AddScoped<IMessageDataSerializer, MessageDataSerializer>();
+builder.Services.AddHostedService<OutboxMessagesProcessingService>();
 
 
 builder.Services.AddRepositories();

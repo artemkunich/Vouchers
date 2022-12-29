@@ -7,14 +7,15 @@ using System.Text;
 using Vouchers.Core;
 using Vouchers.Domains;
 using Vouchers.Entities;
+using Vouchers.InterCommunication;
 
 namespace Vouchers.EntityFramework.Configurations
 {
-    internal class OutboxEventConfiguration : IEntityTypeConfiguration<OutboxEvent>
+    internal class OutboxMessageConfiguration : IEntityTypeConfiguration<OutboxMessage>
     {
-        public void Configure(EntityTypeBuilder<OutboxEvent> builder)
+        public void Configure(EntityTypeBuilder<OutboxMessage> builder)
         {
-            builder.ToTable(nameof(OutboxEvent));
+            builder.ToTable(nameof(OutboxMessage));
 
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Id).ValueGeneratedNever();
@@ -25,7 +26,6 @@ namespace Vouchers.EntityFramework.Configurations
 
             builder.Property<byte[]>("RowVersion").IsRowVersion();
             
-            builder.Ignore(x => x.OutboxEvents);
         }
     }
 }

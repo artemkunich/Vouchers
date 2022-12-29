@@ -18,8 +18,7 @@ namespace Vouchers.EntityFramework.Configurations
             builder.HasKey(identity => identity.Id);
 
             builder.Property<byte[]>("RowVersion").IsRowVersion();
-            
-            builder.Ignore(x => x.OutboxEvents);
+
         }
     }
 }

@@ -3,8 +3,7 @@
 public abstract class Entity<TKey>
 {
     public TKey Id { get; }
-    public ICollection<OutboxEvent> OutboxEvents { get; } = new List<OutboxEvent>();
-
+    
     protected Entity(TKey id)
     {
         Id = id;
