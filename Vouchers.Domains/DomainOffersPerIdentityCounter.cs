@@ -1,42 +1,39 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Vouchers.Entities;
 using Vouchers.Domains.Properties;
 
-namespace Vouchers.Domains
+namespace Vouchers.Domains;
+
+[AggregateRoot]
+public sealed class DomainOffersPerIdentityCounter : Entity<Guid>
 {
-    public sealed class DomainOffersPerIdentityCounter : Entity<Guid>
+    public Guid OfferId { get; private set; }
+    public DomainOffer Offer { get; private set; }
+
+    public Guid IdentityId { get; private set; }
+    public int Counter { get; private set; }
+
+    private DomainOffersPerIdentityCounter() { }
+    private DomainOffersPerIdentityCounter(Guid id, DomainOffer offer, Guid identityId, int counter) : base(id)
+    { 
+        OfferId = offer.Id;
+        Offer = offer;
+
+        IdentityId = identityId;
+
+        Counter = counter;
+    }
+
+    public static DomainOffersPerIdentityCounter Create(DomainOffer offer, Guid identityId) =>
+        new DomainOffersPerIdentityCounter(Guid.NewGuid(), offer, identityId, 0);
+
+
+    public void AddContract()
     {
-        public Guid OfferId { get; private set; }
-        public DomainOffer Offer { get; private set; }
+        if (Counter + 1 > Offer.MaxContractsPerIdentity)
+            throw new DomainsException(Resources.MaxContractsCountIsExceeded);
 
-        public Guid IdentityId { get; private set; }
-        public int Counter { get; private set; }
-
-        private DomainOffersPerIdentityCounter() { }
-        private DomainOffersPerIdentityCounter(Guid id, DomainOffer offer, Guid identityId, int counter) : base(id)
-        { 
-            OfferId = offer.Id;
-            Offer = offer;
-
-            IdentityId = identityId;
-
-            Counter = counter;
-        }
-
-        public static DomainOffersPerIdentityCounter Create(DomainOffer offer, Guid identityId) =>
-            new DomainOffersPerIdentityCounter(Guid.NewGuid(), offer, identityId, 0);
-
-
-        public void AddContract()
-        {
-            if (Counter + 1 > Offer.MaxContractsPerIdentity)
-                throw new DomainsException(Resources.MaxContractsCountIsExceeded);
-
-            Counter++;
-        }
+        Counter++;
     }
 }
+

@@ -4,8 +4,6 @@ namespace Vouchers.MinimalAPI.Validation;
 
 public static class IServiceCollectionExtension
 {
-    public static void AddFormValidators(this IServiceCollection services)
-    {         
+    public static IServiceCollection AddFormValidators(this IServiceCollection services) =>
         services.AddSingleton<IFormValidator<UpdateDomainDetailCommand>, UpdateDomainDetailComandValidator>();
-    }
 }

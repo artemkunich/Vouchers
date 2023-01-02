@@ -1,36 +1,32 @@
 ﻿using System;
 using System.Globalization;
 
-namespace Vouchers.Core
-{
-    public sealed class UnitTypeQuantity
-    {       
-        public decimal Amount { get; }
+namespace Vouchers.Core;
 
-        public Guid UnitTypeId { get; }
-        public UnitType UnitType { get; }
+public sealed class UnitTypeQuantity
+{       
+    public decimal Amount { get; }
 
-        public static UnitTypeQuantity Create(decimal amount, UnitType unitType) =>
-            new UnitTypeQuantity(amount, unitType);
+    public Guid UnitTypeId { get; }
+    public UnitType UnitType { get; }
 
-        private UnitTypeQuantity(decimal amount, UnitType unit)
-        {
-            Amount = amount;
-            UnitTypeId = unit.Id;
-            UnitType = unit;
-        }
+    public static UnitTypeQuantity Create(decimal amount, UnitType unitType) =>
+        new UnitTypeQuantity(amount, unitType);
 
-        private UnitTypeQuantity() { }
-
-        public UnitTypeQuantity Add(UnitQuantity unitQuantity, CultureInfo cultureInfo = null)
-        {
-            if (UnitType.NotEquals(unitQuantity.Unit.UnitType))
-                throw new CoreException("CannotOperateWithDifferentUnitTypes", cultureInfo);
-
-            return Create(Amount + unitQuantity.Amount, UnitType);
-        }
+    private UnitTypeQuantity(decimal amount, UnitType unit)
+    {
+        Amount = amount;
+        UnitTypeId = unit.Id;
+        UnitType = unit;
     }
 
-    
+    private UnitTypeQuantity() { }
 
+    public UnitTypeQuantity Add(UnitQuantity unitQuantity, CultureInfo cultureInfo = null)
+    {
+        if (UnitType.NotEquals(unitQuantity.Unit.UnitType))
+            throw new CoreException("CannotOperateWithDifferentUnitTypes", cultureInfo);
+
+        return Create(Amount + unitQuantity.Amount, UnitType);
+    }
 }

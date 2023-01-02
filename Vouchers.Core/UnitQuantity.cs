@@ -1,26 +1,25 @@
 ﻿using System;
 
-namespace Vouchers.Core
-{
-    public sealed class UnitQuantity
-    {       
-        public decimal Amount { get; }
+namespace Vouchers.Core;
 
-        public Guid UnitId { get; }
-        public Unit Unit { get; }
+public sealed class UnitQuantity
+{       
+    public decimal Amount { get; }
 
-        public static UnitQuantity Create(decimal amount, Unit unit)
-        {
-            return new UnitQuantity(amount, unit);
-        }
+    public Guid UnitId { get; }
+    public Unit Unit { get; }
 
-        private UnitQuantity(decimal amount, Unit unit) 
-        {
-            Amount = amount;
-            UnitId = unit.Id;
-            Unit = unit;
-        }
-
-        private UnitQuantity() { }
+    public static UnitQuantity Create(decimal amount, Unit unit)
+    {
+        return new UnitQuantity(amount, unit);
     }
+
+    private UnitQuantity(decimal amount, Unit unit) 
+    {
+        Amount = amount;
+        UnitId = unit.Id;
+        Unit = unit;
+    }
+
+    private UnitQuantity() { }
 }

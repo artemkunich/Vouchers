@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Vouchers.Application.UseCases;
 
-namespace Vouchers.Application.Infrastructure
+namespace Vouchers.Infrastructure
 {
     public interface IDispatcher
     {

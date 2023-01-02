@@ -1,49 +1,43 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Vouchers.Domains.Properties;
+using Vouchers.Entities;
 
-namespace Vouchers.Domains
+namespace Vouchers.Domains;
+
+public sealed class UpdateDomainContractRequest : Entity<Guid>
 {
-    public sealed class UpdateDomainContractRequest
+    public Guid DomainId { get; }
+    public Domain Domain { get; }
+
+    public Guid OfferId { get; }
+    public DomainOffer Offer { get; }
+
+    public DateTime CreatedDateTime { get; }
+
+    public DateTime? _performedDateTime;
+    public DateTime? PerformedDateTime
     {
-        public Guid Id { get; }
-
-        public Guid DomainId { get; }
-        public Domain Domain { get; }
-
-        public Guid OfferId { get; }
-        public DomainOffer Offer { get; }
-
-        public DateTime CreatedDateTime { get; }
-
-        public DateTime? _performedDateTime;
-        public DateTime? PerformedDateTime
+        get => _performedDateTime;
+        set
         {
-            get => _performedDateTime;
-            set
-            {
-                if (value < CreatedDateTime)
-                    throw new DomainsException(Resources.PerformedDatetimeIsLessThanCreatedDatetime);
+            if (value < CreatedDateTime)
+                throw new DomainsException(Resources.PerformedDatetimeIsLessThanCreatedDatetime);
 
-                _performedDateTime = value;
-            }
+            _performedDateTime = value;
         }
+    }
 
-        public static UpdateDomainContractRequest CreateUpdateDomainContractRequest(Domain domain, DomainOffer offer) =>
-           new UpdateDomainContractRequest(Guid.NewGuid(), domain, offer, DateTime.Now);
+    public static UpdateDomainContractRequest CreateUpdateDomainContractRequest(Domain domain, DomainOffer offer) =>
+       new UpdateDomainContractRequest(Guid.NewGuid(), domain, offer, DateTime.Now);
 
-        private UpdateDomainContractRequest(Guid id, Domain domain, DomainOffer offer, DateTime createdDateTime)
-        {
-            Id = id;
+    private UpdateDomainContractRequest(Guid id, Domain domain, DomainOffer offer, DateTime createdDateTime) : base(id)
+    {
+        DomainId = domain.Id;
+        Domain = domain;
 
-            DomainId = domain.Id;
-            Domain = domain;
-
-            OfferId = offer.Id;
-            Offer = offer;
-            
-            CreatedDateTime = createdDateTime;
-        }
+        OfferId = offer.Id;
+        Offer = offer;
+        
+        CreatedDateTime = createdDateTime;
     }
 }

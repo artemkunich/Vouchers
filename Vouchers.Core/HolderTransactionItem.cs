@@ -4,46 +4,46 @@ using System.Text;
 using Vouchers.Entities;
 using System.Globalization;
 
-namespace Vouchers.Core
+namespace Vouchers.Core;
+
+[AggregateRoot]
+public sealed class HolderTransactionItem : Entity<Guid>
 {
-    public sealed class HolderTransactionItem : Entity<Guid>
+    public UnitQuantity Quantity { get; }
+
+    public Guid CreditAccountItemId { get; }
+    public AccountItem CreditAccountItem { get; }
+
+    public Guid DebitAccountItemId { get; }
+    public AccountItem DebitAccountItem { get; }
+
+    public static HolderTransactionItem Create(UnitQuantity quantity, AccountItem creditAccount, AccountItem debitAccount, CultureInfo cultureInfo = null) =>
+        new HolderTransactionItem(Guid.NewGuid(), quantity, creditAccount, debitAccount, cultureInfo);
+
+    private HolderTransactionItem(Guid id, UnitQuantity quantity, AccountItem creditAccountItem, AccountItem debitAccountItem, CultureInfo cultureInfo = null) : base(id)
     {
-        public UnitQuantity Quantity { get; }
+        if (creditAccountItem.Equals(debitAccountItem))
+            throw new CoreException("CreditAndDebitAccountsAreEqual", cultureInfo);
 
-        public Guid CreditAccountItemId { get; }
-        public AccountItem CreditAccountItem { get; }
+        if (creditAccountItem.Unit.NotEquals(quantity.Unit))
+            throw new CoreException("CreditAccountAndItemHaveDifferentUnits", cultureInfo);
 
-        public Guid DebitAccountItemId { get; }
-        public AccountItem DebitAccountItem { get; }
+        if (debitAccountItem.Unit.NotEquals(quantity.Unit))
+            throw new CoreException("DebitAccountAndItemHaveDifferentUnits", cultureInfo);
 
-        public static HolderTransactionItem Create(UnitQuantity quantity, AccountItem creditAccount, AccountItem debitAccount, CultureInfo cultureInfo = null) =>
-            new HolderTransactionItem(Guid.NewGuid(), quantity, creditAccount, debitAccount, cultureInfo);
+        if(!quantity.Unit.CanBeExchanged && creditAccountItem.HolderAccount.NotEquals(quantity.Unit.UnitType.IssuerAccount) && debitAccountItem.HolderAccount.NotEquals(quantity.Unit.UnitType.IssuerAccount))
+            throw new CoreException("ItemUnitCannotBeExchanged", cultureInfo);
 
-        private HolderTransactionItem(Guid id, UnitQuantity quantity, AccountItem creditAccountItem, AccountItem debitAccountItem, CultureInfo cultureInfo = null) : base(id)
-        {
-            if (creditAccountItem.Equals(debitAccountItem))
-                throw new CoreException("CreditAndDebitAccountsAreEqual", cultureInfo);
+        Quantity = quantity;
 
-            if (creditAccountItem.Unit.NotEquals(quantity.Unit))
-                throw new CoreException("CreditAccountAndItemHaveDifferentUnits", cultureInfo);
+        CreditAccountItemId = creditAccountItem.Id;
+        CreditAccountItem = creditAccountItem;
 
-            if (debitAccountItem.Unit.NotEquals(quantity.Unit))
-                throw new CoreException("DebitAccountAndItemHaveDifferentUnits", cultureInfo);
-
-            if(!quantity.Unit.CanBeExchanged && creditAccountItem.HolderAccount.NotEquals(quantity.Unit.UnitType.IssuerAccount) && debitAccountItem.HolderAccount.NotEquals(quantity.Unit.UnitType.IssuerAccount))
-                throw new CoreException("ItemUnitCannotBeExchanged", cultureInfo);
-
-            Quantity = quantity;
-
-            CreditAccountItemId = creditAccountItem.Id;
-            CreditAccountItem = creditAccountItem;
-
-            DebitAccountItemId = debitAccountItem.Id;
-            DebitAccountItem = debitAccountItem;
-
-        }
-
-        private HolderTransactionItem() { }
+        DebitAccountItemId = debitAccountItem.Id;
+        DebitAccountItem = debitAccountItem;
 
     }
+
+    private HolderTransactionItem() { }
+
 }

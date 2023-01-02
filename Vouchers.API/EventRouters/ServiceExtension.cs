@@ -1,6 +1,9 @@
+using System;
+using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 using Vouchers.Application.UseCases;
 
-namespace Vouchers.MinimalAPI.EventRouters;
+namespace Vouchers.API.EventRouters;
 
 public static class ServiceExtension
 {

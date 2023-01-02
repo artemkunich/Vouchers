@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace Vouchers.Domains
+namespace Vouchers.Domains;
+
+public class DomainsException : Exception
 {
-    public class DomainsException : Exception
+    internal DomainsException(string message) : base(message)
     {
-        internal DomainsException(string message) : base(message)
-        {
-        }
     }
 }
+

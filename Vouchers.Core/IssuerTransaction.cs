@@ -4,58 +4,58 @@ using System.Text;
 using Vouchers.Entities;
 using System.Globalization;
 
-namespace Vouchers.Core
+namespace Vouchers.Core;
+
+[AggregateRoot]
+public sealed class IssuerTransaction : Entity<Guid>
 {
-    public sealed class IssuerTransaction : Entity<Guid>
+    public DateTime Timestamp { get; private set; }
+
+    public UnitQuantity Quantity { get; }
+
+    public Guid IssuerAccountItemId { get; }
+    public AccountItem IssuerAccountItem { get; }
+
+    public static IssuerTransaction Create(AccountItem issuerAccountItem, decimal amount, CultureInfo cultureInfo = null) =>
+        new IssuerTransaction(Guid.NewGuid(), DateTime.Now, issuerAccountItem, UnitQuantity.Create(amount, issuerAccountItem.Unit), cultureInfo);
+
+    private IssuerTransaction(Guid id, DateTime timestamp, AccountItem issuerAccountItem, UnitQuantity quantity, CultureInfo cultureInfo = null) : base(id)
     {
-        public DateTime Timestamp { get; private set; }
+        Timestamp = timestamp;
 
-        public UnitQuantity Quantity { get; }
+        IssuerAccountItemId = issuerAccountItem.Id;
+        IssuerAccountItem = issuerAccountItem;
+        
+        Quantity = quantity;
 
-        public Guid IssuerAccountItemId { get; }
-        public AccountItem IssuerAccountItem { get; }
+        if (Quantity.Unit.ValidTo < DateTime.Today)
+            throw new CoreException("UnitIsExpired", cultureInfo);
 
-        public static IssuerTransaction Create(AccountItem issuerAccountItem, decimal amount, CultureInfo cultureInfo = null) =>
-            new IssuerTransaction(Guid.NewGuid(), DateTime.Now, issuerAccountItem, UnitQuantity.Create(amount, issuerAccountItem.Unit), cultureInfo);
+        if (Quantity.Unit.UnitType.IssuerAccount.NotEquals(IssuerAccountItem.HolderAccount))
+            throw new CoreException("AccountHolderAndUnitTypeIssuerAreDifferent", cultureInfo);
 
-        private IssuerTransaction(Guid id, DateTime timestamp, AccountItem issuerAccountItem, UnitQuantity quantity, CultureInfo cultureInfo = null) : base(id)
+        if (Quantity.Unit.NotEquals(IssuerAccountItem.Unit))
+            throw new CoreException("AccountItemUnitAndTransactionUnitAreDifferent", cultureInfo);
+
+
+        if (Quantity.Amount == 0)
+            throw new CoreException("AmountIsNotPositive", cultureInfo);
+
+    }
+
+    private IssuerTransaction() { }
+
+    public void Perform()
+    {
+        if (Quantity.Amount > 0)
         {
-            Timestamp = timestamp;
-
-            IssuerAccountItemId = issuerAccountItem.Id;
-            IssuerAccountItem = issuerAccountItem;
-            
-            Quantity = quantity;
-
-            if (Quantity.Unit.ValidTo < DateTime.Today)
-                throw new CoreException("UnitIsExpired", cultureInfo);
-
-            if (Quantity.Unit.UnitType.IssuerAccount.NotEquals(IssuerAccountItem.HolderAccount))
-                throw new CoreException("AccountHolderAndUnitTypeIssuerAreDifferent", cultureInfo);
-
-            if (Quantity.Unit.NotEquals(IssuerAccountItem.Unit))
-                throw new CoreException("AccountItemUnitAndTransactionUnitAreDifferent", cultureInfo);
-
-
-            if (Quantity.Amount == 0)
-                throw new CoreException("AmountIsNotPositive", cultureInfo);
-
+            IssuerAccountItem.ProcessDebit(Quantity.Amount);
+            IssuerAccountItem.Unit.IncreaseSupply(Quantity.Amount);
         }
-
-        private IssuerTransaction() { }
-
-        public void Perform()
+        else
         {
-            if (Quantity.Amount > 0)
-            {
-                IssuerAccountItem.ProcessDebit(Quantity.Amount);
-                IssuerAccountItem.Unit.IncreaseSupply(Quantity.Amount);
-            }
-            else
-            {
-                IssuerAccountItem.ProcessCredit(-Quantity.Amount);
-                IssuerAccountItem.Unit.ReduceSupply(-Quantity.Amount);
-            }
+            IssuerAccountItem.ProcessCredit(-Quantity.Amount);
+            IssuerAccountItem.Unit.ReduceSupply(-Quantity.Amount);
         }
     }
 }

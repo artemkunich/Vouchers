@@ -4,30 +4,30 @@ using System;
 using System.Threading.Tasks;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
+using Vouchers.Infrastructure;
 
-namespace Vouchers.API.Controllers
+namespace Vouchers.API.Controllers;
+
+[ApiController]
+//[Route("[controller]")]
+[Authorize(Roles = "User")]
+public sealed class ValueDetailController : Controller
 {
-    [ApiController]
-    //[Route("[controller]")]
-    [Authorize(Roles = "User")]
-    public sealed class ValueDetailController : Controller
+    private readonly IDispatcher _dispatcher;
+
+    public ValueDetailController(IDispatcher dispatcher)
     {
-        private readonly IDispatcher _dispatcher;
+        _dispatcher = dispatcher;
+    }
 
-        public ValueDetailController(IDispatcher dispatcher)
-        {
-            _dispatcher = dispatcher;
-        }
+    [HttpGet]
+    [Route("[controller]/{valueId:guid}")]
+    public async Task<IActionResult> Get(Guid valueId)
+    {
+        var result = await _dispatcher.DispatchAsync<Guid, VoucherValueDetailDto>(valueId);
+        if(result is null)
+            return NotFound();
 
-        [HttpGet]
-        [Route("[controller]/{valueId:guid}")]
-        public async Task<IActionResult> Get(Guid valueId)
-        {
-            var result = await _dispatcher.DispatchAsync<Guid, VoucherValueDetailDto>(valueId);
-            if(result is null)
-                return NotFound();
-
-            return Json(result);
-        }
+        return Json(result);
     }
 }

@@ -6,11 +6,10 @@ namespace Vouchers.MinimalAPI.Binding;
 
 public static class IServiceCollectionExtension
 {
-    public static void AddFormParameterProviders(this IServiceCollection services)
-    {         
-        services.AddScoped<IFormParameterProvider<CropParametersDto>, CropParametersProvider>();
-        services.AddScoped<IFormParameterProvider<CreateIdentityCommand>, CreateIdentityCommandProvider>();
-        services.AddScoped<IFormParameterProvider<UpdateIdentityCommand>, UpdateIdentityCommandProvider>();
-        services.AddScoped<IFormParameterProvider<UpdateDomainDetailCommand>, UpdateDomainDetailCommandProvider>();
-    }
+    public static IServiceCollection AddFormParameterProviders(this IServiceCollection services) =>
+        services
+            .AddScoped<IFormParameterProvider<CropParametersDto>, CropParametersProvider>()
+            .AddScoped<IFormParameterProvider<CreateIdentityCommand>, CreateIdentityCommandProvider>()
+            .AddScoped<IFormParameterProvider<UpdateIdentityCommand>, UpdateIdentityCommandProvider>()
+            .AddScoped<IFormParameterProvider<UpdateDomainDetailCommand>, UpdateDomainDetailCommandProvider>();
 }

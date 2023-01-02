@@ -22,6 +22,8 @@ using Application.Infrastructure;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Options;
 using System.Globalization;
+using Vouchers.API.EventRouters;
+using Vouchers.Application.Events.IdentityEvents;
 using Vouchers.Infrastructure;
 
 namespace Vouchers.API
@@ -96,16 +98,21 @@ namespace Vouchers.API
                 });
             });
 
-            services.AddHttpContextAccessor();
+            services
+                .AddHttpContextAccessor()
 
-            services.AddScoped<IDispatcher, Dispatcher>();
-            services.AddScoped<ILoginNameProvider, JWTLoginNameProvider>();
-            services.AddScoped<IImageService, ImageSharpService>();
-            services.AddScoped<ICultureInfoProvider, CultureInfoProvider>();
+                .AddScoped<IDispatcher, Dispatcher>()
+                .AddScoped<ILoginNameProvider, JWTLoginNameProvider>()
+                .AddScoped<IImageService, ImageSharpService>()
+                .AddScoped<ICultureInfoProvider, CultureInfoProvider>()
 
-            services.AddRepositories();
-            services.AddCommandHandlers();
-            services.AddQueryHandlers();
+                .AddEventRouter<GenericEventRouter<IdentityUpdatedEvent>>(nameof(IdentityUpdatedEvent))
+                .AddScoped<IMessageDataSerializer, MessageDataSerializer>()
+                .AddHostedService<OutboxMessagesProcessingService>()
+                
+                .AddRepositories(Configuration)
+                .AddAppServices(Configuration)
+                .AddHandlers(Configuration);
 
         }
 

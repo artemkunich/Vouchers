@@ -8,53 +8,53 @@ using Vouchers.Application.Commands.IdentityCommands;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.UseCases;
+using Vouchers.Infrastructure;
 
-namespace Vouchers.API.Controllers
+namespace Vouchers.API.Controllers;
+
+[ApiController]
+[Authorize]
+public sealed class IdentityDetailController : Controller
 {
-    [ApiController]
-    [Authorize]
-    public sealed class IdentityDetailController : Controller
+    private readonly IDispatcher _dispatcher;
+
+    public IdentityDetailController(IDispatcher dispatcher)
     {
-        private readonly IDispatcher _dispatcher;
+        _dispatcher = dispatcher;
+    }
 
-        public IdentityDetailController(IDispatcher dispatcher)
+    [HttpGet]
+    [Route("[controller]/{accountId:guid?}")]
+    public async Task<IActionResult> Get(Guid? accountId)
+    {
+        try
         {
-            _dispatcher = dispatcher;
-        }
-
-        [HttpGet]
-        [Route("[controller]/{accountId:guid?}")]
-        public async Task<IActionResult> Get(Guid? accountId)
-        {
-            try
-            {
-                var detail = await _dispatcher.DispatchAsync<Guid?, IdentityDetailDto>(accountId);
-                if (detail is null)
-                    return NotFound();
-
-                return Json(detail);
-            }
-            catch (NotRegisteredException)
-            {
+            var detail = await _dispatcher.DispatchAsync<Guid?, IdentityDetailDto>(accountId);
+            if (detail is null)
                 return NotFound();
-            }
-        }
 
-        [HttpPost]
-        [Route("[controller]")]
-        public async Task<IActionResult> Post([FromForm] CreateIdentityCommand command)
+            return Json(detail);
+        }
+        catch (NotRegisteredException)
         {
+            return NotFound();
+        }
+    }
+
+    [HttpPost]
+    [Route("[controller]")]
+    public async Task<IActionResult> Post([FromForm] CreateIdentityCommand command)
+    {
             
-            var identityId = await _dispatcher.DispatchAsync<CreateIdentityCommand, Guid>(command);
-            return Json(new { identityId });
-        }
+        var identityId = await _dispatcher.DispatchAsync<CreateIdentityCommand, Guid>(command);
+        return Json(new { identityId });
+    }
 
-        [HttpPut]
-        [Route("[controller]")]
-        public async Task<IActionResult> Put([FromForm] UpdateIdentityCommand command)
-        {
-            await _dispatcher.DispatchAsync(command);
-            return NoContent();
-        }
+    [HttpPut]
+    [Route("[controller]")]
+    public async Task<IActionResult> Put([FromForm] UpdateIdentityCommand command)
+    {
+        await _dispatcher.DispatchAsync(command);
+        return NoContent();
     }
 }

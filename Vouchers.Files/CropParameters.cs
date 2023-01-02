@@ -4,34 +4,33 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Vouchers.Files
+namespace Vouchers.Files;
+
+public sealed class CropParameters
 {
-    public sealed class CropParameters
+    public decimal X { get; set; }
+    public decimal Y { get; set; }
+    public decimal Width { get; set; }
+    public decimal Height { get; set; }
+
+    private CropParameters() { }
+    public CropParameters(decimal x, decimal y, decimal width, decimal height)
     {
-        public decimal X { get; set; }
-        public decimal Y { get; set; }
-        public decimal Width { get; set; }
-        public decimal Height { get; set; }
+        if (x > 100 || x < 0)
+            throw new ArgumentException("Invalid x value");
+        if (y > 100 || y < 0)
+            throw new ArgumentException("Invalid y value");
+        if (width > 100 || width <= 0)
+            throw new ArgumentException("Invalid width value");
+        if (height > 100 || height <= 0)
+            throw new ArgumentException("Invalid height value");
 
-        private CropParameters() { }
-        public CropParameters(decimal x, decimal y, decimal width, decimal height)
-        {
-            if (x > 100 || x < 0)
-                throw new ArgumentException("Invalid x value");
-            if (y > 100 || y < 0)
-                throw new ArgumentException("Invalid y value");
-            if (width > 100 || width <= 0)
-                throw new ArgumentException("Invalid width value");
-            if (height > 100 || height <= 0)
-                throw new ArgumentException("Invalid height value");
-
-            X = x;
-            Y = y;
-            Width = width;
-            Height = height;
-        }
-
-        public static CropParameters Create(decimal x, decimal y, decimal width, decimal height) =>
-            new CropParameters(x, y, width, height);
+        X = x;
+        Y = y;
+        Width = width;
+        Height = height;
     }
+
+    public static CropParameters Create(decimal x, decimal y, decimal width, decimal height) =>
+        new CropParameters(x, y, width, height);
 }

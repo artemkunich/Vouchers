@@ -2,6 +2,7 @@ using Vouchers.Entities;
 
 namespace Vouchers.InterCommunication;
 
+[AggregateRoot]
 public class InboxMessage: Entity<Guid>
 {
     public Guid OriginalId { get; }

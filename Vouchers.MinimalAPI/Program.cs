@@ -75,30 +75,29 @@ builder.Services.AddAuthorization(options =>
     });
 });
 
-builder.Services.AddHttpContextAccessor();
-
-builder.Services.AddScoped<IDispatcher, Dispatcher>();
-builder.Services.AddScoped<ILoginNameProvider, JWTLoginNameProvider>();
-builder.Services.AddScoped<IImageService, ImageSharpService>();
-builder.Services.AddScoped<ICultureInfoProvider, CultureInfoProvider>();
-
-builder.Services.AddEventRouter<GenericEventRouter<IdentityUpdatedEvent>>(nameof(IdentityUpdatedEvent));
-builder.Services.AddScoped<IMessageDataSerializer, MessageDataSerializer>();
-builder.Services.AddHostedService<OutboxMessagesProcessingService>();
-
-
-builder.Services.AddRepositories();
-builder.Services.AddCommandHandlers();
-builder.Services.AddQueryHandlers();
-
-builder.Services.AddFormValidators();
-builder.Services.AddFormParameterProviders();
+builder.Services
+    .AddHttpContextAccessor()
+    .AddScoped<IDispatcher, Dispatcher>()
+    .AddScoped<ILoginNameProvider, JWTLoginNameProvider>()
+    .AddScoped<IImageService, ImageSharpService>()
+    .AddScoped<ICultureInfoProvider, CultureInfoProvider>()
+    
+    .AddEventRouter<GenericEventRouter<IdentityUpdatedEvent>>(nameof(IdentityUpdatedEvent))
+    .AddScoped<IMessageDataSerializer, MessageDataSerializer>()
+    .AddHostedService<OutboxMessagesProcessingService>()
+    
+    .AddRepositories(builder.Configuration)
+    .AddAppServices(builder.Configuration)
+    .AddHandlers(builder.Configuration)
+    
+    .AddFormValidators()
+    .AddFormParameterProviders()
 
 //builder.Services.AddControllers(); //use MinimalAPI
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+    .AddEndpointsApiExplorer()
+    .AddSwaggerGen();
 
 var app = builder.Build();
 

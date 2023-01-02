@@ -2,6 +2,7 @@ using Vouchers.Entities;
 
 namespace Vouchers.InterCommunication;
 
+[AggregateRoot]
 public class OutboxMessage: Entity<Guid>
 {
     public string Type { get; }

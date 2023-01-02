@@ -2,48 +2,49 @@
 using System.Globalization;
 using Vouchers.Entities;
 
-namespace Vouchers.Core
+namespace Vouchers.Core;
+
+[AggregateRoot]
+public sealed class UnitType : Entity<Guid>
 {
-    public sealed class UnitType : Entity<Guid>
+    public Guid IssuerAccountId { get; }
+    public Account IssuerAccount { get; }
+    public decimal Supply { get; private set; }
+
+    public static UnitType Create(Account issuerAccount) =>
+        new UnitType(Guid.NewGuid(), issuerAccount);
+
+    private UnitType(Guid id, Account issuerAccount) : base(id)
     {
-        public Guid IssuerAccountId { get; }
-        public Account IssuerAccount { get; }
-        public decimal Supply { get; private set; }
+        IssuerAccountId = issuerAccount.Id;
+        IssuerAccount = issuerAccount;
+    }    
 
-        public static UnitType Create(Account issuerAccount) =>
-            new UnitType(Guid.NewGuid(), issuerAccount);
+    private UnitType() { }
 
-        private UnitType(Guid id, Account issuerAccount) : base(id)
-        {
-            IssuerAccountId = issuerAccount.Id;
-            IssuerAccount = issuerAccount;
-        }    
+    public void IncreaseSupply(decimal amount, CultureInfo cultureInfo = null)
+    {
+        if (amount <= 0)
+            throw new CoreException("AmountIsNotPositive", cultureInfo);
+        Supply += amount;
 
-        private UnitType() { }
+        IssuerAccount.IncreaseSupply(amount);
+    }
 
-        public void IncreaseSupply(decimal amount, CultureInfo cultureInfo = null)
-        {
-            if (amount <= 0)
-                throw new CoreException("AmountIsNotPositive", cultureInfo);
-            Supply += amount;
+    public void ReduceSupply(decimal amount, CultureInfo cultureInfo = null)
+    {
+        if (amount <= 0)
+            throw new CoreException("AmountIsNotPositive", cultureInfo);
+        if (Supply < amount)
+            throw new CoreException("AmountIsGreaterThanSupply", cultureInfo);
+        Supply -= amount;
 
-            IssuerAccount.IncreaseSupply(amount);
-        }
+        IssuerAccount.ReduceSupply(amount);
+    }
 
-        public void ReduceSupply(decimal amount, CultureInfo cultureInfo = null)
-        {
-            if (amount <= 0)
-                throw new CoreException("AmountIsNotPositive", cultureInfo);
-            if (Supply < amount)
-                throw new CoreException("AmountIsGreaterThanSupply", cultureInfo);
-            Supply -= amount;
-
-            IssuerAccount.ReduceSupply(amount);
-        }
-
-        public bool CanBeRemoved()
-        {
-            return Supply == 0;
-        }
+    public bool CanBeRemoved()
+    {
+        return Supply == 0;
     }
 }
+

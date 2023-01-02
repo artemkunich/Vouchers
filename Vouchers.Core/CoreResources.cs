@@ -7,14 +7,13 @@ using System.Resources;
 using System.Globalization;
 using System.Reflection;
 
-namespace Vouchers.Core
+namespace Vouchers.Core;
+
+internal class CoreResources
 {
-    internal class CoreResources
-    {
-        private static ResourceManager _rm = new ResourceManager(typeof(Properties.Resources));
+    private static ResourceManager _rm = new ResourceManager(typeof(Properties.Resources));
 
-        public static string GetString(string resourceKey, CultureInfo cultureInfo) => _rm.GetString(resourceKey, cultureInfo);
+    public static string GetString(string resourceKey, CultureInfo cultureInfo) => _rm.GetString(resourceKey, cultureInfo);
 
-        public static string GetString(string resourceKey, CultureInfo cultureInfo, params object[] args) => string.Format(_rm.GetString(resourceKey, cultureInfo), args);
-    }
+    public static string GetString(string resourceKey, CultureInfo cultureInfo, params object[] args) => string.Format(_rm.GetString(resourceKey, cultureInfo), args);
 }

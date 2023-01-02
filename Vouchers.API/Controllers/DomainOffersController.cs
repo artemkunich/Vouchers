@@ -7,40 +7,36 @@ using Vouchers.Application.Commands.DomainOfferCommands;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Queries;
+using Vouchers.Infrastructure;
 
-namespace Vouchers.API.Controllers
+namespace Vouchers.API.Controllers;
+
+[ApiController]
+[Route("[controller]")]
+[Authorize(Roles = "Manager")]
+public sealed class DomainOffersController : Controller
 {
-    [ApiController]
-    [Route("[controller]")]
-    [Authorize(Roles = "Manager")]
-    public sealed class DomainOffersController : Controller
+    private readonly IDispatcher _dispatcher;
+     public DomainOffersController(IDispatcher dispatcher)
     {
-        private readonly IDispatcher _dispatcher;
-
-        public DomainOffersController(IDispatcher dispatcher)
-        {
-            _dispatcher = dispatcher;
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Get([FromQuery] DomainOffersQuery query)
-        {
-            var result = await _dispatcher.DispatchAsync<DomainOffersQuery, IEnumerable<DomainOfferDto>>(query);
-            return Json(result);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Post(CreateDomainOfferCommand command)
-        {
-            var offerId = await _dispatcher.DispatchAsync<CreateDomainOfferCommand, Guid>(command);
-            return Json(new { OfferId = offerId });
-        }
-
-        [HttpPut]
-        public async Task<IActionResult> Put(UpdateDomainOfferCommand command)
-        {
-            await _dispatcher.DispatchAsync(command);
-            return NoContent();
-        }
+        _dispatcher = dispatcher;
+    }
+     [HttpGet]
+    public async Task<IActionResult> Get([FromQuery] DomainOffersQuery query)
+    {
+        var result = await _dispatcher.DispatchAsync<DomainOffersQuery, IEnumerable<DomainOfferDto>>(query);
+        return Json(result);
+    }
+     [HttpPost]
+    public async Task<IActionResult> Post(CreateDomainOfferCommand command)
+    {
+        var offerId = await _dispatcher.DispatchAsync<CreateDomainOfferCommand, Guid>(command);
+        return Json(new { OfferId = offerId });
+    }
+     [HttpPut]
+    public async Task<IActionResult> Put(UpdateDomainOfferCommand command)
+    {
+        await _dispatcher.DispatchAsync(command);
+        return NoContent();
     }
 }
