@@ -2,14 +2,12 @@
 using Vouchers.Application.Dtos;
 using Vouchers.Identities;
 
-namespace Vouchers.API.Services
-{ 
-    public sealed class AutoMapping : Profile
+namespace Vouchers.API.Services;
+
+public sealed class AutoMapping : Profile
+{
+    public AutoMapping()
     {
-        public AutoMapping()
-        {
-            CreateMap<Identity, IdentityDetailDto>();
-        }
+        CreateMap<Identity, IdentityDetailDto>();
     }
 }
-

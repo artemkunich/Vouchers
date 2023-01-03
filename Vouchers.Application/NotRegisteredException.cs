@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Vouchers.Application
+namespace Vouchers.Application;
+
+public class NotRegisteredException : ApplicationException
 {
-    public class NotRegisteredException : ApplicationException
+    internal NotRegisteredException() : base("User is not registered")
     {
-        internal NotRegisteredException() : base("User is not registered")
-        {
-        }
     }
 }

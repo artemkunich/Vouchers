@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
-using Vouchers.Application.Dtos;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace Vouchers.Application.UseCases.LoginCommands
+namespace Vouchers.Application.Commands.LoginCommands;
+
+public sealed class UpdateLoginCommand
 {
-    public sealed class UpdateLoginCommand
-    {
-        [Required]
-        public string CurrentLoginName { get; }
+    [Required]
+    public string CurrentLoginName { get; }
 
-        [Required]
-        public string NewLoginName { get; }
-    }
+    [Required]
+    public string NewLoginName { get; }
 }

@@ -7,28 +7,27 @@ using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Services;
 using Vouchers.Identities;
 
-namespace Vouchers.Application.ServiceProviders
+namespace Vouchers.Application.ServiceProviders;
+
+public class AuthIdentityProvider : IAuthIdentityProvider
 {
-    public class AuthIdentityProvider : IAuthIdentityProvider
+    private readonly ILoginNameProvider _loginNameProvider;
+    private readonly IRepository<Login, Guid> _loginRepository;
+
+    public AuthIdentityProvider(ILoginNameProvider loginNameProvider, IRepository<Login, Guid> loginRepository)
     {
-        private readonly ILoginNameProvider _loginNameProvider;
-        private readonly IRepository<Login, Guid> _loginRepository;
+        _loginNameProvider = loginNameProvider;
+        _loginRepository = loginRepository;
+    }
 
-        public AuthIdentityProvider(ILoginNameProvider loginNameProvider, IRepository<Login, Guid> loginRepository)
-        {
-            _loginNameProvider = loginNameProvider;
-            _loginRepository = loginRepository;
-        }
+    public async Task<Guid> GetAuthIdentityIdAsync()
+    {
+        var loginName = _loginNameProvider.CurrentLoginName;
+        var login = (await _loginRepository.GetByExpressionAsync(login => login.LoginName == loginName)).FirstOrDefault();
 
-        public async Task<Guid> GetAuthIdentityIdAsync()
-        {
-            var loginName = _loginNameProvider.CurrentLoginName;
-            var login = (await _loginRepository.GetByExpressionAsync(login => login.LoginName == loginName)).FirstOrDefault();
+        if (login?.IdentityId is null)
+            throw new NotRegisteredException();
 
-            if (login?.IdentityId is null)
-                throw new NotRegisteredException();
-
-            return login.IdentityId;
-        }
+        return login.IdentityId;
     }
 }

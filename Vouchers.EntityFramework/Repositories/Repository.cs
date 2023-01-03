@@ -10,123 +10,75 @@ using Vouchers.Application.Infrastructure;
 using Vouchers.Entities;
 using Vouchers.InterCommunication;
 
-namespace Vouchers.EntityFramework.Repositories
+namespace Vouchers.EntityFramework.Repositories;
+
+internal abstract class Repository<TEntity, TKey> : IRepository<TEntity, TKey> where TEntity: Entity<TKey>
 {
-    internal abstract class Repository<TEntity, TKey> : IRepository<TEntity, TKey> where TEntity: Entity<TKey>
+    protected VouchersDbContext DbContext { get; }
+
+    protected Repository(VouchersDbContext context)
     {
-        protected VouchersDbContext DbContext { get; }
+        DbContext = context;
+    }
 
-        protected Repository(VouchersDbContext context)
-        {
-            DbContext = context;
-        }
+    public virtual async Task<TEntity> GetByIdAsync(TKey id)
+    {
+        var dbSet = DbContext.Set<TEntity>();
+        return await dbSet.FindAsync(id);
+    }
 
-        public virtual async Task<TEntity> GetByIdAsync(TKey id)
-        {
-            var dbSet = DbContext.Set<TEntity>();
-            return await dbSet.FindAsync(id);
-        }
-     
-        public virtual TEntity GetById(TKey id)
-        {
-            var dbSet = DbContext.Set<TEntity>();
-            return dbSet.Find(id);
-        }
+    public virtual async Task<IEnumerable<TEntity>> GetByExpressionAsync(Expression<Func<TEntity, bool>> expression)
+    {
+        var dbSet = DbContext.Set<TEntity>();
+        return await dbSet.Where(expression).ToListAsync();
+    }
 
-        public virtual async Task<IEnumerable<TEntity>> GetByExpressionAsync(Expression<Func<TEntity, bool>> expression)
-        {
-            var dbSet = DbContext.Set<TEntity>();
-            return await dbSet.Where(expression).ToListAsync();
-        }
+    public virtual async Task UpdateAsync(TEntity entity, params OutboxMessage[] outboxMessages) =>
+        await UpdateAsync(entity, null, outboxMessages);
 
-        public virtual IEnumerable<TEntity> GetByExpression(Expression<Func<TEntity, bool>> expression)
-        {
-            var dbSet = DbContext.Set<TEntity>();
-            return dbSet.Where(expression).ToList();
-        }
-
-        public virtual async Task UpdateAsync(TEntity entity, IEnumerable<OutboxMessage> outboxMessages = null, IEnumerable<InboxMessage> inboxMessages = null)
-        {
-            var dbSet = DbContext.Set<TEntity>();
-            dbSet.Update(entity);
-
-            await AddMessagesAsync(outboxMessages, inboxMessages);
-                    
-            await DbContext.SaveChangesAsync();
-            
-        }
-
-        public virtual void Update(TEntity entity, IEnumerable<OutboxMessage> outboxMessages = null, IEnumerable<InboxMessage> inboxMessages = null)
-        {
-            var dbSet = DbContext.Set<TEntity>();
-            dbSet.Update(entity);
-            
-            AddMessages(outboxMessages, inboxMessages);
-            
-            DbContext.SaveChanges();
-            
-        }
-
-        public virtual async Task AddAsync(TEntity entity, IEnumerable<OutboxMessage> outboxMessages = null, IEnumerable<InboxMessage> inboxMessages = null)
-        {
-            var dbSet = DbContext.Set<TEntity>();
-            await dbSet.AddAsync(entity);
-            
-            await AddMessagesAsync(outboxMessages, inboxMessages);
-            
-            await DbContext.SaveChangesAsync();
-            
-        }
-
-        public virtual void Add(TEntity entity, IEnumerable<OutboxMessage> outboxMessages = null, IEnumerable<InboxMessage> inboxMessages = null)
-        {
-            var dbSet = DbContext.Set<TEntity>();
-            dbSet.Add(entity);
-            
-            AddMessages(outboxMessages, inboxMessages);
-            
-            DbContext.SaveChanges();
-            
-        }
-
-        public virtual async Task RemoveAsync(TEntity entity, IEnumerable<OutboxMessage> outboxMessages = null, IEnumerable<InboxMessage> inboxMessages = null)
-        {
-            var dbSet = DbContext.Set<TEntity>();
-            dbSet.Remove(entity);
-            
-            await AddMessagesAsync(outboxMessages, inboxMessages);
-            
-            await DbContext.SaveChangesAsync();
-            
-        }
-
-        public virtual void Remove(TEntity entity, IEnumerable<OutboxMessage> outboxMessages = null, IEnumerable<InboxMessage> inboxMessages = null)
-        {
-            var dbSet = DbContext.Set<TEntity>();
-            dbSet.Remove(entity);
-            
-            AddMessages(outboxMessages, inboxMessages);
-            
-            DbContext.SaveChanges();
-            
-        }
-
-        protected async Task AddMessagesAsync(IEnumerable<OutboxMessage> outboxMessages, IEnumerable<InboxMessage> inboxMessages)
-        {
-            if (outboxMessages != null && outboxMessages.Any())
-                await DbContext.OutboxMessages.AddRangeAsync(outboxMessages);
-            
-            if (inboxMessages != null && inboxMessages.Any())
-                await DbContext.InboxMessages.AddRangeAsync(inboxMessages);
-        }
+    public virtual async Task UpdateAsync(TEntity entity, InboxMessage inboxMessage, params OutboxMessage[] outboxMessages)
+    {
+        var dbSet = DbContext.Set<TEntity>();
         
-        protected void AddMessages(IEnumerable<OutboxMessage> outboxMessages, IEnumerable<InboxMessage> inboxMessages)
-        {
-            if (outboxMessages != null && outboxMessages.Any())
-                DbContext.OutboxMessages.AddRange(outboxMessages);
+        dbSet.Update(entity);
+        await AddMessagesAsync(outboxMessages, inboxMessage);
+        
+        await DbContext.SaveChangesAsync();
             
-            if (inboxMessages != null && inboxMessages.Any())
-                DbContext.InboxMessages.AddRange(inboxMessages);
-        }
+    }
+
+    public virtual async Task AddAsync(TEntity entity, params OutboxMessage[] outboxMessages) =>
+        await AddAsync(entity, null, outboxMessages);
+    public virtual async Task AddAsync(TEntity entity, InboxMessage inboxMessage, params OutboxMessage[] outboxMessages)
+    {
+        var dbSet = DbContext.Set<TEntity>();
+        
+        await dbSet.AddAsync(entity);
+        await AddMessagesAsync(outboxMessages, inboxMessage);
+            
+        await DbContext.SaveChangesAsync();
+            
+    }
+
+    public virtual async Task RemoveAsync(TEntity entity, params OutboxMessage[] outboxMessages) =>
+        await RemoveAsync(entity, null, outboxMessages);
+    public virtual async Task RemoveAsync(TEntity entity, InboxMessage inboxMessage, params OutboxMessage[] outboxMessages)
+    {
+        var dbSet = DbContext.Set<TEntity>();
+        
+        dbSet.Remove(entity);
+        await AddMessagesAsync(outboxMessages, inboxMessage);
+            
+        await DbContext.SaveChangesAsync();
+            
+    }
+
+    protected async Task AddMessagesAsync(IEnumerable<OutboxMessage> outboxMessages, InboxMessage inboxMessage)
+    {
+        if (outboxMessages != null && outboxMessages.Any())
+            await DbContext.OutboxMessages.AddRangeAsync(outboxMessages);
+            
+        if (inboxMessage != null)
+            await DbContext.InboxMessages.AddAsync(inboxMessage);
     }
 }

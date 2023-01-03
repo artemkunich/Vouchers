@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Vouchers.Application.Queries
+namespace Vouchers.Application.Queries;
+
+public sealed class IdentityDomainAccountsQuery : ListQuery
 {
-    public sealed class IdentityDomainAccountsQuery : ListQuery
-    {
-        public string DomainName { get; set; }
-    }
+    public string DomainName { get; set; }
 }

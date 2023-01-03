@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Vouchers.Application.Services
+namespace Vouchers.Application.Services;
+
+public interface IAuthIdentityProvider
 {
-    public interface IAuthIdentityProvider
-    {
-        Task<Guid> GetAuthIdentityIdAsync();
-    }
+    Task<Guid> GetAuthIdentityIdAsync();
 }

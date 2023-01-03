@@ -5,10 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Vouchers.Application.Infrastructure
+namespace Vouchers.Application.Infrastructure;
+
+public interface ICultureInfoProvider
 {
-    public interface ICultureInfoProvider
-    {
-        CultureInfo GetCultureInfo();
-    }
+    CultureInfo GetCultureInfo();
 }

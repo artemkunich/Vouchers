@@ -4,28 +4,27 @@ using System.ComponentModel.DataAnnotations;
 using System.Text;
 using Vouchers.Application.Dtos;
 
-namespace Vouchers.Application.Commands.DomainOfferCommands
+namespace Vouchers.Application.Commands.DomainOfferCommands;
+
+public sealed class CreateDomainOfferCommand
 {
-    public sealed class CreateDomainOfferCommand
-    {
-        [Required]
-        public string Name { get; set; }
+    [Required]
+    public string Name { get; set; }
 
-        public string Description { get; set; }
+    public string Description { get; set; }
 
-        [Required]
-        public int MaxMembersCount { get; set; }
-        [Required]
-        public decimal Amount { get; set; }
-        [Required]
-        public string Currency { get; set; }
-        [Required]
-        public string InvoicePeriod { get; set; }
-        [Required]
-        public DateTime ValidFrom { get; set; }
+    [Required]
+    public int MaxMembersCount { get; set; }
+    [Required]
+    public decimal Amount { get; set; }
+    [Required]
+    public string Currency { get; set; }
+    [Required]
+    public string InvoicePeriod { get; set; }
+    [Required]
+    public DateTime ValidFrom { get; set; }
 
-        public DateTime? ValidTo { get; set; }
+    public DateTime? ValidTo { get; set; }
 
-        public int? MaxContractsPerIdentity { get; set; }
-    }
+    public int? MaxContractsPerIdentity { get; set; }
 }

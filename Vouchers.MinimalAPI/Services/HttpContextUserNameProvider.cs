@@ -2,17 +2,16 @@
 using System.Linq;
 using Vouchers.Application.Infrastructure;
 
-namespace Vouchers.MinimalAPI.Services
+namespace Vouchers.MinimalAPI.Services;
+
+public sealed class HttpContextUserNameProvider : ILoginNameProvider
 {
-    public sealed class HttpContextUserNameProvider : ILoginNameProvider
+    IHttpContextAccessor _httpContextAccessor;
+
+    public HttpContextUserNameProvider(IHttpContextAccessor httpContextAccessor)
     {
-        IHttpContextAccessor _httpContextAccessor;
-
-        public HttpContextUserNameProvider(IHttpContextAccessor httpContextAccessor)
-        {
-            _httpContextAccessor = httpContextAccessor;
-        }
-
-        public string CurrentLoginName { get => _httpContextAccessor.HttpContext.User.Identity.Name; }
+        _httpContextAccessor = httpContextAccessor;
     }
+
+    public string CurrentLoginName { get => _httpContextAccessor.HttpContext.User.Identity.Name; }
 }

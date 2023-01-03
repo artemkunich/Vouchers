@@ -18,7 +18,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Vouchers.Application.Infrastructure;
 using Vouchers.API.Services;
 using Microsoft.IdentityModel.Tokens;
-using Application.Infrastructure;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Options;
 using System.Globalization;
@@ -26,131 +25,130 @@ using Vouchers.API.EventRouters;
 using Vouchers.Application.Events.IdentityEvents;
 using Vouchers.Infrastructure;
 
-namespace Vouchers.API
+namespace Vouchers.API;
+
+public class Startup
 {
-    public class Startup
+    public Startup(IConfiguration configuration)
     {
-        public Startup(IConfiguration configuration)
+        Configuration = configuration;
+    }
+
+    public IConfiguration Configuration { get; }
+
+    // This method gets called by the runtime. Use this method to add services to the container.
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.AddDbContext<VouchersDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("VouchersDbContextConnection")));
+
+        services.AddLocalization();
+        services.Configure<RequestLocalizationOptions>(
+            options => {
+
+                options.DefaultRequestCulture = new RequestCulture(CultureInfo.InvariantCulture);
+
+                options.SupportedCultures = new[] { CultureInfo.InvariantCulture };
+                options.SupportedUICultures =  new[] { CultureInfo.InvariantCulture, new CultureInfo("en-US"), new CultureInfo("cs-CZ") };
+
+                options.RequestCultureProviders = new[] { new AcceptLanguageHeaderRequestCultureProvider() };
+            }
+        );
+
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer("Bearer", options =>
+            {
+                options.RequireHttpsMetadata = false;
+                options.Authority = "http://vouchers.identityserver";
+                //options.Authority = "http://localhost:5000";                    
+
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateAudience = false
+                };
+            });
+        //.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options => Configuration.Bind("CookieSettings", options));
+
+        services.AddCors(options =>
         {
-            Configuration = configuration;
-        }
+            // this defines a CORS policy called "default"
+            options.AddPolicy("default", policy =>
+            {
+                policy.WithOrigins("http://localhost:8080")
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+            });
+        });
 
-        public IConfiguration Configuration { get; }
-
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        services.AddControllers();
+        services.AddEndpointsApiExplorer();
+        services.AddSwaggerGen(c =>
         {
-            services.AddDbContext<VouchersDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("VouchersDbContextConnection")));
+            c.SwaggerDoc("v1", new OpenApiInfo { Title = "Vouchers.Web", Version = "v1" });
+        });
 
-            services.AddLocalization();
-            services.Configure<RequestLocalizationOptions>(
-                options => {
-
-                    options.DefaultRequestCulture = new RequestCulture(CultureInfo.InvariantCulture);
-
-                    options.SupportedCultures = new[] { CultureInfo.InvariantCulture };
-                    options.SupportedUICultures =  new[] { CultureInfo.InvariantCulture, new CultureInfo("en-US"), new CultureInfo("cs-CZ") };
-
-                    options.RequestCultureProviders = new[] { new AcceptLanguageHeaderRequestCultureProvider() };
-                }
-            );
-
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer("Bearer", options =>
-                {
-                    options.RequireHttpsMetadata = false;
-                    options.Authority = "http://vouchers.identityserver";
-                    //options.Authority = "http://localhost:5000";                    
-
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateAudience = false
-                    };
-                });
-                //.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options => Configuration.Bind("CookieSettings", options));
-
-            services.AddCors(options =>
+        services.AddAuthorization(options =>
+        {
+            options.AddPolicy("EmailId", policy => policy.RequireClaim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"));
+            options.AddPolicy("RoleAdmin", policy => policy.RequireRole("Admin"));
+            options.AddPolicy("ApiScope", policy =>
             {
-                // this defines a CORS policy called "default"
-                options.AddPolicy("default", policy =>
-                {
-                    policy.WithOrigins("http://localhost:8080")
-                        .AllowAnyHeader()
-                        .AllowAnyMethod();
-                });
+                policy.RequireAuthenticatedUser();
+                policy.RequireClaim("scope", "vouapi");
             });
+        });
 
-            services.AddControllers();
-            services.AddEndpointsApiExplorer();
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Vouchers.Web", Version = "v1" });
-            });
+        services
+            .AddHttpContextAccessor()
 
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy("EmailId", policy => policy.RequireClaim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"));
-                options.AddPolicy("RoleAdmin", policy => policy.RequireRole("Admin"));
-                options.AddPolicy("ApiScope", policy =>
-                {
-                    policy.RequireAuthenticatedUser();
-                    policy.RequireClaim("scope", "vouapi");
-                });
-            });
+            .AddScoped<IDispatcher, Dispatcher>()
+            .AddScoped<ILoginNameProvider, JWTLoginNameProvider>()
+            .AddScoped<IImageService, ImageSharpService>()
+            .AddScoped<ICultureInfoProvider, CultureInfoProvider>()
 
-            services
-                .AddHttpContextAccessor()
-
-                .AddScoped<IDispatcher, Dispatcher>()
-                .AddScoped<ILoginNameProvider, JWTLoginNameProvider>()
-                .AddScoped<IImageService, ImageSharpService>()
-                .AddScoped<ICultureInfoProvider, CultureInfoProvider>()
-
-                .AddEventRouter<GenericEventRouter<IdentityUpdatedEvent>>(nameof(IdentityUpdatedEvent))
-                .AddScoped<IMessageDataSerializer, MessageDataSerializer>()
-                .AddHostedService<OutboxMessagesProcessingService>()
+            .AddEventRouter<GenericEventRouter<IdentityUpdatedEvent>>(nameof(IdentityUpdatedEvent))
+            .AddScoped<IMessageDataSerializer, MessageDataSerializer>()
+            .AddHostedService<OutboxMessagesProcessingService>()
                 
-                .AddRepositories(Configuration)
-                .AddAppServices(Configuration)
-                .AddHandlers(Configuration);
+            .AddRepositories(Configuration)
+            .AddAppServices(Configuration)
+            .AddHandlers(Configuration);
 
-        }
+    }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    {
+        if (env.IsDevelopment())
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Vouchers.Web v1"));
-            }
-
-            app.UseHttpsRedirection();
-
-            app.UseRouting();
-
-            using (var scope = app.ApplicationServices.CreateScope())
-            {
-                using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
-                {
-                    var vouchersContext = serviceScope.ServiceProvider.GetRequiredService<VouchersDbContext>();
-                    vouchersContext.Database.Migrate();
-                }
-            }
-
-            app.UseCors("default");
-
-            var localazeOptions = app.ApplicationServices.GetService<IOptions<RequestLocalizationOptions>>();
-            app.UseRequestLocalization(localazeOptions.Value);
-
-            app.UseAuthentication();
-            app.UseAuthorization();          
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers().RequireAuthorization("ApiScope");
-            });
+            app.UseDeveloperExceptionPage();
+            app.UseSwagger();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Vouchers.Web v1"));
         }
+
+        app.UseHttpsRedirection();
+
+        app.UseRouting();
+
+        using (var scope = app.ApplicationServices.CreateScope())
+        {
+            using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
+            {
+                var vouchersContext = serviceScope.ServiceProvider.GetRequiredService<VouchersDbContext>();
+                vouchersContext.Database.Migrate();
+            }
+        }
+
+        app.UseCors("default");
+
+        var localazeOptions = app.ApplicationServices.GetService<IOptions<RequestLocalizationOptions>>();
+        app.UseRequestLocalization(localazeOptions.Value);
+
+        app.UseAuthentication();
+        app.UseAuthorization();          
+
+        app.UseEndpoints(endpoints =>
+        {
+            endpoints.MapControllers().RequireAuthorization("ApiScope");
+        });
     }
 }

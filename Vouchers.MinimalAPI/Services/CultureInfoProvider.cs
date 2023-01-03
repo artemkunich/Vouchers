@@ -3,20 +3,19 @@ using Microsoft.AspNetCore.Localization;
 using System.Globalization;
 using Vouchers.Application.Infrastructure;
 
-namespace Vouchers.MinimalAPI.Services
+namespace Vouchers.MinimalAPI.Services;
+
+public class CultureInfoProvider : ICultureInfoProvider
 {
-    public class CultureInfoProvider : ICultureInfoProvider
+    readonly IHttpContextAccessor _httpContextAccessor;
+
+    public CultureInfoProvider(IHttpContextAccessor httpContextAccessor)
     {
-        readonly IHttpContextAccessor _httpContextAccessor;
+        _httpContextAccessor = httpContextAccessor;
+    }
 
-        public CultureInfoProvider(IHttpContextAccessor httpContextAccessor)
-        {
-            _httpContextAccessor = httpContextAccessor;
-        }
-
-        public CultureInfo GetCultureInfo() {
-            var rqf = _httpContextAccessor.HttpContext.Features.Get<IRequestCultureFeature>();
-            return rqf?.RequestCulture.UICulture;
-        }
+    public CultureInfo GetCultureInfo() {
+        var rqf = _httpContextAccessor.HttpContext.Features.Get<IRequestCultureFeature>();
+        return rqf?.RequestCulture.UICulture;
     }
 }

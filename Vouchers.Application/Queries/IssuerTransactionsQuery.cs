@@ -2,16 +2,15 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Vouchers.Application.Queries
+namespace Vouchers.Application.Queries;
+
+public sealed class IssuerTransactionsQuery : ListQuery
 {
-    public sealed class IssuerTransactionsQuery : ListQuery
-    {
-        public string Ticker { get; set; }
+    public string Ticker { get; set; }
 
-        public decimal? MinAmount { get; set; }
-        public decimal? MaxAmount { get; set; }
+    public decimal? MinAmount { get; set; }
+    public decimal? MaxAmount { get; set; }
 
-        public DateTime? MinTimestamp { get; set; }
-        public DateTime? MaxTimestamp { get; set; }
-    }
+    public DateTime? MinTimestamp { get; set; }
+    public DateTime? MaxTimestamp { get; set; }
 }

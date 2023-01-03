@@ -4,21 +4,20 @@ using System.ComponentModel.DataAnnotations;
 using System.Text;
 using Vouchers.Application.Dtos;
 
-namespace Vouchers.Application.Commands.DomainOfferCommands
+namespace Vouchers.Application.Commands.DomainOfferCommands;
+
+public sealed class UpdateDomainOfferCommand
 {
-    public sealed class UpdateDomainOfferCommand
-    {
-        [Required]
-        public Guid Id { get; set; }
+    [Required]
+    public Guid Id { get; set; }
 
-        public bool? Terminate { get; set; }
+    public bool? Terminate { get; set; }
 
-        public string Description { get; set; }
+    public string Description { get; set; }
 
-        public DateTime? ValidFrom { get; set; }
+    public DateTime? ValidFrom { get; set; }
 
-        public DateTime? ValidTo { get; set; }
+    public DateTime? ValidTo { get; set; }
 
-        public int? MaxContractsPerIdentity { get; set; }
-    }
+    public int? MaxContractsPerIdentity { get; set; }
 }

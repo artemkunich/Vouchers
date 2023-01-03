@@ -8,11 +8,10 @@ using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Files;
 
-namespace Vouchers.Application.Services
+namespace Vouchers.Application.Services;
+
+internal interface IAppImageService
 {
-    internal interface IAppImageService
-    {
-        Task<CroppedImage> CreateCroppedImageAsync(Stream imageStream, CropParametersDto cropParametersDto);
-        Task<CroppedImage> CreateCroppedImageAsync(Guid croppedImageId, CropParametersDto cropParametersDto);
-    }
+    Task<CroppedImage> CreateCroppedImageAsync(Stream imageStream, CropParametersDto cropParametersDto);
+    Task<CroppedImage> CreateCroppedImageAsync(Guid croppedImageId, CropParametersDto cropParametersDto);
 }

@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Vouchers.Application.Queries
+namespace Vouchers.Application.Queries;
+
+public sealed class IssuerVouchersQuery : ListQuery
 {
-    public sealed class IssuerVouchersQuery : ListQuery
-    {
-        public Guid ValueId { get; set; }
-    }
+    public Guid ValueId { get; set; }
 }

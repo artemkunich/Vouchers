@@ -1,11 +1,10 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Vouchers.Application.Commands.HolderTransactionRequestCommands
+namespace Vouchers.Application.Commands.HolderTransactionRequestCommands;
+
+public sealed class DeleteHolderTransactionRequestCommand
 {
-    public sealed class DeleteHolderTransactionRequestCommand
-    {
-        [Required]
-        public Guid HolderTransactionRequestId { get; set; }
-    }
+    [Required]
+    public Guid HolderTransactionRequestId { get; set; }
 }

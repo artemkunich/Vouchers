@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using Vouchers.Application.Dtos;
 
-namespace Vouchers.Application.Commands.IdentityCommands
+namespace Vouchers.Application.Commands.IdentityCommands;
+
+public sealed class DeleteIdentityCommand
 {
-    public sealed class DeleteIdentityCommand
-    {
-    }
 }

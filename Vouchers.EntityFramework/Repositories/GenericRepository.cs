@@ -8,12 +8,11 @@ using System.Threading.Tasks;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Entities;
 
-namespace Vouchers.EntityFramework.Repositories
+namespace Vouchers.EntityFramework.Repositories;
+
+internal sealed class GenericRepository<TEntity, TKey> : Repository<TEntity, TKey> where TEntity : Entity<TKey>
 {
-    internal sealed class GenericRepository<TEntity, TKey> : Repository<TEntity, TKey> where TEntity : Entity<TKey>
+    public GenericRepository(VouchersDbContext context) : base(context)
     {
-        public GenericRepository(VouchersDbContext context) : base(context)
-        {
-        }
     }
 }

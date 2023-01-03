@@ -4,11 +4,10 @@ using System.ComponentModel.DataAnnotations;
 using System.Text;
 using Vouchers.Application.Dtos;
 
-namespace Vouchers.Application.Commands.VoucherValueCommands
+namespace Vouchers.Application.Commands.VoucherValueCommands;
+
+public sealed class DeleteVoucherValueCommand
 {
-    public sealed class DeleteVoucherValueCommand
-    {
-        [Required]
-        public Guid VoucherValueId { get; }
-    }
+    [Required]
+    public Guid VoucherValueId { get; }
 }

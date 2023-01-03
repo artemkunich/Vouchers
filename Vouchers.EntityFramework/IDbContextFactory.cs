@@ -3,10 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Vouchers.EntityFramework
+namespace Vouchers.EntityFramework;
+
+public interface IDbContextFactory
 {
-    public interface IDbContextFactory
-    {
-        VouchersDbContext CreateVouchersContext();
-    }
+    VouchersDbContext CreateVouchersContext();
 }

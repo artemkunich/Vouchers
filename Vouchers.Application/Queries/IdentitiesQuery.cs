@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace Vouchers.Application.Queries
-{
-    public sealed class IdentitiesQuery : ListQuery
-    {
-        public string Name { get; set; }
+namespace Vouchers.Application.Queries;
 
-        public string OwnerName { get; set; }
-    }
+public sealed class IdentitiesQuery : ListQuery
+{
+    public string Name { get; set; }
+
+    public string OwnerName { get; set; }
 }

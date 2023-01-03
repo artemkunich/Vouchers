@@ -10,33 +10,32 @@ using Vouchers.Application.Services;
 using Vouchers.Core;
 using Vouchers.Domains;
 
-namespace Vouchers.Application.UseCases.DomainOfferCases
+namespace Vouchers.Application.UseCases.DomainOfferCases;
+
+internal sealed class CreateDomainOfferCommandHandler : IHandler<CreateDomainOfferCommand, Guid>
 {
-    internal sealed class CreateDomainOfferCommandHandler : IHandler<CreateDomainOfferCommand, Guid>
+    private readonly IAuthIdentityProvider _authIdentityProvider;
+    private readonly IRepository<DomainOffer,Guid> _domainOfferRepository;
+
+    public CreateDomainOfferCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<DomainOffer,Guid> domainOfferRepository)
     {
-        private readonly IAuthIdentityProvider _authIdentityProvider;
-        private readonly IRepository<DomainOffer,Guid> _domainOfferRepository;
+        _authIdentityProvider = authIdentityProvider;
+        _domainOfferRepository = domainOfferRepository;
+    }
 
-        public CreateDomainOfferCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<DomainOffer,Guid> domainOfferRepository)
-        {
-            _authIdentityProvider = authIdentityProvider;
-            _domainOfferRepository = domainOfferRepository;
-        }
+    public async Task<Guid> HandleAsync(CreateDomainOfferCommand command, CancellationToken cancellation)
+    {
+        var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
 
-        public async Task<Guid> HandleAsync(CreateDomainOfferCommand command, CancellationToken cancellation)
-        {
-            var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
+        var currency = Enum.Parse<Currency>(command.Currency);
+        var currencyAmount = CurrencyAmount.Create(currency, command.Amount);
+        var invoicePeriod = Enum.Parse<InvoicePeriod>(command.InvoicePeriod);
 
-            var currency = Enum.Parse<Currency>(command.Currency);
-            var currencyAmount = CurrencyAmount.Create(currency, command.Amount);
-            var invoicePeriod = Enum.Parse<InvoicePeriod>(command.InvoicePeriod);
+        var validTo = command.ValidTo ?? DateTime.MaxValue;
 
-            var validTo = command.ValidTo ?? DateTime.MaxValue;
+        var domainOffer = DomainOffer.Create(command.Name, command.Description, command.MaxMembersCount, currencyAmount, invoicePeriod, command.ValidFrom, validTo, command.MaxContractsPerIdentity);
+        await _domainOfferRepository.AddAsync(domainOffer);
 
-            var domainOffer = DomainOffer.Create(command.Name, command.Description, command.MaxMembersCount, currencyAmount, invoicePeriod, command.ValidFrom, validTo, command.MaxContractsPerIdentity);
-            await _domainOfferRepository.AddAsync(domainOffer);
-
-            return domainOffer.Id;
-        }
+        return domainOffer.Id;
     }
 }
