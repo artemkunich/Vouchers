@@ -3,14 +3,12 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Tokens;
 using Vouchers.MinimalAPI.Endpoints;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Persistence;
 using Vouchers.Infrastructure;
 using Vouchers.MinimalAPI.Binding;
-using Vouchers.MinimalAPI.EventRouters;
 using Vouchers.MinimalAPI.Services;
 using Vouchers.MinimalAPI.Validation;
 

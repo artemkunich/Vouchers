@@ -73,7 +73,7 @@ internal abstract class Repository<TAggregateRoot, TKey> : IRepository<TAggregat
 
         foreach (var domainEvent in domainEvents)
         {
-            var outboxMessage = OutboxMessage.Create(domainEvent.GetType().Name, await _messageDataSerializer.SerializeAsync(domainEvent));
+            var outboxMessage = OutboxMessage.Create(domainEvent.GetType().FullName, await _messageDataSerializer.SerializeAsync(domainEvent));
             DbContext.Set<OutboxMessage>().Add(outboxMessage);
         }
         

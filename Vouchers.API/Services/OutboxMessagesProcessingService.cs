@@ -10,18 +10,37 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-using Vouchers.Application.Infrastructure;
-using Vouchers.Application.UseCases;
 using Vouchers.InterCommunication;
 using Vouchers.Infrastructure;
 using Vouchers.Persistence;
 using Vouchers.Persistence.InterCommunication;
+using Vouchers.Primitives;
 
 namespace Vouchers.API.Services;
 
 public class OutboxMessagesProcessingService : BackgroundService
 {
     private readonly IServiceProvider _serviceProvider;
+
+    private Type[] _domainEventTypes;
+    private Type[] DomainEventTypes
+    {
+        get
+        {
+            if (_domainEventTypes != null)
+                return _domainEventTypes;
+            
+            IEnumerable<Assembly> assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(x => x.FullName != null && x.FullName.StartsWith("Vouchers"));
+
+            _domainEventTypes = assemblies.SelectMany(assembly =>
+                assembly.GetTypes().Where(type =>
+                    !type.IsInterface && !type.IsAbstract &&
+                    typeof(IDomainEvent).IsAssignableFrom(type))
+                ).ToArray();
+
+            return _domainEventTypes;
+        }
+    }
 
     public OutboxMessagesProcessingService(IServiceProvider serviceProvider)
     {
@@ -59,16 +78,7 @@ public class OutboxMessagesProcessingService : BackgroundService
         {
             try
             {
-                IEnumerable<Assembly> assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(x => x.FullName != null && x.FullName.StartsWith("Vouchers"));
-
-                Type eventType = null;
-                foreach (var assembly in assemblies)
-                {
-                    eventType = assembly.GetTypes().FirstOrDefault(t => t.Name == outboxMessage.Type);
-                    if (eventType is not null)
-                        break; 
-                }
-                
+                Type eventType = DomainEventTypes.FirstOrDefault(type => type.FullName == outboxMessage.Type);
                 if (eventType is null)
                     break;
                 
@@ -78,7 +88,7 @@ public class OutboxMessagesProcessingService : BackgroundService
                 if (messageHandler is null)
                     break;
 
-                var @event = JsonSerializer.Deserialize(outboxMessage.Data,eventType,JsonSerializerOptions.Default);
+                var @event = JsonSerializer.Deserialize(outboxMessage.Data, eventType, JsonSerializerOptions.Default);
                 if (@event is null)
                     break;
 

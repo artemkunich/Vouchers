@@ -3,18 +3,37 @@ using System.Text.Json;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Vouchers.Application.Infrastructure;
-using Vouchers.Application.UseCases;
 using Vouchers.InterCommunication;
-using Vouchers.MinimalAPI.EventRouters;
+using Vouchers.Infrastructure;
 using Vouchers.Persistence;
 using Vouchers.Persistence.InterCommunication;
+using Vouchers.Primitives;
 
 namespace Vouchers.MinimalAPI.Services;
 
 public class OutboxMessagesProcessingService : BackgroundService
 {
     private readonly IServiceProvider _serviceProvider;
+
+    private Type[] _domainEventTypes;
+    private Type[] DomainEventTypes
+    {
+        get
+        {
+            if (_domainEventTypes != null)
+                return _domainEventTypes;
+            
+            IEnumerable<Assembly> assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(x => x.FullName != null && x.FullName.StartsWith("Vouchers"));
+
+            _domainEventTypes = assemblies.SelectMany(assembly =>
+                assembly.GetTypes().Where(type =>
+                    !type.IsInterface && !type.IsAbstract &&
+                    typeof(IDomainEvent).IsAssignableFrom(type))
+                ).ToArray();
+
+            return _domainEventTypes;
+        }
+    }
 
     public OutboxMessagesProcessingService(IServiceProvider serviceProvider)
     {
@@ -23,7 +42,6 @@ public class OutboxMessagesProcessingService : BackgroundService
     
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        
         while (!stoppingToken.IsCancellationRequested)
         {
             var lastProcessedMessagesCount = await ProcessOutboxMessagesAsync(stoppingToken);
@@ -53,34 +71,25 @@ public class OutboxMessagesProcessingService : BackgroundService
         {
             try
             {
-                IEnumerable<Assembly> assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(x => x.FullName != null && x.FullName.StartsWith("Vouchers"));
-
-                Type eventType = null;
-                foreach (var assembly in assemblies)
-                {
-                    eventType = assembly.GetTypes().FirstOrDefault(t => t.Name == outboxMessage.Type);
-                    if (eventType is not null)
-                        break; 
-                }
-                
+                Type eventType = DomainEventTypes.FirstOrDefault(type => type.FullName == outboxMessage.Type);
                 if (eventType is null)
                     break;
                 
-                var eventHandlerType = typeof(IHandler<>).MakeGenericType(eventType);
+                var messageHandlerType = typeof(IMessageHandler<>).MakeGenericType(eventType);
 
-                var eventHandler = serviceProvider.GetService(eventHandlerType);
-                if (eventHandler is null)
+                var messageHandler = serviceProvider.GetService(messageHandlerType);
+                if (messageHandler is null)
                     break;
 
-                var @event = JsonSerializer.Deserialize(outboxMessage.Data,eventType,JsonSerializerOptions.Default);
+                var @event = JsonSerializer.Deserialize(outboxMessage.Data, eventType, JsonSerializerOptions.Default);
                 if (@event is null)
                     break;
 
-                var handleMethod = eventHandlerType.GetMethod(nameof(IHandler<object>.HandleAsync));
+                var handleMethod = messageHandlerType.GetMethod(nameof(IMessageHandler<object>.HandleAsync));
                 if(handleMethod is null)
                     break;
                 
-                if(handleMethod.Invoke(eventHandler, new [] {@event, default(CancellationToken)}) is Task task)
+                if(handleMethod.Invoke(messageHandler, new [] {@event, default(CancellationToken)}) is Task task)
                     await task;
 
                 outboxMessage.MarkAsProcessed();

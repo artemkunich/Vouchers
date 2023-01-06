@@ -26,7 +26,7 @@ public class MessageHandler<TMessage,TResult> : IMessageHandler<TMessage,TResult
         if (messageId is null)
             return;
 
-        var consumer = _handler.GetType().Name;
+        var consumer = _handler.GetType().FullName;
         
         var isMessageConsumed = await _messageHelper.CheckIfMessageWasConsumedAsync(messageId.Value, consumer);
         if (isMessageConsumed)
@@ -62,7 +62,7 @@ public class MessageHandler<TMessage> : IMessageHandler<TMessage>
         if (messageId is null)
             return;
 
-        var consumer = _handler.GetType().Name;
+        var consumer = _handler.GetType().FullName;
 
         var isMessageConsumed = await _messageHelper.CheckIfMessageWasConsumedAsync(messageId.Value, consumer);
         if (isMessageConsumed)

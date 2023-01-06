@@ -8,7 +8,6 @@ namespace Vouchers.Infrastructure;
     
 public static class ServiceCollectionExtension
 {
-    
     public static IServiceCollection AddHandlers(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IMessageHelper, MessageHelper>();
@@ -17,16 +16,13 @@ public static class ServiceCollectionExtension
 
         var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(x => x.FullName != null && x.FullName.StartsWith("Vouchers"));
         
-        var handlerTypes = new List<Type>();
-        foreach (var assembly in assemblies)
-        {
-            handlerTypes.AddRange(assembly.GetTypes().Where(t =>
+        var handlerTypes = assemblies.SelectMany(assembly => 
+            assembly.GetTypes().Where(t =>
                 !t.IsAbstract && !t.IsInterface && !t.IsGenericType &&
-                t.GetInterfaces()
-                    .Any(i => i.IsGenericType && genericHandlerTypes.Contains(i.GetGenericTypeDefinition()))
-            ));
-        }
-
+                t.GetInterfaces().Any(i => i.IsGenericType && genericHandlerTypes.Contains(i.GetGenericTypeDefinition()))
+            )
+        ).ToList();
+        
         foreach (var handlerType in handlerTypes)
         {
             var genericHandlerType = handlerType
@@ -47,7 +43,6 @@ public static class ServiceCollectionExtension
                     services.AddScoped(iMessageHandlerType, messageHandlerType);
                 }
             }
-            
         }
 
         return services;

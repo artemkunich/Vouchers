@@ -39,13 +39,13 @@ public static class ServiceCollectionExtension
         var assemblies = Assembly.GetExecutingAssembly().GetReferencedAssemblies().Select(Assembly.Load).Where(x => x.FullName != null && x.FullName.StartsWith("Vouchers")).ToList();
         assemblies.Add(Assembly.GetExecutingAssembly());
         
-        var aggregateRootTypes = assemblies.SelectMany(assembly =>
+        var aggregateRootTypes = assemblies.SelectMany(assembly => 
             assembly.GetTypes().Where(t =>
                 t.IsClass && !t.IsAbstract &&
-                t.GetInterfaces()
-                    .Any(type => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IEntity<>)) &&
+                t.GetInterfaces().Any(type => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IEntity<>)) &&
                 t.IsInheritedFromGeneric(typeof(AggregateRoot<>))
-            )).ToList();
+            )
+        ).ToList();
 
         var executingAssembly = Assembly.GetExecutingAssembly();
         
