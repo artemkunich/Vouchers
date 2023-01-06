@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Vouchers.Entities;
+using Vouchers.Primitives;
 using Vouchers.Values.Properties;
 
 namespace Vouchers.Values;
 
-[AggregateRoot]
-public sealed class VoucherValue : Entity<Guid>
+public sealed class VoucherValue : AggregateRoot<Guid>
 {
     public Guid DomainId { get; }
     public Guid IssuerIdentityId { get; }

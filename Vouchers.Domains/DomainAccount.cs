@@ -1,10 +1,9 @@
 ﻿using System;
-using Vouchers.Entities;
+using Vouchers.Primitives;
 
 namespace Vouchers.Domains;
 
-[AggregateRoot]
-public sealed class DomainAccount : Entity<Guid>
+public sealed class DomainAccount : AggregateRoot<Guid>
 {
     public Guid IdentityId { get; }
 

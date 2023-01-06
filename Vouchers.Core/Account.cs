@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Vouchers.Entities;
+using Vouchers.Primitives;
 using System.Globalization;
 
 namespace Vouchers.Core;
 
-[AggregateRoot]
-public sealed class Account : Entity<Guid>
+public sealed class Account : AggregateRoot<Guid>
 {
     public DateTime CreatedDateTime { get; }
     public decimal Supply { get; private set; }

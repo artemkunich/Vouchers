@@ -1,10 +1,10 @@
 ﻿using System;
 using Vouchers.Domains.Properties;
-using Vouchers.Entities;
+using Vouchers.Primitives;
 
 namespace Vouchers.Domains;
 
-public sealed class UpdateDomainContractRequest : Entity<Guid>
+public sealed class UpdateDomainContractRequest
 {
     public Guid DomainId { get; }
     public Domain Domain { get; }
@@ -30,7 +30,7 @@ public sealed class UpdateDomainContractRequest : Entity<Guid>
     public static UpdateDomainContractRequest CreateUpdateDomainContractRequest(Domain domain, DomainOffer offer) =>
        new UpdateDomainContractRequest(Guid.NewGuid(), domain, offer, DateTime.Now);
 
-    private UpdateDomainContractRequest(Guid id, Domain domain, DomainOffer offer, DateTime createdDateTime) : base(id)
+    private UpdateDomainContractRequest(Guid id, Domain domain, DomainOffer offer, DateTime createdDateTime)
     {
         DomainId = domain.Id;
         Domain = domain;

@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Vouchers.Entities;
+using Vouchers.Primitives;
 using Vouchers.Domains.Properties;
 
 namespace Vouchers.Domains;
 
-[AggregateRoot]
-public sealed class Domain : Entity<Guid>
+public sealed class Domain : AggregateRoot<Guid>
 {
     public Guid ContractId { get; }
     public DomainContract Contract { get; }

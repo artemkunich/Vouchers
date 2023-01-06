@@ -1,9 +1,8 @@
-﻿using Vouchers.Entities;
+﻿using Vouchers.Primitives;
 
 namespace Vouchers.Files;
 
-[AggregateRoot]
-public sealed class CroppedImage : Entity<Guid>
+public sealed class CroppedImage : AggregateRoot<Guid>
 {
     public Guid ImageId { get; }
     public CropParameters CropParameters { get; set; }

@@ -1,11 +1,10 @@
 ﻿using System;
-using Vouchers.Entities;
+using Vouchers.Primitives;
 using Vouchers.Domains.Properties;
 
 namespace Vouchers.Domains;
 
-[AggregateRoot]
-public sealed class DomainOffersPerIdentityCounter : Entity<Guid>
+public sealed class DomainOffersPerIdentityCounter : AggregateRoot<Guid>
 {
     public Guid OfferId { get; private set; }
     public DomainOffer Offer { get; private set; }

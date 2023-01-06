@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Vouchers.Entities;
+using Vouchers.Primitives;
 using System.Globalization;
 
 namespace Vouchers.Core;
 
-[AggregateRoot]
-public sealed class HolderTransactionItem : Entity<Guid>
+public sealed class HolderTransactionItem : AggregateRoot<Guid>
 {
     public UnitQuantity Quantity { get; }
 

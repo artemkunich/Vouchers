@@ -12,7 +12,7 @@
         <PackageReference Include="FluentValidation" Version="11.4.0" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.0">
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.1">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
@@ -25,7 +25,7 @@
     <ItemGroup>
       <ProjectReference Include="..\Vouchers.Application\Vouchers.Application.csproj" />
       <ProjectReference Include="..\Vouchers.Auth\Vouchers.Auth.csproj" />
-      <ProjectReference Include="..\Vouchers.EntityFramework\Vouchers.EntityFramework.csproj" />
+      <ProjectReference Include="..\Vouchers.Persistence\Vouchers.Persistence.csproj" />
       <ProjectReference Include="..\Vouchers.Infrastructure\Vouchers.Infrastructure.csproj" />
     </ItemGroup>
 

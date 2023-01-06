@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Vouchers.Entities;
+using Vouchers.Primitives;
 using System.Globalization;
 
 namespace Vouchers.Core;
 
-[AggregateRoot]
-public sealed class HolderTransactionRequest : Entity<Guid>
+public sealed class HolderTransactionRequest : AggregateRoot<Guid>
 {
     public DateTime DueDate { get; }
 

@@ -5,10 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Tokens;
-using Vouchers.Application.Events.IdentityEvents;
 using Vouchers.MinimalAPI.Endpoints;
 using Vouchers.Application.Infrastructure;
-using Vouchers.EntityFramework;
+using Vouchers.Persistence;
 using Vouchers.Infrastructure;
 using Vouchers.MinimalAPI.Binding;
 using Vouchers.MinimalAPI.EventRouters;
@@ -81,8 +80,6 @@ builder.Services
     .AddScoped<IImageService, ImageSharpService>()
     .AddScoped<ICultureInfoProvider, CultureInfoProvider>()
     
-    .AddEventRouter<GenericEventRouter<IdentityUpdatedEvent>>(nameof(IdentityUpdatedEvent))
-    .AddScoped<IMessageDataSerializer, MessageDataSerializer>()
     .AddHostedService<OutboxMessagesProcessingService>()
     
     .AddRepositories(builder.Configuration)

@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Vouchers.Entities;
+using Vouchers.Primitives;
 
 namespace Vouchers.Domains;
 
-[AggregateRoot]
-public sealed class DomainContract : Entity<Guid>
+public sealed class DomainContract : AggregateRoot<Guid>
 {
     public Guid OfferId { get; }
     public DomainOffer Offer { get; }

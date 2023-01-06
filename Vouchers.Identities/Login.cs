@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Vouchers.Entities;
+using Vouchers.Primitives;
 
 namespace Vouchers.Identities;
 
-[AggregateRoot]
-public sealed class Login : Entity<Guid>
+public sealed class Login : AggregateRoot<Guid>
 {
     public string LoginName { get; }
 

@@ -11,9 +11,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
 using Microsoft.EntityFrameworkCore;
-using Vouchers.EntityFramework;
+using Vouchers.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Vouchers.Application.Infrastructure;
 using Vouchers.API.Services;
@@ -21,8 +20,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Options;
 using System.Globalization;
-using Vouchers.API.EventRouters;
-using Vouchers.Application.Events.IdentityEvents;
 using Vouchers.Infrastructure;
 
 namespace Vouchers.API;
@@ -104,9 +101,7 @@ public class Startup
             .AddScoped<ILoginNameProvider, JWTLoginNameProvider>()
             .AddScoped<IImageService, ImageSharpService>()
             .AddScoped<ICultureInfoProvider, CultureInfoProvider>()
-
-            .AddEventRouter<GenericEventRouter<IdentityUpdatedEvent>>(nameof(IdentityUpdatedEvent))
-            .AddScoped<IMessageDataSerializer, MessageDataSerializer>()
+            
             .AddHostedService<OutboxMessagesProcessingService>()
                 
             .AddRepositories(Configuration)

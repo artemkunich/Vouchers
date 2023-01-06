@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Vouchers.Entities;
+using Vouchers.Primitives;
 
 namespace Vouchers.Identities;
 
-[AggregateRoot]
-public sealed class Identity : Entity<Guid>
+public sealed class Identity : AggregateRoot<Guid>
 {
     public string FirstName { get; set; }
 

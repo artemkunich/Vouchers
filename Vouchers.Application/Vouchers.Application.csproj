@@ -1,7 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
+    <LangVersion>11</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,7 +16,6 @@
     <ProjectReference Include="..\Vouchers.Domains\Vouchers.Domains.csproj" />
     <ProjectReference Include="..\Vouchers.Files\Vouchers.Files.csproj" />
     <ProjectReference Include="..\Vouchers.Identities\Vouchers.Identities.csproj" />
-    <ProjectReference Include="..\Vouchers.InterCommunication\Vouchers.InterCommunication.csproj" />
     <ProjectReference Include="..\Vouchers.Values\Vouchers.Values.csproj" />
   </ItemGroup>
 

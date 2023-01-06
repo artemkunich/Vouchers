@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Vouchers.Entities;
+using Vouchers.Primitives;
 
 namespace Vouchers.Domains;
 
-[AggregateRoot]
-public sealed class DomainOffer : Entity<Guid>
+public sealed class DomainOffer : AggregateRoot<Guid>
 {
     public string Name { get; }
     public string Description { get; set; }

@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Vouchers.Entities;
+using Vouchers.Primitives;
 using System.Globalization;
 
 namespace Vouchers.Core;
 
-[AggregateRoot]
-public sealed class IssuerTransaction : Entity<Guid>
+public sealed class IssuerTransaction : AggregateRoot<Guid>
 {
     public DateTime Timestamp { get; private set; }
 

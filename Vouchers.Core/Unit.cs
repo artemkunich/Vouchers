@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Globalization;
-using Vouchers.Entities;
+using Vouchers.Primitives;
 
 namespace Vouchers.Core;
 
-[AggregateRoot]
-public sealed class Unit : Entity<Guid>
+public sealed class Unit : AggregateRoot<Guid>
 {
     public Guid UnitTypeId { get; }
     public UnitType UnitType { get; }

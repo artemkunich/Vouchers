@@ -5,13 +5,13 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Vouchers.Application.Commands.IdentityCommands;
-using Vouchers.Application.Events.IdentityEvents;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Services;
 using Vouchers.Core;
-using Vouchers.Entities;
+using Vouchers.Primitives;
 using Vouchers.Files;
 using Vouchers.Identities;
+using Vouchers.Identities.DomainEvents;
 
 namespace Vouchers.Application.UseCases.IdentityCases;
 
@@ -20,15 +20,13 @@ internal sealed class UpdateIdentityCommandHandler : IHandler<UpdateIdentityComm
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IRepository<Identity,Guid> _identityRepository;
     private readonly IAppImageService _appImageService;
-    private readonly IMessageFactory _messageFactory;
 
     public UpdateIdentityCommandHandler(IAuthIdentityProvider authIdentityProvider, 
-        IRepository<Identity,Guid> identityRepository, IAppImageService appImageService, IMessageFactory messageFactory)
+        IRepository<Identity,Guid> identityRepository, IAppImageService appImageService)
     {
         _authIdentityProvider = authIdentityProvider;
         _identityRepository = identityRepository;
         _appImageService = appImageService;
-        _messageFactory = messageFactory;
     }
 
     public async Task HandleAsync(UpdateIdentityCommand command, CancellationToken cancellation)
@@ -38,8 +36,8 @@ internal sealed class UpdateIdentityCommandHandler : IHandler<UpdateIdentityComm
         if (identity is null)
             throw new ApplicationException(Properties.Resources.IdentityDoesNotExist);
 
-        var requireUpdate = false;
-        var identityUpdatedEvent = new IdentityUpdatedEvent();
+        var isChanged = false;
+        var identityUpdatedDomainEvent = new IdentityUpdatedDomainEvent();
             
         if (command.Image is not null && command.CropParameters is not null)
         {
@@ -47,11 +45,9 @@ internal sealed class UpdateIdentityCommandHandler : IHandler<UpdateIdentityComm
             var image = await _appImageService.CreateCroppedImageAsync(imageStream, command.CropParameters);
             identity.ImageId = image.Id;
                 
-            identityUpdatedEvent.NewImageId = image.ImageId;
-            identityUpdatedEvent.NewCroppedImageId = image.Id;
-            identityUpdatedEvent.NewCropParameters = command.CropParameters;
-                
-            requireUpdate = true;
+            identityUpdatedDomainEvent.NewImageId = image.Id;
+
+            isChanged = true;
         }
 
         if (command.Image is null && identity.ImageId is not null && command.CropParameters is not null)
@@ -59,41 +55,40 @@ internal sealed class UpdateIdentityCommandHandler : IHandler<UpdateIdentityComm
             var image = await _appImageService.CreateCroppedImageAsync(identity.ImageId.Value, command.CropParameters);
             identity.ImageId = image.Id;
 
-            identityUpdatedEvent.NewCroppedImageId = image.Id;
-            identityUpdatedEvent.NewCropParameters = command.CropParameters;
-                
-            requireUpdate = true;
+            identityUpdatedDomainEvent.NewImageId = image.Id;
+
+            isChanged = true;
         }
 
         if (identity.FirstName != command.FirstName)
         {
             identity.FirstName = command.FirstName;
-            identityUpdatedEvent.NewFirstName = identity.FirstName;
+            identityUpdatedDomainEvent.NewFirstName = identity.FirstName;
                 
-            requireUpdate = true;
+            isChanged = true;
         }
 
         if (identity.LastName != command.LastName)
         {
             identity.LastName = command.LastName;
-            identityUpdatedEvent.NewLastName = identity.LastName;
+            identityUpdatedDomainEvent.NewLastName = identity.LastName;
                 
-            requireUpdate = true;
+            isChanged = true;
         }
 
         if (identity.Email != command.Email)
         {
             identity.Email = command.Email;
-            identityUpdatedEvent.NewEmail = identity.Email;
+            identityUpdatedDomainEvent.NewEmail = identity.Email;
                 
-            requireUpdate = true;
+            isChanged = true;
         }
 
-        if (requireUpdate)
+        if (isChanged)
         {
-            identityUpdatedEvent.EventId = Guid.NewGuid();
-            var outboxMessage = await _messageFactory.CreateOutboxAsync(identityUpdatedEvent);
-            await _identityRepository.UpdateAsync(identity, outboxMessage);
+            identityUpdatedDomainEvent.Id = Guid.NewGuid();
+            identity.RaiseDomainEvent(identityUpdatedDomainEvent);
+            await _identityRepository.UpdateAsync(identity);
         }
                 
     }
