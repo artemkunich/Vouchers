@@ -8,7 +8,7 @@ using Vouchers.Primitives;
 
 namespace Vouchers.Application.Infrastructure;
 
-public interface IRepository<TAggregateRoot, TKey> where TAggregateRoot : AggregateRoot<TKey>
+public interface IRepository<TAggregateRoot, in TKey> where TAggregateRoot : AggregateRoot<TKey>
 {
     Task<TAggregateRoot> GetByIdAsync(TKey id);
 

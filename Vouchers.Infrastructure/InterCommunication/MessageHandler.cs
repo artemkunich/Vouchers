@@ -1,11 +1,8 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Vouchers.Application.UseCases;
 using Vouchers.Persistence;
 using Vouchers.Persistence.InterCommunication;
-using Vouchers.Primitives;
 
-namespace Vouchers.Infrastructure;
+namespace Vouchers.Infrastructure.InterCommunication;
 
 public class MessageHandler<TMessage,TResult> : IMessageHandler<TMessage,TResult>
 {
@@ -80,40 +77,6 @@ public class MessageHandler<TMessage> : IMessageHandler<TMessage>
 }
 
     
-public interface IMessageHelper
-{
-    public Guid? GetMessageId(object message);
-    public Task<bool> CheckIfMessageWasConsumedAsync(Guid messageId, string consumer);
-}
 
 
-public class MessageHelper : IMessageHelper
-{
-    private VouchersDbContext _dbContext;
 
-    public MessageHelper(VouchersDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
-
-    public Guid? GetMessageId(object message)
-    {
-        var idPropertyInfo = message.GetType().GetProperty("Id", typeof(Guid));
-        if (idPropertyInfo is null)
-            return null;
-
-        return idPropertyInfo.GetValue(message) as Guid?;
-    }
-
-    public async Task<bool> CheckIfMessageWasConsumedAsync(Guid messageId, string consumer)
-    {
-        var consumedMessage = await _dbContext.Set<ConsumedMessage>()
-            .FirstOrDefaultAsync(m => m.MessageId == messageId && m.Consumer == consumer);
-
-        if (consumedMessage is null)
-            return false;
-
-        return true;
-
-    }
-}

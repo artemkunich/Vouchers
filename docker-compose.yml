@@ -12,8 +12,8 @@ services:
       - C:/SQL2019/Docker/data:/var/opt/mssql/data
       - C:/SQL2019/Docker/log:/var/opt/mssql/log
       - C:/SQL2019/Docker/secrets:/var/opt/mssql/secrets
-  vouchers.staticfiles:
-    image: ${DOCKER_REGISTRY-}vouchersstaticfiles
+  vouchers.static-files:
+    image: ${DOCKER_REGISTRY-}vouchers-static-files
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     volumes:
@@ -25,8 +25,8 @@ services:
     build:
       context: .
       dockerfile: Vouchers.StaticFiles/Dockerfile
-  vouchers.identityserver:
-    image: ${DOCKER_REGISTRY-}vouchersidentityserver
+  vouchers.identity-server:
+    image: ${DOCKER_REGISTRY-}vouchers-identity-server
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       #- ASPNETCORE_URLS=http://+:5000
@@ -39,7 +39,7 @@ services:
     depends_on:
       - db
   vouchers.api:
-    image: ${DOCKER_REGISTRY-}vouchersapi
+    image: ${DOCKER_REGISTRY-}vouchers-api
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       #- ASPNETCORE_URLS=http://+:5000
@@ -54,5 +54,5 @@ services:
       dockerfile: Vouchers.API/Dockerfile
     depends_on:
       - db
-      - vouchers.staticfiles
-      - vouchers.identityserver
+      - vouchers.static-files
+      - vouchers.identity-server

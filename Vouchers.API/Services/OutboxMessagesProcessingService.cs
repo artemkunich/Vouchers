@@ -11,7 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Vouchers.InterCommunication;
-using Vouchers.Infrastructure;
+using Vouchers.Infrastructure.InterCommunication;
 using Vouchers.Persistence;
 using Vouchers.Persistence.InterCommunication;
 using Vouchers.Primitives;
@@ -23,14 +23,14 @@ public class OutboxMessagesProcessingService : BackgroundService
     private readonly IServiceProvider _serviceProvider;
 
     private Type[] _domainEventTypes;
-    private Type[] DomainEventTypes
+    private IEnumerable<Type> DomainEventTypes
     {
         get
         {
             if (_domainEventTypes != null)
                 return _domainEventTypes;
             
-            IEnumerable<Assembly> assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(x => x.FullName != null && x.FullName.StartsWith("Vouchers"));
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(x => x.FullName != null && x.FullName.StartsWith("Vouchers"));
 
             _domainEventTypes = assemblies.SelectMany(assembly =>
                 assembly.GetTypes().Where(type =>

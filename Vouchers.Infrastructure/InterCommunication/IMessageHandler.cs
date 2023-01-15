@@ -1,6 +1,4 @@
-using Vouchers.Primitives;
-
-namespace Vouchers.Infrastructure;
+namespace Vouchers.Infrastructure.InterCommunication;
 
 public interface IMessageHandler<in TMessage,TResult>
 {

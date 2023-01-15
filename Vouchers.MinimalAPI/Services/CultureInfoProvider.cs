@@ -7,7 +7,7 @@ namespace Vouchers.MinimalAPI.Services;
 
 public class CultureInfoProvider : ICultureInfoProvider
 {
-    readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
     public CultureInfoProvider(IHttpContextAccessor httpContextAccessor)
     {
@@ -15,7 +15,7 @@ public class CultureInfoProvider : ICultureInfoProvider
     }
 
     public CultureInfo GetCultureInfo() {
-        var rqf = _httpContextAccessor.HttpContext.Features.Get<IRequestCultureFeature>();
+        var rqf = _httpContextAccessor.HttpContext?.Features.Get<IRequestCultureFeature>();
         return rqf?.RequestCulture.UICulture;
     }
 }

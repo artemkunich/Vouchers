@@ -55,7 +55,7 @@ public class Startup
             .AddJwtBearer("Bearer", options =>
             {
                 options.RequireHttpsMetadata = false;
-                options.Authority = "http://vouchers.identityserver";
+                options.Authority = "http://vouchers.identity-server";
                 //options.Authority = "http://localhost:5000";                    
 
                 options.TokenValidationParameters = new TokenValidationParameters

@@ -1,7 +1,7 @@
-﻿using System.Reflection;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Vouchers.Application.UseCases;
+using Vouchers.Infrastructure.InterCommunication;
 using Vouchers.Primitives;
 
 namespace Vouchers.Infrastructure;

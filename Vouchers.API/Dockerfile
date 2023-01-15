@@ -8,7 +8,7 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
 COPY ["Vouchers.API/Vouchers.API.csproj", "Vouchers.API/"]
-COPY ["Vouchers.EntityFramework/Vouchers.EntityFramework.csproj", "Vouchers.EntityFramework/"]
+COPY ["Vouchers.Persistence/Vouchers.Persistence.csproj", "Vouchers.Persistence/"]
 COPY ["Vouchers.Auth/Vouchers.Auth.csproj", "Vouchers.Auth/"]
 COPY ["Vouchers.Domains/Vouchers.Domains.csproj", "Vouchers.Domains/"]
 COPY ["Vouchers.Core/Vouchers.Core.csproj", "Vouchers.Core/"]
