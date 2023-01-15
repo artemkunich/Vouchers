@@ -12,8 +12,8 @@ using Vouchers.Application.Queries;
 using Vouchers.Application.UseCases;
 using System.Threading;
 using Vouchers.Application.Services;
-using Vouchers.Domains;
-using Vouchers.Identities;
+using Vouchers.Domains.Domain;
+using Vouchers.Identities.Domain;
 
 namespace Vouchers.Persistence.QueryHandlers;
 

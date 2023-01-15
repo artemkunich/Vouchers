@@ -1,0 +1,27 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using Vouchers.Primitives;
+
+namespace Vouchers.Identities.Domain;
+
+public sealed class Login : AggregateRoot<Guid>
+{
+    public string LoginName { get; }
+
+    public Guid IdentityId { get; }
+    public Identity Identity { get; }
+
+    public static Login Create(string loginName, Identity identity) =>
+        new (Guid.NewGuid(), loginName, identity);
+
+    internal Login(Guid id, string loginName, Identity identity) : base(id)
+    {
+        LoginName = loginName;
+        IdentityId = identity.Id;
+        Identity = identity;
+    }
+
+    private Login() { }
+}
+

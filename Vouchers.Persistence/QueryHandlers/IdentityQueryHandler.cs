@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Vouchers.Application.UseCases;
-using Vouchers.Identities;
+using Vouchers.Identities.Domain;
 
 namespace Vouchers.Persistence.QueryHandlers;
 

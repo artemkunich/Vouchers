@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Vouchers.Core;
+using Vouchers.Core.Domain;
 using Vouchers.Application.Commands.VoucherValueCommands;
 using Vouchers.Application.Infrastructure;
-using Vouchers.Values;
+using Vouchers.Values.Domain;
 using System.Threading.Tasks;
 using System.Threading;
-using Vouchers.Files;
-using Vouchers.Domains;
+using Vouchers.Files.Domain;
+using Vouchers.Domains.Domain;
 using Vouchers.Application.Services;
 
 namespace Vouchers.Application.UseCases.VoucherValueCases;

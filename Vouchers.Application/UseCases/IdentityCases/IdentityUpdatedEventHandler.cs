@@ -1,6 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Vouchers.Identities.DomainEvents;
+using Vouchers.Identities.Domain.DomainEvents;
 
 namespace Vouchers.Application.UseCases.IdentityCases;
 

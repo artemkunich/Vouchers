@@ -10,8 +10,8 @@ using Vouchers.Application.Queries;
 using Vouchers.Application.UseCases;
 using System.Threading;
 using Vouchers.Application.Services;
-using Vouchers.Core;
-using Vouchers.Values;
+using Vouchers.Core.Domain;
+using Vouchers.Values.Domain;
 
 namespace Vouchers.Persistence.QueryHandlers;
 

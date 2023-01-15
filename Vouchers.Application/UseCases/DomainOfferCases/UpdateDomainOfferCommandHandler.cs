@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 using Vouchers.Application.Commands.DomainOfferCommands;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Services;
-using Vouchers.Core;
-using Vouchers.Domains;
+using Vouchers.Core.Domain;
+using Vouchers.Domains.Domain;
 
 namespace Vouchers.Application.UseCases.DomainOfferCases;
 

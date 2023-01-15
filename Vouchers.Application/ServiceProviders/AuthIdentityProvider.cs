@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Services;
-using Vouchers.Identities;
+using Vouchers.Identities.Domain;
 
 namespace Vouchers.Application.ServiceProviders;
 

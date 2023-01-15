@@ -24,7 +24,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Vouchers.Application\Vouchers.Application.csproj" />
     <ProjectReference Include="..\Vouchers.Auth\Vouchers.Auth.csproj" />
-    <ProjectReference Include="..\Vouchers.Core\Vouchers.Core.csproj" />
+    <ProjectReference Include="..\Vouchers.Core.Domain\Vouchers.Core.Domain.csproj" />
     <ProjectReference Include="..\Vouchers.Persistence\Vouchers.Persistence.csproj" />
     <ProjectReference Include="..\Vouchers.Infrastructure\Vouchers.Infrastructure.csproj" />
   </ItemGroup>

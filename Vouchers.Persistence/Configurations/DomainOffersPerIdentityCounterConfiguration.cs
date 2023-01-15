@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Vouchers.Domains;
+using Vouchers.Domains.Domain;
 
 namespace Vouchers.Persistence.Configurations;
 

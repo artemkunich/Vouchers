@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 using Vouchers.Application.Commands.IdentityCommands;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Services;
-using Vouchers.Core;
+using Vouchers.Core.Domain;
 using Vouchers.Primitives;
-using Vouchers.Files;
-using Vouchers.Identities;
-using Vouchers.Identities.DomainEvents;
+using Vouchers.Files.Domain;
+using Vouchers.Identities.Domain;
+using Vouchers.Identities.Domain.DomainEvents;
 
 namespace Vouchers.Application.UseCases.IdentityCases;
 

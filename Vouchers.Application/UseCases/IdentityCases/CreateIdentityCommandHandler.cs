@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 using Vouchers.Application.Commands.IdentityCommands;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Services;
-using Vouchers.Core;
-using Vouchers.Files;
-using Vouchers.Identities;
+using Vouchers.Core.Domain;
+using Vouchers.Files.Domain;
+using Vouchers.Identities.Domain;
 
 namespace Vouchers.Application.UseCases.IdentityCases;
 

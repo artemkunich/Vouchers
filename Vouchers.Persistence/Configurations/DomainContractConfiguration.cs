@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-using Vouchers.Domains;
+using Vouchers.Domains.Domain;
 
 namespace Vouchers.Persistence.Configurations;
 

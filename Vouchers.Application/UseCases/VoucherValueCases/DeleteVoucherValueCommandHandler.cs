@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Vouchers.Core;
+using Vouchers.Core.Domain;
 using Vouchers.Application.Commands.VoucherValueCommands;
 using Vouchers.Application.Infrastructure;
 using System.Threading.Tasks;
 using System.Threading;
-using Vouchers.Values;
+using Vouchers.Values.Domain;
 using Vouchers.Application.Services;
 
 namespace Vouchers.Application.UseCases.VoucherValueCases;

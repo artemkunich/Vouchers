@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Services;
-using Vouchers.Files;
+using Vouchers.Files.Domain;
 
 namespace Vouchers.Application.ServiceProviders;
 

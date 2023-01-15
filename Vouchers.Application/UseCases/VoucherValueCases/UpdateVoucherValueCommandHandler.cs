@@ -6,8 +6,8 @@ using Vouchers.Application.Infrastructure;
 using System.Threading.Tasks;
 using System.Threading;
 using System.IO;
-using Vouchers.Files;
-using Vouchers.Values;
+using Vouchers.Files.Domain;
+using Vouchers.Values.Domain;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Services;
 

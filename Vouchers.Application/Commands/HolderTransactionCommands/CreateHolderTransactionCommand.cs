@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-using Vouchers.Core;
+using Vouchers.Core.Domain;
 
 namespace Vouchers.Application.Commands.HolderTransactionCommands;
 

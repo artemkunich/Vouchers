@@ -12,11 +12,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Vouchers.Core\Vouchers.Core.csproj" />
-    <ProjectReference Include="..\Vouchers.Domains\Vouchers.Domains.csproj" />
-    <ProjectReference Include="..\Vouchers.Files\Vouchers.Files.csproj" />
-    <ProjectReference Include="..\Vouchers.Identities\Vouchers.Identities.csproj" />
-    <ProjectReference Include="..\Vouchers.Values\Vouchers.Values.csproj" />
+    <ProjectReference Include="..\Vouchers.Core.Domain\Vouchers.Core.Domain.csproj" />
+    <ProjectReference Include="..\Vouchers.Domains.Domain\Vouchers.Domains.Domain.csproj" />
+    <ProjectReference Include="..\Vouchers.Files.Domain\Vouchers.Files.Domain.csproj" />
+    <ProjectReference Include="..\Vouchers.Identities.Domain\Vouchers.Identities.Domain.csproj" />
+    <ProjectReference Include="..\Vouchers.Values.Domain\Vouchers.Values.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

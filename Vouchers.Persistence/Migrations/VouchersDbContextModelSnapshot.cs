@@ -22,7 +22,7 @@ namespace Vouchers.Persistence.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Vouchers.Core.Account", b =>
+            modelBuilder.Entity("Vouchers.Core.Domain.Account", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -44,7 +44,7 @@ namespace Vouchers.Persistence.Migrations
                     b.ToTable("Account", (string)null);
                 });
 
-            modelBuilder.Entity("Vouchers.Core.AccountItem", b =>
+            modelBuilder.Entity("Vouchers.Core.Domain.AccountItem", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
@@ -73,7 +73,7 @@ namespace Vouchers.Persistence.Migrations
                     b.ToTable("AccountItem", (string)null);
                 });
 
-            modelBuilder.Entity("Vouchers.Core.HolderTransaction", b =>
+            modelBuilder.Entity("Vouchers.Core.Domain.HolderTransaction", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
@@ -102,7 +102,7 @@ namespace Vouchers.Persistence.Migrations
                     b.ToTable("HolderTransaction", (string)null);
                 });
 
-            modelBuilder.Entity("Vouchers.Core.HolderTransactionItem", b =>
+            modelBuilder.Entity("Vouchers.Core.Domain.HolderTransactionItem", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
@@ -127,7 +127,7 @@ namespace Vouchers.Persistence.Migrations
                     b.ToTable("HolderTransactionItem", (string)null);
                 });
 
-            modelBuilder.Entity("Vouchers.Core.HolderTransactionRequest", b =>
+            modelBuilder.Entity("Vouchers.Core.Domain.HolderTransactionRequest", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -161,7 +161,7 @@ namespace Vouchers.Persistence.Migrations
                     b.ToTable("HolderTransactionRequest", (string)null);
                 });
 
-            modelBuilder.Entity("Vouchers.Core.IssuerTransaction", b =>
+            modelBuilder.Entity("Vouchers.Core.Domain.IssuerTransaction", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -180,7 +180,7 @@ namespace Vouchers.Persistence.Migrations
                     b.ToTable("IssuerTransaction", (string)null);
                 });
 
-            modelBuilder.Entity("Vouchers.Core.Unit", b =>
+            modelBuilder.Entity("Vouchers.Core.Domain.Unit", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -215,7 +215,7 @@ namespace Vouchers.Persistence.Migrations
                     b.ToTable("Unit", (string)null);
                 });
 
-            modelBuilder.Entity("Vouchers.Core.UnitType", b =>
+            modelBuilder.Entity("Vouchers.Core.Domain.UnitType", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -240,7 +240,7 @@ namespace Vouchers.Persistence.Migrations
                     b.ToTable("UnitType", (string)null);
                 });
 
-            modelBuilder.Entity("Vouchers.Domains.Domain", b =>
+            modelBuilder.Entity("Vouchers.Domains.Domain.Domain", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -280,7 +280,7 @@ namespace Vouchers.Persistence.Migrations
                     b.ToTable("Domain", (string)null);
                 });
 
-            modelBuilder.Entity("Vouchers.Domains.DomainAccount", b =>
+            modelBuilder.Entity("Vouchers.Domains.Domain.DomainAccount", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -314,7 +314,7 @@ namespace Vouchers.Persistence.Migrations
                     b.ToTable("DomainAccount", (string)null);
                 });
 
-            modelBuilder.Entity("Vouchers.Domains.DomainContract", b =>
+            modelBuilder.Entity("Vouchers.Domains.Domain.DomainContract", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -356,7 +356,7 @@ namespace Vouchers.Persistence.Migrations
                     b.ToTable("DomainContract", (string)null);
                 });
 
-            modelBuilder.Entity("Vouchers.Domains.DomainOffer", b =>
+            modelBuilder.Entity("Vouchers.Domains.Domain.DomainOffer", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -396,7 +396,7 @@ namespace Vouchers.Persistence.Migrations
                     b.ToTable("DomainOffer", (string)null);
                 });
 
-            modelBuilder.Entity("Vouchers.Domains.DomainOffersPerIdentityCounter", b =>
+            modelBuilder.Entity("Vouchers.Domains.Domain.DomainOffersPerIdentityCounter", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -427,7 +427,7 @@ namespace Vouchers.Persistence.Migrations
                     b.ToTable("DomainOffersPerIdentityCounter", (string)null);
                 });
 
-            modelBuilder.Entity("Vouchers.Files.CroppedImage", b =>
+            modelBuilder.Entity("Vouchers.Files.Domain.CroppedImage", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
@@ -445,7 +445,7 @@ namespace Vouchers.Persistence.Migrations
                     b.ToTable("CroppedImage", (string)null);
                 });
 
-            modelBuilder.Entity("Vouchers.Identities.Identity", b =>
+            modelBuilder.Entity("Vouchers.Identities.Domain.Identity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -473,7 +473,7 @@ namespace Vouchers.Persistence.Migrations
                     b.ToTable("Identity", (string)null);
                 });
 
-            modelBuilder.Entity("Vouchers.Identities.Login", b =>
+            modelBuilder.Entity("Vouchers.Identities.Domain.Login", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -557,7 +557,7 @@ namespace Vouchers.Persistence.Migrations
                     b.ToTable("OutboxMessage", (string)null);
                 });
 
-            modelBuilder.Entity("Vouchers.Values.VoucherValue", b =>
+            modelBuilder.Entity("Vouchers.Values.Domain.VoucherValue", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -592,15 +592,15 @@ namespace Vouchers.Persistence.Migrations
                     b.ToTable("VoucherValue", (string)null);
                 });
 
-            modelBuilder.Entity("Vouchers.Core.AccountItem", b =>
+            modelBuilder.Entity("Vouchers.Core.Domain.AccountItem", b =>
                 {
-                    b.HasOne("Vouchers.Core.Account", "HolderAccount")
+                    b.HasOne("Vouchers.Core.Domain.Account", "HolderAccount")
                         .WithMany()
                         .HasForeignKey("HolderAccountId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Vouchers.Core.Unit", "Unit")
+                    b.HasOne("Vouchers.Core.Domain.Unit", "Unit")
                         .WithMany()
                         .HasForeignKey("UnitId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -611,21 +611,21 @@ namespace Vouchers.Persistence.Migrations
                     b.Navigation("Unit");
                 });
 
-            modelBuilder.Entity("Vouchers.Core.HolderTransaction", b =>
+            modelBuilder.Entity("Vouchers.Core.Domain.HolderTransaction", b =>
                 {
-                    b.HasOne("Vouchers.Core.Account", "CreditorAccount")
+                    b.HasOne("Vouchers.Core.Domain.Account", "CreditorAccount")
                         .WithMany()
                         .HasForeignKey("CreditorAccountId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Vouchers.Core.Account", "DebtorAccount")
+                    b.HasOne("Vouchers.Core.Domain.Account", "DebtorAccount")
                         .WithMany()
                         .HasForeignKey("DebtorAccountId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.OwnsOne("Vouchers.Core.UnitTypeQuantity", "Quantity", b1 =>
+                    b.OwnsOne("Vouchers.Core.Domain.UnitTypeQuantity", "Quantity", b1 =>
                         {
                             b1.Property<Guid>("HolderTransactionId")
                                 .HasColumnType("uniqueidentifier");
@@ -646,7 +646,7 @@ namespace Vouchers.Persistence.Migrations
                             b1.WithOwner()
                                 .HasForeignKey("HolderTransactionId");
 
-                            b1.HasOne("Vouchers.Core.UnitType", "UnitType")
+                            b1.HasOne("Vouchers.Core.Domain.UnitType", "UnitType")
                                 .WithMany()
                                 .HasForeignKey("UnitTypeId")
                                 .OnDelete(DeleteBehavior.Restrict)
@@ -662,26 +662,26 @@ namespace Vouchers.Persistence.Migrations
                     b.Navigation("Quantity");
                 });
 
-            modelBuilder.Entity("Vouchers.Core.HolderTransactionItem", b =>
+            modelBuilder.Entity("Vouchers.Core.Domain.HolderTransactionItem", b =>
                 {
-                    b.HasOne("Vouchers.Core.AccountItem", "CreditAccountItem")
+                    b.HasOne("Vouchers.Core.Domain.AccountItem", "CreditAccountItem")
                         .WithMany()
                         .HasForeignKey("CreditAccountItemId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Vouchers.Core.AccountItem", "DebitAccountItem")
+                    b.HasOne("Vouchers.Core.Domain.AccountItem", "DebitAccountItem")
                         .WithMany()
                         .HasForeignKey("DebitAccountItemId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Vouchers.Core.HolderTransaction", null)
+                    b.HasOne("Vouchers.Core.Domain.HolderTransaction", null)
                         .WithMany("TransactionItems")
                         .HasForeignKey("HolderTransactionId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.OwnsOne("Vouchers.Core.UnitQuantity", "Quantity", b1 =>
+                    b.OwnsOne("Vouchers.Core.Domain.UnitQuantity", "Quantity", b1 =>
                         {
                             b1.Property<Guid>("HolderTransactionItemId")
                                 .HasColumnType("uniqueidentifier");
@@ -702,7 +702,7 @@ namespace Vouchers.Persistence.Migrations
                             b1.WithOwner()
                                 .HasForeignKey("HolderTransactionItemId");
 
-                            b1.HasOne("Vouchers.Core.Unit", "Unit")
+                            b1.HasOne("Vouchers.Core.Domain.Unit", "Unit")
                                 .WithMany()
                                 .HasForeignKey("UnitId1")
                                 .OnDelete(DeleteBehavior.Restrict);
@@ -717,25 +717,25 @@ namespace Vouchers.Persistence.Migrations
                     b.Navigation("Quantity");
                 });
 
-            modelBuilder.Entity("Vouchers.Core.HolderTransactionRequest", b =>
+            modelBuilder.Entity("Vouchers.Core.Domain.HolderTransactionRequest", b =>
                 {
-                    b.HasOne("Vouchers.Core.Account", "CreditorAccount")
+                    b.HasOne("Vouchers.Core.Domain.Account", "CreditorAccount")
                         .WithMany()
                         .HasForeignKey("CreditorAccountId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Vouchers.Core.Account", "DebtorAccount")
+                    b.HasOne("Vouchers.Core.Domain.Account", "DebtorAccount")
                         .WithMany()
                         .HasForeignKey("DebtorAccountId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Vouchers.Core.HolderTransaction", "Transaction")
+                    b.HasOne("Vouchers.Core.Domain.HolderTransaction", "Transaction")
                         .WithMany()
                         .HasForeignKey("TransactionId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.OwnsOne("Vouchers.Core.UnitTypeQuantity", "Quantity", b1 =>
+                    b.OwnsOne("Vouchers.Core.Domain.UnitTypeQuantity", "Quantity", b1 =>
                         {
                             b1.Property<Guid>("HolderTransactionRequestId")
                                 .HasColumnType("uniqueidentifier");
@@ -756,7 +756,7 @@ namespace Vouchers.Persistence.Migrations
                             b1.WithOwner()
                                 .HasForeignKey("HolderTransactionRequestId");
 
-                            b1.HasOne("Vouchers.Core.UnitType", "UnitType")
+                            b1.HasOne("Vouchers.Core.Domain.UnitType", "UnitType")
                                 .WithMany()
                                 .HasForeignKey("UnitTypeId")
                                 .OnDelete(DeleteBehavior.Restrict)
@@ -774,14 +774,14 @@ namespace Vouchers.Persistence.Migrations
                     b.Navigation("Transaction");
                 });
 
-            modelBuilder.Entity("Vouchers.Core.IssuerTransaction", b =>
+            modelBuilder.Entity("Vouchers.Core.Domain.IssuerTransaction", b =>
                 {
-                    b.HasOne("Vouchers.Core.AccountItem", "IssuerAccountItem")
+                    b.HasOne("Vouchers.Core.Domain.AccountItem", "IssuerAccountItem")
                         .WithMany()
                         .HasForeignKey("IssuerAccountItemId1")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.OwnsOne("Vouchers.Core.UnitQuantity", "Quantity", b1 =>
+                    b.OwnsOne("Vouchers.Core.Domain.UnitQuantity", "Quantity", b1 =>
                         {
                             b1.Property<Guid>("IssuerTransactionId")
                                 .HasColumnType("uniqueidentifier");
@@ -802,7 +802,7 @@ namespace Vouchers.Persistence.Migrations
                             b1.WithOwner()
                                 .HasForeignKey("IssuerTransactionId");
 
-                            b1.HasOne("Vouchers.Core.Unit", "Unit")
+                            b1.HasOne("Vouchers.Core.Domain.Unit", "Unit")
                                 .WithMany()
                                 .HasForeignKey("UnitId1")
                                 .OnDelete(DeleteBehavior.Restrict);
@@ -815,9 +815,9 @@ namespace Vouchers.Persistence.Migrations
                     b.Navigation("Quantity");
                 });
 
-            modelBuilder.Entity("Vouchers.Core.Unit", b =>
+            modelBuilder.Entity("Vouchers.Core.Domain.Unit", b =>
                 {
-                    b.HasOne("Vouchers.Core.UnitType", "UnitType")
+                    b.HasOne("Vouchers.Core.Domain.UnitType", "UnitType")
                         .WithMany()
                         .HasForeignKey("UnitTypeId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -826,9 +826,9 @@ namespace Vouchers.Persistence.Migrations
                     b.Navigation("UnitType");
                 });
 
-            modelBuilder.Entity("Vouchers.Core.UnitType", b =>
+            modelBuilder.Entity("Vouchers.Core.Domain.UnitType", b =>
                 {
-                    b.HasOne("Vouchers.Core.Account", "IssuerAccount")
+                    b.HasOne("Vouchers.Core.Domain.Account", "IssuerAccount")
                         .WithMany()
                         .HasForeignKey("IssuerAccountId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -837,9 +837,9 @@ namespace Vouchers.Persistence.Migrations
                     b.Navigation("IssuerAccount");
                 });
 
-            modelBuilder.Entity("Vouchers.Domains.Domain", b =>
+            modelBuilder.Entity("Vouchers.Domains.Domain.Domain", b =>
                 {
-                    b.HasOne("Vouchers.Domains.DomainContract", "Contract")
+                    b.HasOne("Vouchers.Domains.Domain.DomainContract", "Contract")
                         .WithMany()
                         .HasForeignKey("ContractId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -848,9 +848,9 @@ namespace Vouchers.Persistence.Migrations
                     b.Navigation("Contract");
                 });
 
-            modelBuilder.Entity("Vouchers.Domains.DomainAccount", b =>
+            modelBuilder.Entity("Vouchers.Domains.Domain.DomainAccount", b =>
                 {
-                    b.HasOne("Vouchers.Domains.Domain", "Domain")
+                    b.HasOne("Vouchers.Domains.Domain.Domain", "Domain")
                         .WithMany()
                         .HasForeignKey("DomainId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -859,15 +859,15 @@ namespace Vouchers.Persistence.Migrations
                     b.Navigation("Domain");
                 });
 
-            modelBuilder.Entity("Vouchers.Domains.DomainContract", b =>
+            modelBuilder.Entity("Vouchers.Domains.Domain.DomainContract", b =>
                 {
-                    b.HasOne("Vouchers.Domains.DomainOffer", "Offer")
+                    b.HasOne("Vouchers.Domains.Domain.DomainOffer", "Offer")
                         .WithMany()
                         .HasForeignKey("OfferId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Vouchers.Domains.DomainOffersPerIdentityCounter", "OffersPerIdentityCounter")
+                    b.HasOne("Vouchers.Domains.Domain.DomainOffersPerIdentityCounter", "OffersPerIdentityCounter")
                         .WithMany()
                         .HasForeignKey("OffersPerIdentityCounterId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -878,9 +878,9 @@ namespace Vouchers.Persistence.Migrations
                     b.Navigation("OffersPerIdentityCounter");
                 });
 
-            modelBuilder.Entity("Vouchers.Domains.DomainOffer", b =>
+            modelBuilder.Entity("Vouchers.Domains.Domain.DomainOffer", b =>
                 {
-                    b.OwnsOne("Vouchers.Domains.CurrencyAmount", "Amount", b1 =>
+                    b.OwnsOne("Vouchers.Domains.Domain.CurrencyAmount", "Amount", b1 =>
                         {
                             b1.Property<Guid>("DomainOfferId")
                                 .HasColumnType("uniqueidentifier");
@@ -905,9 +905,9 @@ namespace Vouchers.Persistence.Migrations
                     b.Navigation("Amount");
                 });
 
-            modelBuilder.Entity("Vouchers.Domains.DomainOffersPerIdentityCounter", b =>
+            modelBuilder.Entity("Vouchers.Domains.Domain.DomainOffersPerIdentityCounter", b =>
                 {
-                    b.HasOne("Vouchers.Domains.DomainOffer", "Offer")
+                    b.HasOne("Vouchers.Domains.Domain.DomainOffer", "Offer")
                         .WithMany()
                         .HasForeignKey("OfferId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -916,9 +916,9 @@ namespace Vouchers.Persistence.Migrations
                     b.Navigation("Offer");
                 });
 
-            modelBuilder.Entity("Vouchers.Files.CroppedImage", b =>
+            modelBuilder.Entity("Vouchers.Files.Domain.CroppedImage", b =>
                 {
-                    b.OwnsOne("Vouchers.Files.CropParameters", "CropParameters", b1 =>
+                    b.OwnsOne("Vouchers.Files.Domain.CropParameters", "CropParameters", b1 =>
                         {
                             b1.Property<Guid>("CroppedImageId")
                                 .HasColumnType("uniqueidentifier");
@@ -951,9 +951,9 @@ namespace Vouchers.Persistence.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Vouchers.Identities.Login", b =>
+            modelBuilder.Entity("Vouchers.Identities.Domain.Login", b =>
                 {
-                    b.HasOne("Vouchers.Identities.Identity", "Identity")
+                    b.HasOne("Vouchers.Identities.Domain.Identity", "Identity")
                         .WithMany()
                         .HasForeignKey("IdentityId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -962,7 +962,7 @@ namespace Vouchers.Persistence.Migrations
                     b.Navigation("Identity");
                 });
 
-            modelBuilder.Entity("Vouchers.Core.HolderTransaction", b =>
+            modelBuilder.Entity("Vouchers.Core.Domain.HolderTransaction", b =>
                 {
                     b.Navigation("TransactionItems");
                 });

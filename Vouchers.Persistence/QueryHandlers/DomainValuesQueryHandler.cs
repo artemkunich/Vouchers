@@ -10,10 +10,10 @@ using Vouchers.Application.Dtos;
 using Vouchers.Application.Queries;
 using Vouchers.Application.Services;
 using Vouchers.Application.UseCases;
-using Vouchers.Core;
-using Vouchers.Domains;
-using Vouchers.Identities;
-using Vouchers.Values;
+using Vouchers.Core.Domain;
+using Vouchers.Domains.Domain;
+using Vouchers.Identities.Domain;
+using Vouchers.Values.Domain;
 
 namespace Vouchers.Persistence.QueryHandlers;
 

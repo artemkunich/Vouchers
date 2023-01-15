@@ -7,15 +7,15 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-using Vouchers.Core;
-using Vouchers.Domains;
+using Vouchers.Core.Domain;
+using Vouchers.Domains.Domain;
 using Vouchers.Primitives;
-using Vouchers.Files;
-using Vouchers.Identities;
+using Vouchers.Files.Domain;
+using Vouchers.Identities.Domain;
 using Vouchers.InterCommunication;
 using Vouchers.Persistence.Configurations;
 using Vouchers.Persistence.InterCommunication;
-using Vouchers.Values;
+using Vouchers.Values.Domain;
 
 namespace Vouchers.Persistence;
 

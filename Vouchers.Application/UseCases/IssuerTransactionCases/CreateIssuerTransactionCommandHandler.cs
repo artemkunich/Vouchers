@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Vouchers.Core;
+using Vouchers.Core.Domain;
 using Vouchers.Application.Infrastructure;
-using Vouchers.Domains;
+using Vouchers.Domains.Domain;
 using Vouchers.Application.Commands.IssuerTransactionCommands;
 using Vouchers.Application.Services;
 

@@ -4,8 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-using Vouchers.Values;
-using Vouchers.Core;
+using Vouchers.Values.Domain;
+using Vouchers.Core.Domain;
 
 namespace Vouchers.Persistence.Configurations;
 

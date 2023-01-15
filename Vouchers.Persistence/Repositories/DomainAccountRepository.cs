@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using Vouchers.Application.Infrastructure;
-using Vouchers.Domains;
+using Vouchers.Domains.Domain;
 using Vouchers.Persistence.InterCommunication;
 
 namespace Vouchers.Persistence.Repositories;

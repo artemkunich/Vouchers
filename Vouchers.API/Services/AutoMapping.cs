@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Vouchers.Application.Dtos;
-using Vouchers.Identities;
+using Vouchers.Identities.Domain;
 
 namespace Vouchers.API.Services;
 

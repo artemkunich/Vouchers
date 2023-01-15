@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Vouchers.Core;
+using Vouchers.Core.Domain;
 using Vouchers.Application.Infrastructure;
 using System.Threading.Tasks;
 using System.Threading;
-using Vouchers.Domains;
+using Vouchers.Domains.Domain;
 using System.Linq;
 using Vouchers.Application.Commands.HolderTransactionRequestCommands;
 using Vouchers.Application.Services;

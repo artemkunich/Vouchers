@@ -4,8 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-using Vouchers.Core;
-using Vouchers.Domains;
+using Vouchers.Core.Domain;
+using Vouchers.Domains.Domain;
 using Vouchers.Primitives;
 using Vouchers.InterCommunication;
 using Vouchers.Persistence.InterCommunication;
