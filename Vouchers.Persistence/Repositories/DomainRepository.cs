@@ -14,7 +14,7 @@ namespace Vouchers.Persistence.Repositories;
 
 internal sealed class DomainRepository : Repository<Domain, Guid>
 {
-    public DomainRepository(VouchersDbContext dbContext, IMessageDataSerializer messageDataSerializer) : base(dbContext, messageDataSerializer)
+    public DomainRepository(VouchersDbContext dbContext, IMessageDataSerializer messageDataSerializer, IIdentifierProvider<Guid> identifierProvider) : base(dbContext, messageDataSerializer, identifierProvider)
     {
     }
 

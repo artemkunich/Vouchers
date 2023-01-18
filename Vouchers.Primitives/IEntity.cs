@@ -2,5 +2,5 @@ namespace Vouchers.Primitives;
 
 public interface IEntity<TKey>
 {
-    TKey Id { get; }
+    TKey Id { get; init; }
 }

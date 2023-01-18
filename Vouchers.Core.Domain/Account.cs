@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Vouchers.Primitives;
 using System.Globalization;
 
@@ -8,18 +6,14 @@ namespace Vouchers.Core.Domain;
 
 public sealed class Account : AggregateRoot<Guid>
 {
-    public DateTime CreatedDateTime { get; }
+    public DateTime CreatedDateTime { get; init; }
     public decimal Supply { get; private set; }
 
-    public static Account Create() =>
-        new Account(Guid.NewGuid(), DateTime.Now);
-
-    private Account(Guid id, DateTime createdDateTime) : base(id)
+    public static Account Create(Guid id, DateTime createdDateTime) => new ()
     {
-        CreatedDateTime = createdDateTime;
-    }   
-
-    private Account() { }
+        Id = id,
+        CreatedDateTime = createdDateTime
+    };
 
     public void IncreaseSupply(decimal amount, CultureInfo cultureInfo = null) 
     { 

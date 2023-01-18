@@ -2,20 +2,14 @@
 
 public abstract class Entity<TKey>: IEntity<TKey>
 {
-    public TKey Id { get; }
-    
-    protected Entity(TKey id)
-    {
-        Id = id;
-    }
-    protected Entity() { }
+    public TKey Id { get; init; }
 
     public bool Equals(Entity<TKey> entity)
     {
         if (ReferenceEquals(this, entity))
             return true;
 
-        if (Id.Equals(default) || entity.Id.Equals(default))
+        if (Id is null || entity.Id is null || Id.Equals(default) || entity.Id.Equals(default))
             return false;
 
         return Id.Equals(entity.Id);

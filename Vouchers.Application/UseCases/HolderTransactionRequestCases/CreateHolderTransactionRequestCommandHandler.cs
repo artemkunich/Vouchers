@@ -19,16 +19,17 @@ internal sealed class CreateHolderTransactionRequestCommandHandler : IHandler<Cr
     private readonly IRepository<Account,Guid> _accountRepository;
     private readonly IRepository<UnitType,Guid> _unitTypeRepository;
     private readonly IRepository<HolderTransactionRequest,Guid> _holderTransactionRequestRepository;
-
+    private readonly IIdentifierProvider<Guid> _identifierProvider;
     public CreateHolderTransactionRequestCommandHandler(IAuthIdentityProvider authIdentityProvider, 
         IRepository<DomainAccount,Guid> domainAccountRepository, IRepository<Account,Guid> accountRepository, 
-        IRepository<UnitType,Guid> unitTypeRepository, IRepository<HolderTransactionRequest,Guid> holderTransactionRequestRepository)
+        IRepository<UnitType,Guid> unitTypeRepository, IRepository<HolderTransactionRequest,Guid> holderTransactionRequestRepository, IIdentifierProvider<Guid> identifierProvider)
     {
         _authIdentityProvider = authIdentityProvider;
         _domainAccountRepository = domainAccountRepository;
         _accountRepository = accountRepository;
         _unitTypeRepository = unitTypeRepository;
         _holderTransactionRequestRepository = holderTransactionRequestRepository;
+        _identifierProvider = identifierProvider;
     }
 
     public async Task<Guid> HandleAsync(CreateHolderTransactionRequestCommand command, CancellationToken cancellation)
@@ -52,10 +53,11 @@ internal sealed class CreateHolderTransactionRequestCommandHandler : IHandler<Cr
         var maxDurationBeforeValidityStart = command.MaxDaysBeforeValidityStart is null ? TimeSpan.Zero : TimeSpan.FromDays(command.MaxDaysBeforeValidityStart.Value);
         var minDaysBeforeValidityEnd = command.MinDaysBeforeValidityEnd is null ? TimeSpan.Zero : TimeSpan.FromDays(command.MinDaysBeforeValidityEnd.Value);
 
-        var transaction = HolderTransactionRequest.Create(command.DueDate, creditorAccount, debtorAccount, quantity, maxDurationBeforeValidityStart, minDaysBeforeValidityEnd, command.MustBeExchangeable, command.Message);
+        var requestId = _identifierProvider.CreateNewId();
+        var request = HolderTransactionRequest.Create(requestId, command.DueDate, creditorAccount, debtorAccount, quantity, maxDurationBeforeValidityStart, minDaysBeforeValidityEnd, command.MustBeExchangeable, command.Message);
 
-        await _holderTransactionRequestRepository.AddAsync(transaction);
+        await _holderTransactionRequestRepository.AddAsync(request);
 
-        return transaction.Id;
+        return request.Id;
     }
 }

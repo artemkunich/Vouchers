@@ -13,9 +13,8 @@ public sealed class CropParameters
     public decimal Width { get; set; }
     public decimal Height { get; set; }
 
-    private CropParameters() { }
-    public CropParameters(decimal x, decimal y, decimal width, decimal height)
-    {
+    public static CropParameters Create(decimal x, decimal y, decimal width, decimal height)
+    { 
         if (x > 100 || x < 0)
             throw new ArgumentException("Invalid x value");
         if (y > 100 || y < 0)
@@ -25,12 +24,12 @@ public sealed class CropParameters
         if (height > 100 || height <= 0)
             throw new ArgumentException("Invalid height value");
 
-        X = x;
-        Y = y;
-        Width = width;
-        Height = height;
+        return new()
+        {
+            X = x,
+            Y = y,
+            Width = width,
+            Height = height
+        };
     }
-
-    public static CropParameters Create(decimal x, decimal y, decimal width, decimal height) =>
-        new CropParameters(x, y, width, height);
 }

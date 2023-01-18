@@ -7,34 +7,32 @@ namespace Vouchers.Domains.Domain;
 
 public sealed class DomainContract : AggregateRoot<Guid>
 {
-    public Guid OfferId { get; }
-    public DomainOffer Offer { get; }
+    public Guid OfferId { get; init; }
+    public DomainOffer Offer { get; init; }
 
-    public Guid OffersPerIdentityCounterId { get; }
-    public DomainOffersPerIdentityCounter OffersPerIdentityCounter { get; }
+    public Guid OffersPerIdentityCounterId { get; init; }
+    public DomainOffersPerIdentityCounter OffersPerIdentityCounter { get; init; }
 
-    public Guid PartyId { get; }
+    public Guid PartyId { get; init; }
 
-    public DateTime CreatedDate { get; }
+    public DateTime CreatedDate { get; init; }
 
-    public string DomainName { get; }
+    public string DomainName { get; init; }
 
-    public static DomainContract Create(DomainOffer offer, DomainOffersPerIdentityCounter offersPerIdentityCounter, Guid partyId, string domainName) =>
-        new DomainContract(Guid.NewGuid(), offer, offersPerIdentityCounter, partyId, domainName, DateTime.Now);
-
-    private DomainContract(Guid id, DomainOffer offer, DomainOffersPerIdentityCounter offersPerIdentityCounter, Guid partyId, string domainName, DateTime createdDate) : base(id)
+    public static DomainContract Create(Guid id, DomainOffer offer,
+        DomainOffersPerIdentityCounter offersPerIdentityCounter, Guid partyId, string domainName,
+        DateTime createdDate) => new()
     {
-        OfferId = offer.Id;
-        Offer = offer;
-       
-        OffersPerIdentityCounterId = offersPerIdentityCounter.Id;
-        OffersPerIdentityCounter = offersPerIdentityCounter; 
+        Id = id,
+        OfferId = offer.Id,
+        Offer = offer,
 
-        PartyId = partyId;
-        DomainName = domainName;
-        CreatedDate = createdDate;
-    }
-    private DomainContract()
-    { }
+        OffersPerIdentityCounterId = offersPerIdentityCounter.Id,
+        OffersPerIdentityCounter = offersPerIdentityCounter,
+
+        PartyId = partyId,
+        DomainName = domainName,
+        CreatedDate = createdDate,
+    };
 }
 

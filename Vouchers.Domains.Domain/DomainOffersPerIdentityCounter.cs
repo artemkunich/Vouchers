@@ -12,19 +12,16 @@ public sealed class DomainOffersPerIdentityCounter : AggregateRoot<Guid>
     public Guid IdentityId { get; private set; }
     public int Counter { get; private set; }
 
-    private DomainOffersPerIdentityCounter() { }
-    private DomainOffersPerIdentityCounter(Guid id, DomainOffer offer, Guid identityId, int counter) : base(id)
-    { 
-        OfferId = offer.Id;
-        Offer = offer;
+    public static DomainOffersPerIdentityCounter Create(Guid id, DomainOffer offer, Guid identityId, int counter) => new()
+    {
+        Id = id,
+        OfferId = offer.Id,
+        Offer = offer,
 
-        IdentityId = identityId;
+        IdentityId = identityId,
 
-        Counter = counter;
-    }
-
-    public static DomainOffersPerIdentityCounter Create(DomainOffer offer, Guid identityId) =>
-        new DomainOffersPerIdentityCounter(Guid.NewGuid(), offer, identityId, 0);
+        Counter = counter,
+    };
 
 
     public void AddContract()

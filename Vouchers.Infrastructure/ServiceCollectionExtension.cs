@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Vouchers.Application.Infrastructure;
 using Vouchers.Application.UseCases;
 using Vouchers.Infrastructure.InterCommunication;
 using Vouchers.Primitives;
@@ -11,6 +12,8 @@ public static class ServiceCollectionExtension
     public static IServiceCollection AddHandlers(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IMessageHelper, MessageHelper>();
+        services.AddScoped<IIdentifierProvider<Guid>, GuidIdentifierProvider>();
+        services.AddScoped<IDateTimeProvider, DateTimeProvider>();
         
         var genericHandlerTypes = new[] {typeof(IHandler<>), typeof(IHandler<,>)};
 

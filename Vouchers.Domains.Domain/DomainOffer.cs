@@ -7,46 +7,42 @@ namespace Vouchers.Domains.Domain;
 
 public sealed class DomainOffer : AggregateRoot<Guid>
 {
-    public string Name { get; }
+    public string Name { get; init; }
     public string Description { get; set; }
 
-    public int MaxMembersCount { get; }
-    public CurrencyAmount Amount { get; }
-    public InvoicePeriod InvoicePeriod { get; }
+    public int MaxMembersCount { get; init; }
+    public CurrencyAmount Amount { get; init; }
+    public InvoicePeriod InvoicePeriod { get; init; }
 
-    public bool IsPublic { get; }
-    public Guid? RecipientId { get; }
+    public bool IsPublic { get; init; }
+    public Guid? RecipientId { get; init; }
 
     public DateTime ValidFrom { get; set; }
     public DateTime ValidTo { get; set; }
 
-    public int? MaxContractsPerIdentity { get; }
+    public int? MaxContractsPerIdentity { get; init; }
 
-    public static DomainOffer Create(string name, string description, int maxMembersCount, CurrencyAmount amount, InvoicePeriod period, DateTime validFrom, DateTime validTo, int? maxContractsPerIdentity) =>
-        new DomainOffer(Guid.NewGuid(), name, description, maxMembersCount, amount, period, validFrom, validTo, maxContractsPerIdentity);
+    public static DomainOffer Create(Guid id, string name, string description, int maxMembersCount,
+        CurrencyAmount amount, InvoicePeriod period, DateTime validFrom, DateTime validTo,
+        int? maxContractsPerIdentity) => Create(id, name, description, maxMembersCount,
+        amount, period, validFrom, validTo,
+        maxContractsPerIdentity, null);
 
-    public static DomainOffer Create(string name, string description, int maxMembersCount, CurrencyAmount amount, InvoicePeriod period, DateTime validFrom, DateTime validTo, Guid recipientId, int? maxContractsPerIdentity) =>
-        new DomainOffer(Guid.NewGuid(), name, description, maxMembersCount, amount, period, validFrom, validTo, recipientId, maxContractsPerIdentity);
-
-    private DomainOffer(Guid id, string name, string description, int maxMembersCount, CurrencyAmount amount, InvoicePeriod period, DateTime validFrom, DateTime validTo, int? maxContractsPerIdentity) : base(id)
+    public static DomainOffer Create(Guid id, string name, string description, int maxMembersCount,
+        CurrencyAmount amount, InvoicePeriod period, DateTime validFrom, DateTime validTo,
+        int? maxContractsPerIdentity, Guid? recipientId) => new()
     {
-        Name = name;
-        Description = description;
-        MaxMembersCount = maxMembersCount;
-        Amount = amount;
-        InvoicePeriod = period;
-        ValidFrom = validFrom;
-        ValidTo = validTo;
-        MaxContractsPerIdentity = maxContractsPerIdentity;
-    }
-
-    public DomainOffer(Guid id, string name, string description, int maxMembersCount, CurrencyAmount amount, InvoicePeriod period, DateTime validFrom, DateTime validTo, Guid recipientId, int? maxContractsPerIdentity)
-        : this(id, name, description, maxMembersCount, amount, period, validFrom, validTo, maxContractsPerIdentity) =>
-        RecipientId = recipientId;
-
-
-    private DomainOffer()
-    {}
+        Id = id,
+        Name = name,
+        Description = description,
+        MaxMembersCount = maxMembersCount,
+        Amount = amount,
+        InvoicePeriod = period,
+        ValidFrom = validFrom,
+        ValidTo = validTo,
+        MaxContractsPerIdentity = maxContractsPerIdentity,
+        RecipientId = recipientId,
+    };
 }
 
 public class CurrencyAmount

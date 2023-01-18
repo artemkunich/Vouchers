@@ -5,20 +5,16 @@ namespace Vouchers.Persistence.InterCommunication;
 
 public class ConsumedMessage: Entity<Guid>
 {
-    public Guid MessageId { get; }
-    public string Consumer { get; }
-    public DateTime ConsumedDate { get; }
+    public Guid MessageId { get; init; }
+    public string Consumer { get; init; }
+    public DateTime ConsumedDate { get; init; }
 
 
-    public static ConsumedMessage Create(Guid messageId, string handler) => new (Guid.NewGuid(), messageId, handler);
-
-    private ConsumedMessage(Guid id, Guid messageId, string consumer) : base(id)
+    public static ConsumedMessage Create(Guid id, Guid messageId, string consumer, DateTime consumedDate) => new()
     {
-        MessageId = messageId;
-        Consumer = consumer;
-        ConsumedDate = DateTime.Now;
-    }
-
-    private ConsumedMessage()
-    {}
+        Id = id,
+        MessageId = messageId,
+        Consumer = consumer,
+        ConsumedDate = consumedDate,
+    };
 }

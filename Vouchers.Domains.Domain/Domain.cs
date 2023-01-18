@@ -8,14 +8,14 @@ namespace Vouchers.Domains.Domain;
 
 public sealed class Domain : AggregateRoot<Guid>
 {
-    public Guid ContractId { get; }
-    public DomainContract Contract { get; }
+    public Guid ContractId { get; init; }
+    public DomainContract Contract { get; init; }
 
     public decimal Credit  { get; private set; }
 
     public int MembersCount { get; private set; }
 
-    public DateTime CreatedDateTime { get; }
+    public DateTime CreatedDateTime { get; init; }
 
     public string Description { get; set; }
 
@@ -23,20 +23,16 @@ public sealed class Domain : AggregateRoot<Guid>
 
     public Guid? ImageId { get; set; }
 
-    public static Domain Create(DomainContract contract, decimal credit) =>
-        new Domain(Guid.NewGuid(), contract, credit, 0, DateTime.Now);
-
-    internal Domain(Guid id, DomainContract contract, decimal credit, int membersCount, DateTime createdDateTime) : base(id)
+    public static Domain Create(Guid id, DomainContract contract, decimal credit, int membersCount, DateTime createdDateTime) => new()
     {
-        ContractId = contract.Id;
-        Contract = contract;
-        
-        Credit = credit;
-        MembersCount = membersCount;
-        CreatedDateTime = createdDateTime;
-    }
+        Id = id,
+        ContractId = contract.Id,
+        Contract = contract,
 
-    private Domain() { }
+        Credit = credit,
+        MembersCount = membersCount,
+        CreatedDateTime = createdDateTime
+    };
 
     public void IncreaseMembersCount()
     {

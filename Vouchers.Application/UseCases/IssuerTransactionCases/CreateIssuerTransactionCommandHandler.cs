@@ -20,12 +20,12 @@ internal sealed class CreateIssuerTransactionCommandHandler : IHandler<CreateIss
     private readonly IRepository<AccountItem,Guid> _accountItemRepository;
     private readonly IRepository<Unit,Guid> _unitRepository;
     private readonly IRepository<IssuerTransaction,Guid> _issuerTransactionRepository;
-
-
+    private readonly IIdentifierProvider<Guid> _identifierProvider;
+    private readonly IDateTimeProvider _dateTimeProvider;
     public CreateIssuerTransactionCommandHandler(IAuthIdentityProvider authIdentityProvider,
         IRepository<DomainAccount,Guid> domainAccountRepository, IRepository<Account,Guid> accountRepository, 
         IRepository<AccountItem,Guid> accountItemRepository, IRepository<Unit,Guid> unitRepository, 
-        IRepository<IssuerTransaction,Guid> issuerTransactionRepository) 
+        IRepository<IssuerTransaction,Guid> issuerTransactionRepository, IIdentifierProvider<Guid> identifierProvider, IDateTimeProvider dateTimeProvider) 
     {
         _authIdentityProvider = authIdentityProvider;
         _domainAccountRepository = domainAccountRepository;
@@ -33,6 +33,8 @@ internal sealed class CreateIssuerTransactionCommandHandler : IHandler<CreateIss
         _accountItemRepository = accountItemRepository;
         _unitRepository = unitRepository;
         _issuerTransactionRepository = issuerTransactionRepository;
+        _identifierProvider = identifierProvider;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     public async Task<Guid> HandleAsync(CreateIssuerTransactionCommand command, CancellationToken cancellation)
@@ -55,14 +57,15 @@ internal sealed class CreateIssuerTransactionCommandHandler : IHandler<CreateIss
             if (command.Quantity > 0)
             {
                 var unit = await _unitRepository.GetByIdAsync(command.VoucherId);
-                accountItem = AccountItem.Create(issuerAccount, 0, unit);
+                var accountItemId = _identifierProvider.CreateNewId();
+                accountItem = AccountItem.Create(accountItemId, issuerAccount, 0, unit);
             }
             else
                 throw new ApplicationException(Properties.Resources.IssuerDoesNotHaveAccountItemForUnit, issuerDomainAccount.Id, command.VoucherId);
         }
 
-
-        IssuerTransaction transaction = IssuerTransaction.Create(accountItem, command.Quantity);
+        var transactionId = _identifierProvider.CreateNewId();
+        IssuerTransaction transaction = IssuerTransaction.Create(transactionId, _dateTimeProvider.CurrentDateTime(), accountItem, command.Quantity);
         transaction.Perform();
 
         await _issuerTransactionRepository.AddAsync(transaction);

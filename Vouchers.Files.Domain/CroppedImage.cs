@@ -4,17 +4,14 @@ namespace Vouchers.Files.Domain;
 
 public sealed class CroppedImage : AggregateRoot<Guid>
 {
-    public Guid ImageId { get; }
+    public Guid ImageId { get; init; }
     public CropParameters CropParameters { get; set; }
 
-    private CroppedImage() { }
-    private CroppedImage(Guid id, Guid imageId, CropParameters cropParameters) : base(id)
+    public static CroppedImage Create(Guid id, Guid imageId, CropParameters cropParameters) => new()
     {
-        ImageId = imageId;
-        CropParameters = cropParameters;
-    }
+        Id = id,
+        ImageId = imageId,
+        CropParameters = cropParameters,
+    };
 
-    public static CroppedImage Create(Guid id, Guid imageId, CropParameters cropParameters) =>
-        new CroppedImage(id, imageId, cropParameters);
-    
 }

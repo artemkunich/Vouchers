@@ -102,11 +102,11 @@ export const HolderTransactionDetailContainer = ({transaction, transactionReques
     }
 
     const postHolderTransaction = async (transaction) => {
-        const transactionId = await api.postHolderTransaction(token, transaction) 
-        if(transactionId){
+        const result = await api.postHolderTransaction(token, transaction) 
+        if(result?.holderTransactionId){
             setCurrentTransaction({
                 ...currentTransaction,
-                id: transactionId
+                id: result.holderTransactionId
             })
         }
     }

@@ -21,16 +21,18 @@ internal sealed class CreateVoucherValueCommandHandler : IHandler<CreateVoucherV
     private readonly IRepository<VoucherValue,Guid> _voucherValueRepository;
     private readonly IRepository<UnitType,Guid> _unitTypeRepository;
     private readonly IAppImageService _appImageService;
-
+    private readonly IIdentifierProvider<Guid> _identifierProvider;
+    
     public CreateVoucherValueCommandHandler(IAuthIdentityProvider authIdentityProvider, IAppImageService appImageService,
         IRepository<DomainAccount,Guid> domainAccountRepository, IRepository<Account,Guid> accountRepository,
-        IRepository<VoucherValue,Guid> voucherValueRepository, IRepository<UnitType,Guid> unitTypeRepository)
+        IRepository<VoucherValue,Guid> voucherValueRepository, IRepository<UnitType,Guid> unitTypeRepository, IIdentifierProvider<Guid> identifierProvider)
     {
         _authIdentityProvider = authIdentityProvider;
         _domainAccountRepository = domainAccountRepository;
         _accountRepository = accountRepository;
         _voucherValueRepository = voucherValueRepository;
         _unitTypeRepository = unitTypeRepository;
+        _identifierProvider = identifierProvider;
         _appImageService = appImageService;
     }
 
@@ -54,8 +56,9 @@ internal sealed class CreateVoucherValueCommandHandler : IHandler<CreateVoucherV
         }
 
         var account = await _accountRepository.GetByIdAsync(command.IssuerAccountId);
-
-        var unitType = UnitType.Create(account);
+        
+        var unitTypeId = _identifierProvider.CreateNewId();
+        var unitType = UnitType.Create(unitTypeId, account);
         await _unitTypeRepository.AddAsync(unitType);
 
         var value = VoucherValue.Create(unitType.Id, issuerDomainAccount.Domain.Id, issuerDomainAccount.IdentityId, command.Ticker);

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Vouchers.Application.Infrastructure;
 using Vouchers.Core.Domain;
 using Vouchers.Persistence.InterCommunication;
 
@@ -11,7 +12,7 @@ namespace Vouchers.Persistence.Repositories;
 
 internal sealed class UnitRepository : Repository<Unit, Guid>
 {
-    public UnitRepository(VouchersDbContext dbContext, IMessageDataSerializer messageDataSerializer) : base(dbContext, messageDataSerializer)
+    public UnitRepository(VouchersDbContext dbContext, IMessageDataSerializer messageDataSerializer, IIdentifierProvider<Guid> identifierProvider) : base(dbContext, messageDataSerializer, identifierProvider)
     {
     }
 

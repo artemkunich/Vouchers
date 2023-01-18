@@ -4,22 +4,18 @@ namespace Vouchers.Core.Domain;
 
 public sealed class UnitQuantity
 {       
-    public decimal Amount { get; }
+    public decimal Amount { get; init; }
 
-    public Guid UnitId { get; }
-    public Unit Unit { get; }
+    public Guid UnitId { get; init; }
+    public Unit Unit { get; init; }
 
     public static UnitQuantity Create(decimal amount, Unit unit)
     {
-        return new UnitQuantity(amount, unit);
+        return new()
+        {
+            Amount = amount,
+            UnitId = unit.Id,
+            Unit = unit
+        };
     }
-
-    private UnitQuantity(decimal amount, Unit unit) 
-    {
-        Amount = amount;
-        UnitId = unit.Id;
-        Unit = unit;
-    }
-
-    private UnitQuantity() { }
 }

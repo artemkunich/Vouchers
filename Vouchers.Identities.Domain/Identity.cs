@@ -17,15 +17,13 @@ public sealed class Identity : AggregateRoot<Guid>
 
     private Identity() { }
 
-    public static Identity Create(string email, string firstName, string lastName) =>
-        new Identity(Guid.NewGuid(), email, firstName, lastName);
-
-    internal Identity(Guid id, string email, string firstName, string lastName) : base(id)
+    public static Identity Create(Guid id, string email, string firstName, string lastName) => new()
     {
-        Email = email;
-        FirstName = firstName;
-        LastName = lastName;
-    }
+        Id = id,
+        Email = email,
+        FirstName = firstName,
+        LastName = lastName
+    };
 
     public bool Equals(Identity identity) =>
         Id == identity.Id;

@@ -18,12 +18,13 @@ internal sealed class CreateIdentityCommandHandler : IHandler<CreateIdentityComm
     private readonly ILoginNameProvider _loginNameProvider;
     private readonly IRepository<Login,Guid> _loginRepository;
     private readonly IAppImageService _appImageService;
-        
-    public CreateIdentityCommandHandler(ILoginNameProvider loginNameProvider, IRepository<Login,Guid> loginRepository, IAppImageService appImageService)
+    private readonly IIdentifierProvider<Guid> _identifierProvider;
+    public CreateIdentityCommandHandler(ILoginNameProvider loginNameProvider, IRepository<Login,Guid> loginRepository, IAppImageService appImageService, IIdentifierProvider<Guid> identifierProvider)
     {
         _loginNameProvider = loginNameProvider;
         _loginRepository = loginRepository;
         _appImageService = appImageService;
+        _identifierProvider = identifierProvider;
     }
 
     public async Task<Guid> HandleAsync(CreateIdentityCommand command, CancellationToken cancellation)
@@ -36,8 +37,11 @@ internal sealed class CreateIdentityCommandHandler : IHandler<CreateIdentityComm
             image = await _appImageService.CreateCroppedImageAsync(imageStream, command.CropParameters);
         }
 
-        var identity = Identity.Create(command.Email, command.FirstName, command.LastName);
-        var login = Login.Create(loginName, identity);
+        var identityId = _identifierProvider.CreateNewId();
+        var identity = Identity.Create(identityId, command.Email, command.FirstName, command.LastName);
+        
+        var loginId = _identifierProvider.CreateNewId();
+        var login = Login.Create(loginId, loginName, identity);
         identity.ImageId = image?.Id;
 
         await _loginRepository.AddAsync(login);

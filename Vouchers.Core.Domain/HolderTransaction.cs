@@ -10,44 +10,37 @@ public sealed class HolderTransaction : AggregateRoot<Guid>
 {
     public DateTime Timestamp { get; private set; }
 
-    public Guid CreditorAccountId { get;}
-    public Account CreditorAccount { get; }
+    public Guid CreditorAccountId { get; init; }
+    public Account CreditorAccount { get; init; }
 
-    public Guid DebtorAccountId { get;}
-    public Account DebtorAccount { get; }
+    public Guid DebtorAccountId { get; init; }
+    public Account DebtorAccount { get; init; }
     
     public UnitTypeQuantity Quantity { get; private set; }
 
-    public ICollection<HolderTransactionItem> TransactionItems { get; }
+    public ICollection<HolderTransactionItem> TransactionItems { get; init; }
 
-    public string Message { get; }
+    public string Message { get; init; }
     public bool IsPerformed { get; private set; }
 
-    public static HolderTransaction Create(Account creditorAccount, Account debtorAccount, UnitType value, string message, CultureInfo cultureInfo = null) =>
-        new HolderTransaction(Guid.NewGuid(), DateTime.Now, creditorAccount, debtorAccount, value, message, cultureInfo);
-
-    private HolderTransaction(Guid id, DateTime timestamp, Account creditorAccount, Account debtorAccount, UnitType unitType, string message, CultureInfo cultureInfo = null) : base(id)
+    public static HolderTransaction Create(Guid id, DateTime timestamp, Account creditorAccount, Account debtorAccount, UnitType unitType, string message, CultureInfo cultureInfo = null)
     {
-        Timestamp = timestamp;
-
-        CreditorAccountId = creditorAccount.Id;
-        CreditorAccount = creditorAccount;
-
-        DebtorAccountId = debtorAccount.Id;
-        DebtorAccount = debtorAccount;            
-
-        Quantity = UnitTypeQuantity.Create(0, unitType);
-
-        Message = message;
-
-        if (CreditorAccount.Equals(DebtorAccount))
+        if (creditorAccount.Equals(debtorAccount))
             throw new CoreException("CreditorAndDebtorAreTheSame", cultureInfo);
 
-        TransactionItems = new List<HolderTransactionItem>();            
-
+        return new()
+        {
+            Id = id,
+            Timestamp = timestamp,
+            CreditorAccountId = creditorAccount.Id,
+            CreditorAccount = creditorAccount,
+            DebtorAccountId = debtorAccount.Id,
+            DebtorAccount = debtorAccount,
+            Quantity = UnitTypeQuantity.Create(0, unitType),
+            Message = message,
+            TransactionItems = new List<HolderTransactionItem>()
+        };
     }
-
-    private HolderTransaction(){ }
 
     public void AddTransactionItem(HolderTransactionItem item, CultureInfo cultureInfo = null)
     {

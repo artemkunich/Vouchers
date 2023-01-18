@@ -8,41 +8,35 @@ namespace Vouchers.Core.Domain;
 
 public sealed class HolderTransactionRequest : AggregateRoot<Guid>
 {
-    public DateTime DueDate { get; }
+    public DateTime DueDate { get; init; }
 
-    public Guid? CreditorAccountId { get; }
-    public Account CreditorAccount { get; }
+    public Guid? CreditorAccountId { get; init; }
+    public Account CreditorAccount { get; init; }
 
-    public Guid DebtorAccountId { get; }
-    public Account DebtorAccount { get; }     
+    public Guid DebtorAccountId { get; init; }
+    public Account DebtorAccount { get; init; }     
 
-    public UnitTypeQuantity Quantity { get; }
+    public UnitTypeQuantity Quantity { get; init; }
 
-    public TimeSpan? MaxDurationBeforeValidityStart { get; }
-    public TimeSpan? MinDurationBeforeValidityEnd { get; }
+    public TimeSpan? MaxDurationBeforeValidityStart { get; init; }
+    public TimeSpan? MinDurationBeforeValidityEnd { get; init; }
     
-    public bool MustBeExchangeable { get; }
+    public bool MustBeExchangeable { get; init; }
 
-    public string Message { get; }
+    public string Message { get; init; }
 
     public Guid? TransactionId { get; private set; }
     public HolderTransaction Transaction { get; private set; }
+    
 
-    private HolderTransactionRequest() { }
-
-    private HolderTransactionRequest (Guid id, DateTime dueDate, Account creditorAccount, Account debtorAccount, UnitTypeQuantity quantity, TimeSpan maxDurationBeforeValidityStart, TimeSpan minDurationBeforeValidityEnd, bool mustBeExchangeable, string message, CultureInfo cultureInfo = null) : base(id)
+    public static HolderTransactionRequest Create(Guid id, DateTime dueDate, Account creditorAccount, Account debtorAccount,
+        UnitTypeQuantity quantity, TimeSpan maxDurationBeforeValidityStart, TimeSpan minDurationBeforeValidityEnd,
+        bool mustBeExchangeable, string message, CultureInfo cultureInfo = null)
     {
         if (quantity.Amount <= 0)
             throw new CoreException("AmountIsNotPositive", cultureInfo);
-
-        DueDate = dueDate;
-
-        DebtorAccountId = debtorAccount.Id;
-        DebtorAccount = debtorAccount;
-
-        Quantity = quantity;
-
-        if (quantity.UnitType.IssuerAccount.Equals(DebtorAccount))
+        
+        if (quantity.UnitType.IssuerAccount.Equals(debtorAccount))
         {
             if (maxDurationBeforeValidityStart != TimeSpan.Zero)
                 throw new CoreException("IssuerCannotSetMaxDurationBeforeValidityStart", cultureInfo);
@@ -53,27 +47,31 @@ public sealed class HolderTransactionRequest : AggregateRoot<Guid>
             if (mustBeExchangeable)
                 throw new CoreException("IssuerCannotRequireExchangeability", cultureInfo);
         }
-
-        MaxDurationBeforeValidityStart = maxDurationBeforeValidityStart;
-        MinDurationBeforeValidityEnd = minDurationBeforeValidityEnd;
-        MustBeExchangeable = mustBeExchangeable;
-
-        Message = message;
-
-        if (creditorAccount is null)
-            return;
-
+        
         if (creditorAccount.Equals(debtorAccount))
             throw new CoreException("CreditorAndDebtorAreTheSame", cultureInfo);
 
-        CreditorAccountId = creditorAccount.Id;
-        CreditorAccount = creditorAccount;
+        return new()
+        {
+            Id = id,
+            DueDate = dueDate,
 
-        
+            DebtorAccountId = debtorAccount.Id,
+            DebtorAccount = debtorAccount,
+
+            Quantity = quantity,
+            
+            MaxDurationBeforeValidityStart = maxDurationBeforeValidityStart,
+            MinDurationBeforeValidityEnd = minDurationBeforeValidityEnd,
+            MustBeExchangeable = mustBeExchangeable,
+
+            Message = message,
+            
+            CreditorAccount = creditorAccount,
+            CreditorAccountId = creditorAccount?.Id
+        };
+
     }
-
-    public static HolderTransactionRequest Create(DateTime validTo, Account creditorAccount, Account debtorAccount, UnitTypeQuantity quantity, TimeSpan maxDurationBeforeValidityStart, TimeSpan minDurationBeforeValidityEnd, bool mustBeExchangeable, string message, CultureInfo cultureInfo = null) =>
-        new HolderTransactionRequest(Guid.NewGuid(), validTo, creditorAccount, debtorAccount, quantity, maxDurationBeforeValidityStart, minDurationBeforeValidityEnd, mustBeExchangeable, message, cultureInfo);
 
     public void Perform(HolderTransaction transaction, CultureInfo cultureInfo = null)
     {

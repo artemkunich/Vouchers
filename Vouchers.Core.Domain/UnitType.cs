@@ -6,20 +6,16 @@ namespace Vouchers.Core.Domain;
 
 public sealed class UnitType : AggregateRoot<Guid>
 {
-    public Guid IssuerAccountId { get; }
-    public Account IssuerAccount { get; }
+    public Guid IssuerAccountId { get; init; }
+    public Account IssuerAccount { get; init; }
     public decimal Supply { get; private set; }
 
-    public static UnitType Create(Account issuerAccount) =>
-        new UnitType(Guid.NewGuid(), issuerAccount);
-
-    private UnitType(Guid id, Account issuerAccount) : base(id)
+    public static UnitType Create(Guid id, Account issuerAccount) => new()
     {
-        IssuerAccountId = issuerAccount.Id;
-        IssuerAccount = issuerAccount;
-    }    
-
-    private UnitType() { }
+        Id = id,
+        IssuerAccountId = issuerAccount.Id,
+        IssuerAccount = issuerAccount,
+    };
 
     public void IncreaseSupply(decimal amount, CultureInfo cultureInfo = null)
     {

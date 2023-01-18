@@ -7,21 +7,17 @@ namespace Vouchers.Identities.Domain;
 
 public sealed class Login : AggregateRoot<Guid>
 {
-    public string LoginName { get; }
+    public string LoginName { get; init; }
 
-    public Guid IdentityId { get; }
-    public Identity Identity { get; }
+    public Guid IdentityId { get; init; }
+    public Identity Identity { get; init; }
 
-    public static Login Create(string loginName, Identity identity) =>
-        new (Guid.NewGuid(), loginName, identity);
-
-    internal Login(Guid id, string loginName, Identity identity) : base(id)
+    public static Login Create(Guid id, string loginName, Identity identity) => new()
     {
-        LoginName = loginName;
-        IdentityId = identity.Id;
-        Identity = identity;
-    }
-
-    private Login() { }
+        Id = id,
+        LoginName = loginName,
+        IdentityId = identity.Id,
+        Identity = identity,
+    };
 }
 

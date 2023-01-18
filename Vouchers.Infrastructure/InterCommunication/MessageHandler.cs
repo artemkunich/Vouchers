@@ -1,3 +1,4 @@
+using Vouchers.Application.Infrastructure;
 using Vouchers.Application.UseCases;
 using Vouchers.Persistence;
 using Vouchers.Persistence.InterCommunication;
@@ -9,12 +10,16 @@ public class MessageHandler<TMessage,TResult> : IMessageHandler<TMessage,TResult
     private readonly IMessageHelper _messageHelper;
     private readonly VouchersDbContext _dbContext;
     private readonly IHandler<TMessage, TResult> _handler;
+    private readonly IIdentifierProvider<Guid> _identifierProvider;
+    private readonly IDateTimeProvider _dateTimeProvider;
     
-    public MessageHandler(IMessageHelper messageHelper, VouchersDbContext dbContext, IHandler<TMessage, TResult> handler)
+    public MessageHandler(IMessageHelper messageHelper, VouchersDbContext dbContext, IHandler<TMessage, TResult> handler, IIdentifierProvider<Guid> identifierProvider, IDateTimeProvider dateTimeProvider)
     {
         _messageHelper = messageHelper;
         _dbContext = dbContext;
         _handler = handler;
+        _identifierProvider = identifierProvider;
+        _dateTimeProvider = dateTimeProvider;
     }
     
     public async Task HandleAsync(TMessage message, CancellationToken token)
@@ -31,7 +36,9 @@ public class MessageHandler<TMessage,TResult> : IMessageHandler<TMessage,TResult
             return;
         }
 
-        _dbContext.Set<ConsumedMessage>().Add(ConsumedMessage.Create(messageId.Value, consumer));
+        var messageConsumerId = _identifierProvider.CreateNewId();
+        var messageConsumer = ConsumedMessage.Create(messageConsumerId, messageId.Value, consumer, _dateTimeProvider.CurrentDateTime());
+        _dbContext.Set<ConsumedMessage>().Add(messageConsumer);
         
         TResult result = await _handler.HandleAsync(message, token);
 
@@ -45,12 +52,15 @@ public class MessageHandler<TMessage> : IMessageHandler<TMessage>
     private readonly IMessageHelper _messageHelper;
     private readonly VouchersDbContext _dbContext;
     private readonly IHandler<TMessage> _handler;
-    
-    public MessageHandler(IMessageHelper messageHelper, VouchersDbContext dbContext, IHandler<TMessage> handler)
+    private readonly IIdentifierProvider<Guid> _identifierProvider;
+    private readonly IDateTimeProvider _dateTimeProvider;
+    public MessageHandler(IMessageHelper messageHelper, VouchersDbContext dbContext, IHandler<TMessage> handler, IIdentifierProvider<Guid> identifierProvider, IDateTimeProvider dateTimeProvider)
     {
         _messageHelper = messageHelper;
         _dbContext = dbContext;
         _handler = handler;
+        _identifierProvider = identifierProvider;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     public async Task HandleAsync(TMessage message, CancellationToken token)
@@ -66,8 +76,10 @@ public class MessageHandler<TMessage> : IMessageHandler<TMessage>
         {
             return;
         }
-
-        _dbContext.Set<ConsumedMessage>().Add(ConsumedMessage.Create(messageId.Value, consumer));
+        
+        var messageConsumerId = _identifierProvider.CreateNewId();
+        var consumerMessage = ConsumedMessage.Create(messageConsumerId, messageId.Value, consumer, _dateTimeProvider.CurrentDateTime());
+        _dbContext.Set<ConsumedMessage>().Add(consumerMessage);
 
         await _handler.HandleAsync(message, token);
 

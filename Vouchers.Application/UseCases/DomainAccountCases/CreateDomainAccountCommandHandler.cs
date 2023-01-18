@@ -18,14 +18,18 @@ internal sealed class CreateDomainAccountCommandHandler : IHandler<CreateDomainA
     private readonly IRepository<Domain,Guid> _domainRepository;
     private readonly IRepository<DomainAccount,Guid> _domainAccountRepository;
     private readonly IRepository<Account,Guid> _accountRepository;
+    private readonly IIdentifierProvider<Guid> _identifierProvider;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
     public CreateDomainAccountCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<Domain,Guid> domainRepository, 
-        IRepository<DomainAccount,Guid> domainAccountRepository, IRepository<Account,Guid> accountRepository)
+        IRepository<DomainAccount,Guid> domainAccountRepository, IRepository<Account,Guid> accountRepository, IIdentifierProvider<Guid> identifierProvider, IDateTimeProvider dateTimeProvider)
     {
         _authIdentityProvider = authIdentityProvider;
         _domainRepository = domainRepository;
         _domainAccountRepository = domainAccountRepository;
         _accountRepository = accountRepository;
+        _identifierProvider = identifierProvider;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     public async Task<Guid> HandleAsync(CreateDomainAccountCommand command, CancellationToken cancellation)
@@ -36,10 +40,11 @@ internal sealed class CreateDomainAccountCommandHandler : IHandler<CreateDomainA
         if (domain is null)
             throw new ApplicationException(Properties.Resources.DomainDoesNotExist);
 
-        var account = Account.Create();
+        var accountId = _identifierProvider.CreateNewId();
+        var account = Account.Create(accountId, _dateTimeProvider.CurrentDateTime());
         await _accountRepository.AddAsync(account);
 
-        var domainAccount = DomainAccount.Create(account.Id, authIdentityId, domain);
+        var domainAccount = DomainAccount.Create(account.Id, authIdentityId, domain, _dateTimeProvider.CurrentDateTime());
             
         if (domain.IsPublic)
         {

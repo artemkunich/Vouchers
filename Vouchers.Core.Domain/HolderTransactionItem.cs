@@ -8,18 +8,15 @@ namespace Vouchers.Core.Domain;
 
 public sealed class HolderTransactionItem : AggregateRoot<Guid>
 {
-    public UnitQuantity Quantity { get; }
+    public UnitQuantity Quantity { get; init; }
 
-    public Guid CreditAccountItemId { get; }
-    public AccountItem CreditAccountItem { get; }
+    public Guid CreditAccountItemId { get; init; }
+    public AccountItem CreditAccountItem { get; init; }
 
-    public Guid DebitAccountItemId { get; }
-    public AccountItem DebitAccountItem { get; }
+    public Guid DebitAccountItemId { get; init; }
+    public AccountItem DebitAccountItem { get; init; }
 
-    public static HolderTransactionItem Create(UnitQuantity quantity, AccountItem creditAccount, AccountItem debitAccount, CultureInfo cultureInfo = null) =>
-        new HolderTransactionItem(Guid.NewGuid(), quantity, creditAccount, debitAccount, cultureInfo);
-
-    private HolderTransactionItem(Guid id, UnitQuantity quantity, AccountItem creditAccountItem, AccountItem debitAccountItem, CultureInfo cultureInfo = null) : base(id)
+    public static HolderTransactionItem Create(Guid id, UnitQuantity quantity, AccountItem creditAccountItem, AccountItem debitAccountItem, CultureInfo cultureInfo = null)
     {
         if (creditAccountItem.Equals(debitAccountItem))
             throw new CoreException("CreditAndDebitAccountsAreEqual", cultureInfo);
@@ -33,16 +30,17 @@ public sealed class HolderTransactionItem : AggregateRoot<Guid>
         if(!quantity.Unit.CanBeExchanged && creditAccountItem.HolderAccount.NotEquals(quantity.Unit.UnitType.IssuerAccount) && debitAccountItem.HolderAccount.NotEquals(quantity.Unit.UnitType.IssuerAccount))
             throw new CoreException("ItemUnitCannotBeExchanged", cultureInfo);
 
-        Quantity = quantity;
+        return new()
+        {
+            Id = id,
+            Quantity = quantity,
 
-        CreditAccountItemId = creditAccountItem.Id;
-        CreditAccountItem = creditAccountItem;
+            CreditAccountItemId = creditAccountItem.Id,
+            CreditAccountItem = creditAccountItem,
 
-        DebitAccountItemId = debitAccountItem.Id;
-        DebitAccountItem = debitAccountItem;
-
+            DebitAccountItemId = debitAccountItem.Id,
+            DebitAccountItem = debitAccountItem,
+        };
     }
-
-    private HolderTransactionItem() { }
 
 }

@@ -14,7 +14,7 @@ namespace Vouchers.Persistence.Repositories;
 
 internal sealed class DomainOffersPerIdentityCounterRepository : Repository<DomainOffersPerIdentityCounter, Guid>
 {
-    public DomainOffersPerIdentityCounterRepository(VouchersDbContext dbContext, IMessageDataSerializer messageDataSerializer) : base(dbContext, messageDataSerializer)
+    public DomainOffersPerIdentityCounterRepository(VouchersDbContext dbContext, IMessageDataSerializer messageDataSerializer, IIdentifierProvider<Guid> identifierProvider) : base(dbContext, messageDataSerializer, identifierProvider)
     {
     }
 

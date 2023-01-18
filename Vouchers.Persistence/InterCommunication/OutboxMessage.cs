@@ -6,26 +6,20 @@ namespace Vouchers.Persistence.InterCommunication;
 
 public class OutboxMessage: Entity<Guid>
 {
-    public string Type { get; }
-    public string Data { get; }
+    public string Type { get; init; }
+    public string Data { get; init; }
     public OutboxMessageState State { get; private set; }
-    public DateTime CreatedDateTime { get; }
+    public DateTime CreatedDateTime { get; init; }
     public DateTime ProcessedDateTime { get; private set; }
 
 
-    public static OutboxMessage Create(string type, string data) => new OutboxMessage(Guid.NewGuid(), type, data);
-
-    private OutboxMessage(Guid id, string type, string data) : base(id)
+    public static OutboxMessage Create(Guid id, string type, string data) => new()
     {
-        Type = type;
-        Data = data;
-        State = OutboxMessageState.Ready;
-        CreatedDateTime = DateTime.Now;
-    }
+        Id = id,
+        Type = type,
+        Data = data,
+    };
 
-    private OutboxMessage()
-    {}
-    
     public void MarkAsProcessed()
     {
         State = OutboxMessageState.Processed;

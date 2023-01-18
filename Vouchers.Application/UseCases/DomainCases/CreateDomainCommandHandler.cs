@@ -20,10 +20,11 @@ internal sealed class CreateDomainCommandHandler : IHandler<CreateDomainCommand,
     private readonly IRepository<DomainContract,Guid> _domainContractRepository;
     private readonly IRepository<DomainAccount,Guid> _domainAccountRepository;
     private readonly IRepository<Account,Guid> _accountRepository;
-
+    private readonly IIdentifierProvider<Guid> _identifierProvider;
+    private readonly IDateTimeProvider _dateTimeProvider;
     public CreateDomainCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<DomainOffer,Guid> domainOfferRepository, 
         IRepository<DomainOffersPerIdentityCounter,Guid> domainOffersPerIdentityCounterRepository, IRepository<DomainContract,Guid> domainContractRepository, 
-        IRepository<DomainAccount,Guid> domainAccountRepository, IRepository<Account,Guid> accountRepository)
+        IRepository<DomainAccount,Guid> domainAccountRepository, IRepository<Account,Guid> accountRepository, IIdentifierProvider<Guid> identifierProvider, IDateTimeProvider dateTimeProvider)
     {
         _authIdentityProvider = authIdentityProvider;
         _domainOfferRepository = domainOfferRepository;
@@ -31,6 +32,8 @@ internal sealed class CreateDomainCommandHandler : IHandler<CreateDomainCommand,
         _domainContractRepository = domainContractRepository;
         _domainAccountRepository = domainAccountRepository;
         _accountRepository = accountRepository;
+        _identifierProvider = identifierProvider;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     public async Task<Guid?> HandleAsync(CreateDomainCommand command, CancellationToken cancellation)
@@ -45,7 +48,8 @@ internal sealed class CreateDomainCommandHandler : IHandler<CreateDomainCommand,
             domainOffersPerIdentityCounter = (await _domainOffersPerIdentityCounterRepository.GetByExpressionAsync(counter => counter.OfferId == domainOffer.Id && counter.IdentityId == authIdentityId)).FirstOrDefault();
             if (domainOffersPerIdentityCounter is null)
             {
-                domainOffersPerIdentityCounter = DomainOffersPerIdentityCounter.Create(domainOffer, authIdentityId);
+                var domainOffersPerIdentityCounterId = _identifierProvider.CreateNewId();
+                domainOffersPerIdentityCounter = DomainOffersPerIdentityCounter.Create(domainOffersPerIdentityCounterId, domainOffer, authIdentityId, 0);
                 domainOffersPerIdentityCounter.AddContract();
             }
             else if (domainOffersPerIdentityCounter.Counter > domainOffer.MaxContractsPerIdentity)
@@ -58,17 +62,19 @@ internal sealed class CreateDomainCommandHandler : IHandler<CreateDomainCommand,
             }
         }
 
-        var domainContract = DomainContract.Create(domainOffer, domainOffersPerIdentityCounter, authIdentityId, command.DomainName);
+        var domainContract = DomainContract.Create(_identifierProvider.CreateNewId(), domainOffer, domainOffersPerIdentityCounter, authIdentityId, command.DomainName, _dateTimeProvider.CurrentDateTime());
             
         if (domainOffer.Amount.Amount == 0)
         {
-            var account = Account.Create();
+            var accountId = _identifierProvider.CreateNewId();
+            var account = Account.Create(accountId, _dateTimeProvider.CurrentDateTime());
             await _accountRepository.AddAsync(account);
 
-            var domain = Domain.Create(domainContract, 0);
+            var domainId = _identifierProvider.CreateNewId();
+            var domain = Domain.Create(domainId, domainContract, 0, 0, _dateTimeProvider.CurrentDateTime());
             domain.IncreaseMembersCount();
 
-            var domainAccount = DomainAccount.Create(account.Id, authIdentityId, domain);
+            var domainAccount = DomainAccount.Create(account.Id, authIdentityId, domain, _dateTimeProvider.CurrentDateTime());
             domainAccount.IsIssuer = true;
             domainAccount.IsConfirmed = true;
                 

@@ -5,12 +5,12 @@ namespace Vouchers.Domains.Domain;
 
 public sealed class DomainAccount : AggregateRoot<Guid>
 {
-    public Guid IdentityId { get; }
+    public Guid IdentityId { get; init; }
 
-    public Guid DomainId { get; }
-    public Domain Domain { get; }
+    public Guid DomainId { get; init; }
+    public Domain Domain { get; init; }
 
-    public DateTime CreatedDateTime { get; }
+    public DateTime CreatedDateTime { get; init; }
 
     public bool IsIssuer { get; set; }
 
@@ -20,21 +20,16 @@ public sealed class DomainAccount : AggregateRoot<Guid>
 
     public bool IsConfirmed { get; set; }
 
-    public static DomainAccount Create(Guid accountId, Guid identityId, Domain domain) =>
-        new DomainAccount(accountId, identityId, domain, DateTime.Now);
-
-    private DomainAccount(Guid accountId, Guid identityId, Domain domain, DateTime createdDateTime) : base(accountId)
+    public static DomainAccount Create(Guid accountId, Guid identityId, Domain domain, DateTime createdDateTime) => new()
     {
-        IdentityId = identityId;
+        Id = accountId,
+        IdentityId = identityId,
 
-        DomainId = domain.Id;
-        Domain = domain;
-        
-        CreatedDateTime = createdDateTime;
-    }
+        DomainId = domain.Id,
+        Domain = domain,
 
-    private DomainAccount() { }
-
+        CreatedDateTime = createdDateTime,
+    };
 
     public bool Equals(DomainAccount domainAccount) =>
         Id == domainAccount.Id;

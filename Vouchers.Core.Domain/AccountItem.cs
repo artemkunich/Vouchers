@@ -6,29 +6,25 @@ namespace Vouchers.Core.Domain;
 
 public sealed class AccountItem : AggregateRoot<Guid>
 {
-    public Guid HolderAccountId { get; }
-    public Account HolderAccount { get; }
+    public Guid HolderAccountId { get; init; }
+    public Account HolderAccount { get; init; }
 
     public decimal Balance { get; private set; }
 
-    public Guid UnitId { get; }
-    public Unit Unit { get; }
+    public Guid UnitId { get; init; }
+    public Unit Unit { get; init; }
 
-    public static AccountItem Create(Account holderAccount, decimal balance, Unit unit) =>
-        new AccountItem(Guid.NewGuid(), holderAccount, balance, unit);
-
-    private AccountItem(Guid id, Account holderAccount, decimal balance, Unit unit) : base(id)
+    public static AccountItem Create(Guid id, Account holderAccount, decimal balance, Unit unit) => new()
     {
-        HolderAccountId = holderAccount.Id;
-        HolderAccount = holderAccount;
+        Id = id,
+        HolderAccountId = holderAccount.Id,
+        HolderAccount = holderAccount,
         
-        Balance = balance;
-
-        UnitId = unit.Id;
-        Unit = unit;          
-    }
-
-    private AccountItem() { }
+        Balance = balance,
+        
+        UnitId = unit.Id,
+        Unit = unit
+    };
 
     public void ProcessDebit(decimal amount)
     {

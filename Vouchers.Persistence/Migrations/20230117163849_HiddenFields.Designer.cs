@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Vouchers.Persistence;
 
@@ -11,9 +12,11 @@ using Vouchers.Persistence;
 namespace Vouchers.Persistence.Migrations
 {
     [DbContext(typeof(VouchersDbContext))]
-    partial class VouchersDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230117163849_HiddenFields")]
+    partial class HiddenFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

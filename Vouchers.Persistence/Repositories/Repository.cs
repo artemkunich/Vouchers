@@ -16,11 +16,13 @@ namespace Vouchers.Persistence.Repositories;
 internal abstract class Repository<TAggregateRoot, TKey> : IRepository<TAggregateRoot, TKey> where TAggregateRoot: AggregateRoot<TKey>
 {
     private readonly IMessageDataSerializer _messageDataSerializer;
+    private readonly IIdentifierProvider<Guid> _identifierProvider;
     protected VouchersDbContext DbContext { get; }
 
-    protected Repository(VouchersDbContext context, IMessageDataSerializer messageDataSerializer)
+    protected Repository(VouchersDbContext context, IMessageDataSerializer messageDataSerializer, IIdentifierProvider<Guid> identifierProvider)
     {
         _messageDataSerializer = messageDataSerializer;
+        _identifierProvider = identifierProvider;
         DbContext = context;
     }
 
@@ -73,7 +75,8 @@ internal abstract class Repository<TAggregateRoot, TKey> : IRepository<TAggregat
 
         foreach (var domainEvent in domainEvents)
         {
-            var outboxMessage = OutboxMessage.Create(domainEvent.GetType().FullName, await _messageDataSerializer.SerializeAsync(domainEvent));
+            var outboxMessageId = _identifierProvider.CreateNewId();
+            var outboxMessage = OutboxMessage.Create(outboxMessageId, domainEvent.GetType().FullName, await _messageDataSerializer.SerializeAsync(domainEvent));
             DbContext.Set<OutboxMessage>().Add(outboxMessage);
         }
         

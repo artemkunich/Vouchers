@@ -16,11 +16,12 @@ internal sealed class CreateDomainOfferCommandHandler : IHandler<CreateDomainOff
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IRepository<DomainOffer,Guid> _domainOfferRepository;
-
-    public CreateDomainOfferCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<DomainOffer,Guid> domainOfferRepository)
+    private readonly IIdentifierProvider<Guid> _identifierProvider;
+    public CreateDomainOfferCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<DomainOffer,Guid> domainOfferRepository, IIdentifierProvider<Guid> identifierProvider)
     {
         _authIdentityProvider = authIdentityProvider;
         _domainOfferRepository = domainOfferRepository;
+        _identifierProvider = identifierProvider;
     }
 
     public async Task<Guid> HandleAsync(CreateDomainOfferCommand command, CancellationToken cancellation)
@@ -33,7 +34,9 @@ internal sealed class CreateDomainOfferCommandHandler : IHandler<CreateDomainOff
 
         var validTo = command.ValidTo ?? DateTime.MaxValue;
 
-        var domainOffer = DomainOffer.Create(command.Name, command.Description, command.MaxMembersCount, currencyAmount, invoicePeriod, command.ValidFrom, validTo, command.MaxContractsPerIdentity);
+        var domainOfferId = _identifierProvider.CreateNewId();
+        var domainOffer = DomainOffer.Create(domainOfferId, command.Name, command.Description, command.MaxMembersCount, 
+            currencyAmount, invoicePeriod, command.ValidFrom, validTo, command.MaxContractsPerIdentity);
         await _domainOfferRepository.AddAsync(domainOffer);
 
         return domainOffer.Id;

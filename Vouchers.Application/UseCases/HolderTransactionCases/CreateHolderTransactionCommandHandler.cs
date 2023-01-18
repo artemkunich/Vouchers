@@ -22,11 +22,13 @@ internal sealed class CreateHolderTransactionCommandHandler : IHandler<CreateHol
     private readonly IRepository<AccountItem,Guid> _accountItemRepository;
     private readonly IRepository<HolderTransaction,Guid> _holderTransactionRepository;
     private readonly IRepository<HolderTransactionRequest,Guid> _holderTransactionRequestRepository;
-
+    private readonly IIdentifierProvider<Guid> _identifierProvider;
+    private readonly IDateTimeProvider _dateTimeProvider;
+    
     public CreateHolderTransactionCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<DomainAccount,Guid> domainAccountRepository, 
         IRepository<Account,Guid> accountRepository, IRepository<Unit,Guid> unitRepository, 
         IRepository<UnitType,Guid> unitTypeRepository, IRepository<AccountItem,Guid> accountItemRepository, 
-        IRepository<HolderTransaction,Guid> holderTransactionRepository, IRepository<HolderTransactionRequest,Guid> holderTransactionRequestRepository)
+        IRepository<HolderTransaction,Guid> holderTransactionRepository, IRepository<HolderTransactionRequest,Guid> holderTransactionRequestRepository, IIdentifierProvider<Guid> identifierProvider, IDateTimeProvider dateTimeProvider)
     {
         _authIdentityProvider = authIdentityProvider;
         _domainAccountRepository = domainAccountRepository;
@@ -36,6 +38,8 @@ internal sealed class CreateHolderTransactionCommandHandler : IHandler<CreateHol
         _accountItemRepository = accountItemRepository;
         _holderTransactionRepository = holderTransactionRepository;
         _holderTransactionRequestRepository = holderTransactionRequestRepository;
+        _identifierProvider = identifierProvider;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     public async Task<Guid> HandleAsync(CreateHolderTransactionCommand command, CancellationToken cancellation)
@@ -74,7 +78,9 @@ internal sealed class CreateHolderTransactionCommandHandler : IHandler<CreateHol
         if (debtorAccount is null)
             throw new ApplicationException(Properties.Resources.DebtorAccountDoesNotExist);
 
-        HolderTransaction transaction = HolderTransaction.Create(creditorAccount, debtorAccount, unitType, command.Message);
+        var transactionId = _identifierProvider.CreateNewId();
+        var currentDateTime = _dateTimeProvider.CurrentDateTime();
+        HolderTransaction transaction = HolderTransaction.Create(transactionId, currentDateTime, creditorAccount, debtorAccount, unitType, command.Message);
 
         foreach (var item in command.Items)
         {
@@ -86,10 +92,15 @@ internal sealed class CreateHolderTransactionCommandHandler : IHandler<CreateHol
             var debitAccountItem = (await _accountItemRepository.GetByExpressionAsync(accItem => accItem.HolderAccountId == command.DebtorAccountId && accItem.Unit.Id == item.Item1)).FirstOrDefault();
             if (debitAccountItem is null)
             {
+                var voucherId = _identifierProvider.CreateNewId();
                 var voucher = await _unitRepository.GetByIdAsync(item.Item1);
-                debitAccountItem = AccountItem.Create(debtorAccount, 0, voucher);
+                debitAccountItem = AccountItem.Create(voucherId, debtorAccount, 0, voucher);
             }
-            transaction.AddTransactionItem(HolderTransactionItem.Create(UnitQuantity.Create(item.Item2, debitAccountItem.Unit), creditAccountItem, debitAccountItem));
+
+            var transactionItemId = _identifierProvider.CreateNewId();
+            var transactionItem = HolderTransactionItem.Create(transactionItemId,
+                UnitQuantity.Create(item.Item2, debitAccountItem.Unit), creditAccountItem, debitAccountItem);
+            transaction.AddTransactionItem(transactionItem);
         }
     
         if (holderTransactionRequest is null)

@@ -8,26 +8,23 @@ namespace Vouchers.Values.Domain;
 
 public sealed class VoucherValue : AggregateRoot<Guid>
 {
-    public Guid DomainId { get; }
-    public Guid IssuerIdentityId { get; }
+    public Guid DomainId { get; init; }
+    public Guid IssuerIdentityId { get; init; }
     public string Ticker { get; set; }
     public string Description { get; set; }
     public Guid? ImageId { get; set; }
 
-    internal VoucherValue(Guid unitTypeId, Guid domainId, Guid issuerIdentityId, string ticker) : base(unitTypeId)
-    {
-        DomainId = domainId; //Is needed for unique constraint
-        IssuerIdentityId = issuerIdentityId;
-
-        if (string.IsNullOrEmpty(ticker))
-            throw new VoucherValueException(Resources.TickerIsNotSpecified);
-        Ticker = ticker;
-    }
-
-    private VoucherValue() { }
-
     public static VoucherValue Create(Guid unitTypeId, Guid domainId, Guid issuerIdentityId, string ticker)
     {
-        return new VoucherValue(unitTypeId, domainId, issuerIdentityId, ticker);
+        if (string.IsNullOrEmpty(ticker))
+            throw new VoucherValueException(Resources.TickerIsNotSpecified);
+
+        return new()
+        {
+            Id = unitTypeId,
+            DomainId = domainId, //Is needed for unique constraint
+            IssuerIdentityId = issuerIdentityId,
+            Ticker = ticker
+        };
     }
 }

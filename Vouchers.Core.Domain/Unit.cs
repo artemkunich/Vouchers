@@ -6,8 +6,8 @@ namespace Vouchers.Core.Domain;
 
 public sealed class Unit : AggregateRoot<Guid>
 {
-    public Guid UnitTypeId { get; }
-    public UnitType UnitType { get; }
+    public Guid UnitTypeId { get; init; }
+    public UnitType UnitType { get; init; }
 
     public DateTime ValidFrom { get; private set; }
     public DateTime ValidTo { get; private set; }
@@ -16,10 +16,7 @@ public sealed class Unit : AggregateRoot<Guid>
 
     public decimal Supply { get; private set; }
 
-    public static Unit Create(DateTime validFrom, DateTime validTo, bool canBeExchanged, UnitType value, CultureInfo cultureInfo = null) =>
-        new Unit(Guid.NewGuid(), value, validFrom, validTo, canBeExchanged, 0, cultureInfo);
-
-    private Unit(Guid id, UnitType unitType, DateTime validFrom, DateTime validTo, bool canBeExchanged, decimal supply, CultureInfo cultureInfo = null) : base(id)
+    public static Unit Create(Guid id, DateTime validFrom, DateTime validTo, bool canBeExchanged, UnitType unitType, decimal supply, CultureInfo cultureInfo = null)
     {
         if (validTo < DateTime.Today)
             throw new CoreException("ValidToIsLessThanToday", cultureInfo);
@@ -27,17 +24,19 @@ public sealed class Unit : AggregateRoot<Guid>
         if (validFrom > validTo)
             throw new CoreException("ValidFromIsGreaterThanValidTo", cultureInfo);
 
-        ValidFrom = validFrom;
-        ValidTo = validTo;
-        CanBeExchanged = canBeExchanged;
+        return new()
+        {
+            Id = id,
+            ValidFrom = validFrom,
+            ValidTo = validTo,
+            CanBeExchanged = canBeExchanged,
 
-        UnitTypeId = unitType.Id;
-        UnitType = unitType;
-        
-        Supply = supply;
+            UnitTypeId = unitType.Id,
+            UnitType = unitType,
+
+            Supply = supply
+        };
     }
-
-    private Unit() { }
 
     public void IncreaseSupply(decimal amount, CultureInfo cultureInfo = null)
     {
