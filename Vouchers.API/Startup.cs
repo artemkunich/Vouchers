@@ -135,11 +135,12 @@ public class Startup
 
         app.UseCors("default");
 
-        var localazeOptions = app.ApplicationServices.GetService<IOptions<RequestLocalizationOptions>>();
-        app.UseRequestLocalization(localazeOptions.Value);
+        var localizeOptions = app.ApplicationServices.GetService<IOptions<RequestLocalizationOptions>>();
+        if(localizeOptions is not null)
+            app.UseRequestLocalization(localizeOptions.Value);
 
         app.UseAuthentication();
-        app.UseAuthorization();          
+        app.UseAuthorization();
 
         app.UseEndpoints(endpoints =>
         {

@@ -13,30 +13,28 @@ using Vouchers.Persistence.InterCommunication;
 
 namespace Vouchers.Persistence.Repositories;
 
-internal abstract class Repository<TAggregateRoot, TKey> : IRepository<TAggregateRoot, TKey> where TAggregateRoot: AggregateRoot<TKey>
+internal abstract class Repository<TAggregateRoot, TKey> : ReadOnlyRepository<TAggregateRoot, TKey>, IRepository<TAggregateRoot, TKey> where TAggregateRoot: AggregateRoot<TKey>
 {
     private readonly IMessageDataSerializer _messageDataSerializer;
     private readonly IIdentifierProvider<Guid> _identifierProvider;
-    protected VouchersDbContext DbContext { get; }
 
-    protected Repository(VouchersDbContext context, IMessageDataSerializer messageDataSerializer, IIdentifierProvider<Guid> identifierProvider)
+    protected Repository(VouchersDbContext dbContext, IMessageDataSerializer messageDataSerializer, IIdentifierProvider<Guid> identifierProvider) : base(dbContext)
     {
         _messageDataSerializer = messageDataSerializer;
         _identifierProvider = identifierProvider;
-        DbContext = context;
     }
 
-    public virtual async Task<TAggregateRoot> GetByIdAsync(TKey id)
-    {
-        var dbSet = DbContext.Set<TAggregateRoot>();
-        return await dbSet.FindAsync(id);
-    }
-
-    public virtual async Task<IEnumerable<TAggregateRoot>> GetByExpressionAsync(Expression<Func<TAggregateRoot, bool>> expression)
-    {
-        var dbSet = DbContext.Set<TAggregateRoot>();
-        return await dbSet.Where(expression).ToListAsync();
-    }
+    // public virtual async Task<TAggregateRoot> GetByIdAsync(TKey id)
+    // {
+    //     var dbSet = DbContext.Set<TAggregateRoot>();
+    //     return await dbSet.FindAsync(id);
+    // }
+    //
+    // public virtual async Task<IEnumerable<TAggregateRoot>> GetByExpressionAsync(Expression<Func<TAggregateRoot, bool>> expression)
+    // {
+    //     var dbSet = DbContext.Set<TAggregateRoot>();
+    //     return await dbSet.Where(expression).ToListAsync();
+    // }
 
     public virtual async Task UpdateAsync(TAggregateRoot aggregateRoot)
     {
