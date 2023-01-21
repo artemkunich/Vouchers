@@ -48,7 +48,7 @@ public sealed class HolderTransactionRequest : AggregateRoot<Guid>
                 throw new CoreException("IssuerCannotRequireExchangeability", cultureInfo);
         }
         
-        if (creditorAccount.Equals(debtorAccount))
+        if (creditorAccount is not null && debtorAccount.Equals(creditorAccount))
             throw new CoreException("CreditorAndDebtorAreTheSame", cultureInfo);
 
         return new()

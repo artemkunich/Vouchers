@@ -6,7 +6,7 @@ using System.Globalization;
 
 namespace Vouchers.Core.Domain;
 
-public sealed class HolderTransactionItem : AggregateRoot<Guid>
+public sealed class HolderTransactionItem : Entity<Guid>
 {
     public UnitQuantity Quantity { get; init; }
 

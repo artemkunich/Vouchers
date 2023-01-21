@@ -39,29 +39,36 @@ public static class ServiceCollectionExtension
         var assemblies = Assembly.GetExecutingAssembly().GetReferencedAssemblies().Select(Assembly.Load).Where(x => x.FullName != null && x.FullName.StartsWith("Vouchers")).ToList();
         assemblies.Add(Assembly.GetExecutingAssembly());
         
-        var aggregateRootTypes = assemblies.SelectMany(assembly => 
+        var entityTypes = assemblies.SelectMany(assembly => 
             assembly.GetTypes().Where(t =>
                 t.IsClass && !t.IsAbstract &&
-                t.GetInterfaces().Any(type => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IEntity<>)) &&
-                t.IsInheritedFromGeneric(typeof(AggregateRoot<>))
+                t.GetInterfaces().Any(type => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IEntity<>))
             )
         ).ToList();
 
         var executingAssembly = Assembly.GetExecutingAssembly();
         
-        foreach (var aggregateRootType in aggregateRootTypes)
+        foreach (var entityType in entityTypes)
         {
-            var idType = aggregateRootType.GetProperty(nameof(Entity<object>.Id))?.PropertyType;
+            var idType = entityType.GetProperty(nameof(Entity<object>.Id))?.PropertyType;
 
             if(idType is null)
                 continue;
             
-            var genericRepositoryType = typeof(IRepository<,>).MakeGenericType(aggregateRootType, idType);
-            var genericRepositoryTypeInfo = genericRepositoryType.GetTypeInfo();
+            var genericReadOnlyRepositoryType = typeof(IReadOnlyRepository<,>).MakeGenericType(entityType, idType);
+            var readOnlyRepositoryType = executingAssembly.GetTypes()
+                .Where(t => genericReadOnlyRepositoryType.IsAssignableFrom(t) && t.IsClass && !t.IsAbstract && !t.IsGenericType)
+                .FirstOrDefault(typeof(GenericReadOnlyRepository<,>).MakeGenericType(entityType, idType));
+            
+            services.AddScoped(genericReadOnlyRepositoryType, readOnlyRepositoryType);
 
+            if (!entityType.IsInheritedFromGeneric(typeof(AggregateRoot<>)))
+                continue;
+            
+            var genericRepositoryType = typeof(IRepository<,>).MakeGenericType(entityType, idType);
             var repositoryType = executingAssembly.GetTypes()
-                .Where(t => genericRepositoryTypeInfo.IsAssignableFrom(t) && t.IsClass && !t.IsAbstract)
-                .FirstOrDefault(typeof(GenericRepository<,>).MakeGenericType(aggregateRootType, idType));
+                .Where(t => genericRepositoryType.IsAssignableFrom(t) && t.IsClass && !t.IsAbstract && !t.IsGenericType)
+                .FirstOrDefault(typeof(GenericRepository<,>).MakeGenericType(entityType, idType));
             
             services.AddScoped(genericRepositoryType, repositoryType);
         }

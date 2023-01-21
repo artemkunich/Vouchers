@@ -14,10 +14,10 @@ namespace Vouchers.Application.UseCases.DomainCases;
 internal sealed class UpdateDomainDetailCommandHandler : IHandler<UpdateDomainDetailCommand>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
-    private readonly IRepository<DomainAccount,Guid> _domainAccountRepository;
+    private readonly IReadOnlyRepository<DomainAccount,Guid> _domainAccountRepository;
     private readonly IRepository<Domain,Guid> _domainRepository;
     private readonly IAppImageService _appImageService;
-    public UpdateDomainDetailCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<DomainAccount,Guid> domainAccountRepository, 
+    public UpdateDomainDetailCommandHandler(IAuthIdentityProvider authIdentityProvider, IReadOnlyRepository<DomainAccount,Guid> domainAccountRepository, 
         IRepository<Domain,Guid> domainRepository, IAppImageService appImageService)
     {
         _authIdentityProvider = authIdentityProvider;

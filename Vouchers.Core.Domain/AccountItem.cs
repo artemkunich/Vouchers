@@ -4,7 +4,7 @@ using System.Globalization;
 
 namespace Vouchers.Core.Domain;
 
-public sealed class AccountItem : AggregateRoot<Guid>
+public sealed class AccountItem : Entity<Guid>
 {
     public Guid HolderAccountId { get; init; }
     public Account HolderAccount { get; init; }

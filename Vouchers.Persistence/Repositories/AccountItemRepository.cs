@@ -11,9 +11,9 @@ using Vouchers.Persistence.InterCommunication;
 
 namespace Vouchers.Persistence.Repositories;
 
-internal sealed class AccountItemRepository : Repository<AccountItem, Guid>
+internal sealed class AccountItemRepository : ReadOnlyRepository<AccountItem, Guid>
 {
-    public AccountItemRepository(VouchersDbContext dbContext, IMessageDataSerializer messageDataSerializer, IIdentifierProvider<Guid> identifierProvider) : base(dbContext, messageDataSerializer, identifierProvider)
+    public AccountItemRepository(VouchersDbContext dbContext) : base(dbContext)
     {
     }
 

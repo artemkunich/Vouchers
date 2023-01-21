@@ -15,11 +15,11 @@ namespace Vouchers.Application.UseCases.HolderTransactionRequestCases;
 internal sealed class DeleteHolderTransactionRequestCommandHandler : IHandler<DeleteHolderTransactionRequestCommand>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
-    private readonly IRepository<DomainAccount,Guid> _domainAccountRepository;
+    private readonly IReadOnlyRepository<DomainAccount,Guid> _domainAccountRepository;
     private readonly IRepository<HolderTransactionRequest,Guid> _holderTransactionRequestRepository;
 
     public DeleteHolderTransactionRequestCommandHandler(IAuthIdentityProvider authIdentityProvider, 
-        IRepository<DomainAccount,Guid> domainAccountRepository, IRepository<HolderTransactionRequest,Guid> holderTransactionRequestRepository)
+        IReadOnlyRepository<DomainAccount,Guid> domainAccountRepository, IRepository<HolderTransactionRequest,Guid> holderTransactionRequestRepository)
     {
         _authIdentityProvider = authIdentityProvider;
         _domainAccountRepository = domainAccountRepository;

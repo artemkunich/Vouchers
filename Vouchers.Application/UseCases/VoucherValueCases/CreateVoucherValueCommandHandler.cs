@@ -16,15 +16,15 @@ namespace Vouchers.Application.UseCases.VoucherValueCases;
 internal sealed class CreateVoucherValueCommandHandler : IHandler<CreateVoucherValueCommand, Guid>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
-    private readonly IRepository<DomainAccount,Guid> _domainAccountRepository;
-    private readonly IRepository<Account,Guid> _accountRepository;
+    private readonly IReadOnlyRepository<DomainAccount,Guid> _domainAccountRepository;
+    private readonly IReadOnlyRepository<Account,Guid> _accountRepository;
     private readonly IRepository<VoucherValue,Guid> _voucherValueRepository;
     private readonly IRepository<UnitType,Guid> _unitTypeRepository;
     private readonly IAppImageService _appImageService;
     private readonly IIdentifierProvider<Guid> _identifierProvider;
     
     public CreateVoucherValueCommandHandler(IAuthIdentityProvider authIdentityProvider, IAppImageService appImageService,
-        IRepository<DomainAccount,Guid> domainAccountRepository, IRepository<Account,Guid> accountRepository,
+        IReadOnlyRepository<DomainAccount,Guid> domainAccountRepository, IReadOnlyRepository<Account,Guid> accountRepository,
         IRepository<VoucherValue,Guid> voucherValueRepository, IRepository<UnitType,Guid> unitTypeRepository, IIdentifierProvider<Guid> identifierProvider)
     {
         _authIdentityProvider = authIdentityProvider;

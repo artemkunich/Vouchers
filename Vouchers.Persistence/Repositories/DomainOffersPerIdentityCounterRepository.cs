@@ -12,9 +12,9 @@ using Vouchers.Persistence.InterCommunication;
 
 namespace Vouchers.Persistence.Repositories;
 
-internal sealed class DomainOffersPerIdentityCounterRepository : Repository<DomainOffersPerIdentityCounter, Guid>
+internal sealed class DomainOffersPerIdentityCounterRepository : ReadOnlyRepository<DomainOffersPerIdentityCounter, Guid>
 {
-    public DomainOffersPerIdentityCounterRepository(VouchersDbContext dbContext, IMessageDataSerializer messageDataSerializer, IIdentifierProvider<Guid> identifierProvider) : base(dbContext, messageDataSerializer, identifierProvider)
+    public DomainOffersPerIdentityCounterRepository(VouchersDbContext dbContext) : base(dbContext)
     {
     }
 

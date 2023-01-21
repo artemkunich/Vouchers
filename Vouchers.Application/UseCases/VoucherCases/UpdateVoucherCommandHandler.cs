@@ -15,16 +15,17 @@ internal sealed class UpdateVoucherCommandHandler : IHandler<UpdateVoucherComman
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly ICultureInfoProvider _cultureInfoProvider;
+    private readonly IReadOnlyRepository<VoucherValue,Guid> _voucherValueRepository;
     private readonly IRepository<Unit,Guid> _unitRepository;
-    private readonly IRepository<VoucherValue,Guid> _voucherValueRepository;
+    
 
     public UpdateVoucherCommandHandler(IAuthIdentityProvider authIdentityProvider, ICultureInfoProvider cultureInfoProvider, 
-        IRepository<Unit,Guid> unitRepository, IRepository<VoucherValue,Guid> voucherValueRepository)
+        IReadOnlyRepository<VoucherValue,Guid> voucherValueRepository, IRepository<Unit,Guid> unitRepository)
     {
         _authIdentityProvider = authIdentityProvider;
         _cultureInfoProvider = cultureInfoProvider;
-        _unitRepository = unitRepository;
         _voucherValueRepository = voucherValueRepository;
+        _unitRepository = unitRepository;
     }
 
     public async Task HandleAsync(UpdateVoucherCommand command, CancellationToken cancellation)

@@ -15,16 +15,16 @@ namespace Vouchers.Application.UseCases.IssuerTransactionCases;
 internal sealed class CreateIssuerTransactionCommandHandler : IHandler<CreateIssuerTransactionCommand, Guid>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
-    private readonly IRepository<DomainAccount,Guid> _domainAccountRepository;
-    private readonly IRepository<Account,Guid> _accountRepository;
-    private readonly IRepository<AccountItem,Guid> _accountItemRepository;
-    private readonly IRepository<Unit,Guid> _unitRepository;
+    private readonly IReadOnlyRepository<DomainAccount,Guid> _domainAccountRepository;
+    private readonly IReadOnlyRepository<Account,Guid> _accountRepository;
+    private readonly IReadOnlyRepository<AccountItem,Guid> _accountItemRepository;
+    private readonly IReadOnlyRepository<Unit,Guid> _unitRepository;
     private readonly IRepository<IssuerTransaction,Guid> _issuerTransactionRepository;
     private readonly IIdentifierProvider<Guid> _identifierProvider;
     private readonly IDateTimeProvider _dateTimeProvider;
     public CreateIssuerTransactionCommandHandler(IAuthIdentityProvider authIdentityProvider,
-        IRepository<DomainAccount,Guid> domainAccountRepository, IRepository<Account,Guid> accountRepository, 
-        IRepository<AccountItem,Guid> accountItemRepository, IRepository<Unit,Guid> unitRepository, 
+        IReadOnlyRepository<DomainAccount,Guid> domainAccountRepository, IReadOnlyRepository<Account,Guid> accountRepository, 
+        IReadOnlyRepository<AccountItem,Guid> accountItemRepository, IReadOnlyRepository<Unit,Guid> unitRepository, 
         IRepository<IssuerTransaction,Guid> issuerTransactionRepository, IIdentifierProvider<Guid> identifierProvider, IDateTimeProvider dateTimeProvider) 
     {
         _authIdentityProvider = authIdentityProvider;
