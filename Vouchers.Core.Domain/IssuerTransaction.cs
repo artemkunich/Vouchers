@@ -15,45 +15,44 @@ public sealed class IssuerTransaction : AggregateRoot<Guid>
     public Guid IssuerAccountItemId { get; init; }
     public AccountItem IssuerAccountItem { get; init; }
 
-    public static IssuerTransaction Create(Guid id, DateTime timestamp, AccountItem issuerAccountItem, decimal amount, CultureInfo cultureInfo = null)
+    public static Result<IssuerTransaction> Create(Guid id, DateTime timestamp, AccountItem issuerAccountItem,
+        decimal amount, CultureInfo cultureInfo = null) =>
+        Result.Create()
+            .AddErrorIf(issuerAccountItem.Unit.ValidTo < DateTime.Today, Errors.UnitIsExpired(cultureInfo))
+            .AddErrorIf(issuerAccountItem.Unit.UnitType.IssuerAccount.NotEquals(issuerAccountItem.HolderAccount),
+                Errors.AccountHolderAndUnitTypeIssuerAreDifferent(cultureInfo))
+            .AddErrorIf(issuerAccountItem.Unit.NotEquals(issuerAccountItem.Unit),
+                Errors.AccountItemUnitAndTransactionUnitAreDifferent(cultureInfo))
+            .AddErrorIf(amount == 0, Errors.AmountIsNotPositive(cultureInfo))
+            .Map(() => UnitQuantity.Create(amount, issuerAccountItem.Unit))
+            .Map(quantity => new IssuerTransaction
+            {
+                Id = id,
+                Timestamp = timestamp,
+
+                Quantity = quantity.Value,
+
+                IssuerAccountItemId = issuerAccountItem.Id,
+                IssuerAccountItem = issuerAccountItem,
+            });
+
+    private IssuerTransaction()
     {
-        var quantity = UnitQuantity.Create(amount, issuerAccountItem.Unit);
-        
-        if (quantity.Unit.ValidTo < DateTime.Today)
-            throw new CoreException("UnitIsExpired", cultureInfo);
-
-        if (quantity.Unit.UnitType.IssuerAccount.NotEquals(issuerAccountItem.HolderAccount))
-            throw new CoreException("AccountHolderAndUnitTypeIssuerAreDifferent", cultureInfo);
-
-        if (quantity.Unit.NotEquals(issuerAccountItem.Unit))
-            throw new CoreException("AccountItemUnitAndTransactionUnitAreDifferent", cultureInfo);
-
-        if (quantity.Amount == 0)
-            throw new CoreException("AmountIsNotPositive", cultureInfo);
-
-        return new()
-        {
-            Id = id,
-            Timestamp = timestamp,
-
-            Quantity = quantity,
-            
-            IssuerAccountItemId = issuerAccountItem.Id,
-            IssuerAccountItem = issuerAccountItem,
-        };
+        //Empty
     }
+    
+    public Result<IssuerTransaction> Perform() =>
+        Result.Create(this)
+            .IfSuccess(transaction =>
+                {
+                    var result = transaction.Quantity.Amount > 0
+                        ? transaction.IssuerAccountItem.ProcessDebit(transaction.Quantity.Amount)
+                        : transaction.IssuerAccountItem.ProcessCredit(-transaction.Quantity.Amount);
 
-    public void Perform()
-    {
-        if (Quantity.Amount > 0)
-        {
-            IssuerAccountItem.ProcessDebit(Quantity.Amount);
-            IssuerAccountItem.Unit.IncreaseSupply(Quantity.Amount);
-        }
-        else
-        {
-            IssuerAccountItem.ProcessCredit(-Quantity.Amount);
-            IssuerAccountItem.Unit.ReduceSupply(-Quantity.Amount);
-        }
-    }
+                    return result.IfSuccess(item => transaction.Quantity.Amount > 0
+                        ? item.Unit.IncreaseSupply(Quantity.Amount)
+                        : item.Unit.ReduceSupply(-Quantity.Amount)
+                    );
+                }
+            );
 }

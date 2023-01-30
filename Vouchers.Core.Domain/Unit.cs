@@ -16,80 +16,61 @@ public sealed class Unit : AggregateRoot<Guid>
 
     public decimal Supply { get; private set; }
 
-    public static Unit Create(Guid id, DateTime validFrom, DateTime validTo, bool canBeExchanged, UnitType unitType, decimal supply, CultureInfo cultureInfo = null)
+    public static Result<Unit> Create(Guid id, DateTime validFrom, DateTime validTo, bool canBeExchanged, UnitType unitType, decimal supply, CultureInfo cultureInfo = null) =>
+        Result.Create()
+            .AddErrorIf(validTo < DateTime.Today, Errors.ValidToIsLessThanToday(cultureInfo))
+            .AddErrorIf(validFrom > validTo, Errors.ValidFromIsGreaterThanValidTo(cultureInfo))
+            .Map(() => new Unit
+                {
+                    Id = id,
+                    ValidFrom = validFrom,
+                    ValidTo = validTo,
+                    CanBeExchanged = canBeExchanged,
+
+                    UnitTypeId = unitType.Id,
+                    UnitType = unitType,
+
+                    Supply = supply
+                }
+            );
+
+    private Unit()
     {
-        if (validTo < DateTime.Today)
-            throw new CoreException("ValidToIsLessThanToday", cultureInfo);
-
-        if (validFrom > validTo)
-            throw new CoreException("ValidFromIsGreaterThanValidTo", cultureInfo);
-
-        return new()
-        {
-            Id = id,
-            ValidFrom = validFrom,
-            ValidTo = validTo,
-            CanBeExchanged = canBeExchanged,
-
-            UnitTypeId = unitType.Id,
-            UnitType = unitType,
-
-            Supply = supply
-        };
+        //Empty
     }
+    
+    public Result<Unit> IncreaseSupply(decimal amount, CultureInfo cultureInfo = null) =>
+        Result.Create(this)
+            .AddErrorIf(amount <= 0, Errors.AmountIsNotPositive(cultureInfo))
+            .IfSuccess(unit => unit.Supply += amount)
+            .IfSuccess(unit => unit.UnitType.IncreaseSupply(amount));
 
-    public void IncreaseSupply(decimal amount, CultureInfo cultureInfo = null)
-    {
-        if (amount <= 0)
-            throw new CoreException("AmountIsNotPositive", cultureInfo);
-        Supply += amount;
+    public Result<Unit> ReduceSupply(decimal amount, CultureInfo cultureInfo = null) =>
+        Result.Create(this)
+            .AddErrorIf(amount <= 0, Errors.AmountIsNotPositive(cultureInfo))
+            .AddErrorIf(Supply < amount, Errors.AmountIsGreaterThanSupply(cultureInfo))
+            .IfSuccess(unit => unit.Supply -= amount)
+            .IfSuccess(unit => unit.UnitType.ReduceSupply(amount));
 
-        UnitType.IncreaseSupply(amount);
-    }
+    public Result<Unit> SetValidFrom(DateTime validFrom, CultureInfo cultureInfo = null) =>
+        Result.Create(this)
+            .AddErrorIf(validFrom > ValidFrom && Supply != 0,
+                Errors.NewValidFromIsGreaterThanCurrentValidFrom(cultureInfo))
+            .AddErrorIf(validFrom > ValidTo, Errors.NewValidFromIsGreaterThanCurrentValidTo(cultureInfo))
+            .IfSuccess(unit => unit.ValidFrom = validFrom);
 
-    public void ReduceSupply(decimal amount, CultureInfo cultureInfo = null)
-    {
-        if (amount <= 0)
-            throw new CoreException("AmountIsNotPositive", cultureInfo);
-        if (Supply < amount)
-            throw new CoreException("AmountIsGreaterThanSupply", cultureInfo);
-        Supply -= amount;
+    public Result<Unit> SetValidTo(DateTime validTo, CultureInfo cultureInfo = null) =>
+        Result.Create(this)
+            .AddErrorIf(validTo < ValidTo && Supply != 0, Errors.NewValidToIsLessThanCurrentValidFrom(cultureInfo))
+            .AddErrorIf(ValidFrom > validTo, Errors.CurrentValidFromIsGreaterThanNewValidTo(cultureInfo))
+            .IfSuccess(unit => unit.ValidTo = validTo);
 
-        UnitType.ReduceSupply(amount);
-    }
 
-    public void SetValidFrom(DateTime validFrom, CultureInfo cultureInfo = null)
-    {
-        if (validFrom > ValidFrom && Supply != 0)
-            throw new CoreException("NewValidFromIsGreaterThanCurrentValidFrom", cultureInfo);
+    public Result<Unit> SetCanBeExchanged(bool canBeExchanged, CultureInfo cultureInfo = null) =>
+        Result.Create(this)
+            .AddErrorIf(!canBeExchanged && CanBeExchanged && Supply != 0,
+                Errors.CannotDisableExchangeability(cultureInfo))
+            .IfSuccess(unit => unit.CanBeExchanged = canBeExchanged);
 
-        if (validFrom > ValidTo)
-            throw new CoreException("NewValidFromIsGreaterThanCurrentValidTo", cultureInfo);
-
-        ValidFrom = validFrom;
-    }
-
-    public void SetValidTo(DateTime validTo, CultureInfo cultureInfo = null)
-    {
-        if (validTo < ValidTo && Supply != 0)
-            throw new CoreException("NewValidToIsLessThanCurrentValidFrom", cultureInfo);
-
-        if (ValidFrom > validTo)
-            throw new CoreException("CurrentValidFromIsGreaterThanNewValidTo", cultureInfo);
-
-        ValidTo = validTo;
-    }
-
-    public void SetCanBeExchanged(bool canBeExchanged, CultureInfo cultureInfo = null)
-    {
-        if (!canBeExchanged && CanBeExchanged && Supply != 0)
-            throw new CoreException("CannotDisableExchangeability", cultureInfo);
-
-        CanBeExchanged = canBeExchanged;
-    }
-
-    public bool CanBeRemoved()
-    {
-        return Supply == 0;
-    }
+    public bool CanBeRemoved() => Supply == 0;
 }

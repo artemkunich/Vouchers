@@ -14,29 +14,31 @@ public sealed class AccountItem : Entity<Guid>
     public Guid UnitId { get; init; }
     public Unit Unit { get; init; }
 
-    public static AccountItem Create(Guid id, Account holderAccount, decimal balance, Unit unit) => new()
-    {
-        Id = id,
-        HolderAccountId = holderAccount.Id,
-        HolderAccount = holderAccount,
-        
-        Balance = balance,
-        
-        UnitId = unit.Id,
-        Unit = unit
-    };
-
-    public void ProcessDebit(decimal amount)
-    {
-        Balance += amount;
-    }
-    public void ProcessCredit(decimal amount, CultureInfo cultureInfo = null)
-    {
-        if (amount > Balance)
+    public static Result<AccountItem> Create(Guid id, Account holderAccount, decimal balance, Unit unit) => 
+        new AccountItem
         {
-            throw new CoreException("AmountIsGreaterThanBalance", cultureInfo);
-        }
-        Balance -= amount;
+            Id = id,
+            HolderAccountId = holderAccount.Id,
+            HolderAccount = holderAccount,
+            
+            Balance = balance,
+            
+            UnitId = unit.Id,
+            Unit = unit
+        };
+
+    private AccountItem()
+    {
+        //Empty
     }
+    
+    public Result<AccountItem> ProcessDebit(decimal amount) =>
+        Result.Create(this)
+            .IfSuccess(item => item.Balance += amount);
+
+    public Result<AccountItem> ProcessCredit(decimal amount, CultureInfo cultureInfo = null) =>
+        Result.Create(this)
+            .AddErrorIf(amount > Balance, Errors.AmountIsGreaterThanBalance(cultureInfo))
+            .IfSuccess(item => item.Balance -= amount);
 }
 

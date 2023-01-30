@@ -9,10 +9,11 @@ using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Services;
 using Vouchers.Core.Domain;
 using Vouchers.Domains.Domain;
+using Vouchers.Primitives;
 
 namespace Vouchers.Application.UseCases.DomainCases;
 
-internal sealed class CreateDomainCommandHandler : IHandler<CreateDomainCommand, Guid?>
+internal sealed class CreateDomainCommandHandler : IHandler<CreateDomainCommand, Result<Guid?>>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IReadOnlyRepository<DomainOffer,Guid> _domainOfferRepository;
@@ -36,7 +37,7 @@ internal sealed class CreateDomainCommandHandler : IHandler<CreateDomainCommand,
         _dateTimeProvider = dateTimeProvider;
     }
 
-    public async Task<Guid?> HandleAsync(CreateDomainCommand command, CancellationToken cancellation)
+    public async Task<Result<Guid?>> HandleAsync(CreateDomainCommand command, CancellationToken cancellation)
     {
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
 
@@ -67,7 +68,11 @@ internal sealed class CreateDomainCommandHandler : IHandler<CreateDomainCommand,
         if (domainOffer.Amount.Amount == 0)
         {
             var accountId = _identifierProvider.CreateNewId();
-            var account = Account.Create(accountId, _dateTimeProvider.CurrentDateTime());
+            var accountResult = Account.Create(accountId, _dateTimeProvider.CurrentDateTime());
+            if (accountResult.IsFailure)
+                return accountResult.Errors;
+
+            var account = accountResult.Value;
             await _accountRepository.AddAsync(account);
 
             var domainId = _identifierProvider.CreateNewId();
@@ -82,10 +87,8 @@ internal sealed class CreateDomainCommandHandler : IHandler<CreateDomainCommand,
             return domain.Id;
 
         }
-        else
-        {
-            await _domainContractRepository.AddAsync(domainContract);
-            return null;
-        }         
+        
+        await _domainContractRepository.AddAsync(domainContract);
+        return null;
     }
 }

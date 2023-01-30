@@ -8,35 +8,30 @@ public sealed class Account : AggregateRoot<Guid>
 {
     public DateTime CreatedDateTime { get; init; }
     public decimal Supply { get; private set; }
+    
+    public static Result<Account> Create(Guid id, DateTime createdDateTime) => 
+        new Account
+        {
+            Id = id,
+            CreatedDateTime = createdDateTime
+        };
 
-    public static Account Create(Guid id, DateTime createdDateTime) => new ()
+    private Account()
     {
-        Id = id,
-        CreatedDateTime = createdDateTime
-    };
-
-    public void IncreaseSupply(decimal amount, CultureInfo cultureInfo = null) 
-    { 
-        if(amount <= 0)
-            throw new CoreException("AmountIsNotPositive", cultureInfo);
-
-        Supply += amount;
+        //Empty
     }
+    
+    public Result<Account> IncreaseSupply(decimal amount, CultureInfo cultureInfo = null) =>
+        Result.Create(this)
+            .AddErrorIf(amount <= 0, Errors.AmountIsNotPositive(cultureInfo))
+            .IfSuccess(account => account.Supply += amount);
 
-    public void ReduceSupply(decimal amount, CultureInfo cultureInfo = null)
-    {
-        if (amount <= 0)
-            throw new CoreException("AmountIsNotPositive", cultureInfo);
+    public Result<Account> ReduceSupply(decimal amount, CultureInfo cultureInfo = null) =>
+        Result.Create(this)
+            .AddErrorIf(amount <= 0, Errors.AmountIsNotPositive(cultureInfo))
+            .AddErrorIf(amount > Supply, Errors.AmountIsGreaterThanSupply(cultureInfo))
+            .IfSuccess(account => account.Supply -= amount);
 
-        if (Supply < amount)
-            throw new CoreException("AmountIsGreaterThanSupply", cultureInfo);
-
-        Supply -= amount;
-    }
-
-    public bool CanBeRemoved()
-    {
-        return Supply == 0;
-    }
+    public bool CanBeRemoved() => Supply == 0;
 }
 

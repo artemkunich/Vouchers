@@ -7,6 +7,7 @@ using Vouchers.Application.Commands.DomainAccountCommands;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Queries;
 using Vouchers.Infrastructure;
+using Vouchers.Primitives;
 
 namespace Vouchers.API.Controllers;
 
@@ -32,7 +33,12 @@ public sealed class DomainAccountsController : Controller
     [HttpPost]
     public async Task<IActionResult> Post(CreateDomainAccountCommand command)
     {
-        var domainAccountId = await _dispatcher.DispatchAsync<CreateDomainAccountCommand, Guid>(command);
+        var createDomainAccountResult = await _dispatcher.DispatchAsync<CreateDomainAccountCommand, Result<Guid>>(command);
+
+        if (createDomainAccountResult.IsFailure)
+            return BadRequest(createDomainAccountResult.Errors);
+
+        var domainAccountId = createDomainAccountResult.Value;
         return Json(new { DomainAccountId = domainAccountId });
     }
 

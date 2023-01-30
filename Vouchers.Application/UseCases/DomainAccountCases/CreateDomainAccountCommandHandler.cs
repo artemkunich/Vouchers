@@ -9,10 +9,11 @@ using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Services;
 using Vouchers.Core.Domain;
 using Vouchers.Domains.Domain;
+using Vouchers.Primitives;
 
 namespace Vouchers.Application.UseCases.DomainAccountCases;
 
-internal sealed class CreateDomainAccountCommandHandler : IHandler<CreateDomainAccountCommand, Guid>
+internal sealed class CreateDomainAccountCommandHandler : IHandler<CreateDomainAccountCommand, Result<Guid>>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IReadOnlyRepository<Domain,Guid> _domainRepository;
@@ -32,7 +33,7 @@ internal sealed class CreateDomainAccountCommandHandler : IHandler<CreateDomainA
         _dateTimeProvider = dateTimeProvider;
     }
 
-    public async Task<Guid> HandleAsync(CreateDomainAccountCommand command, CancellationToken cancellation)
+    public async Task<Result<Guid>> HandleAsync(CreateDomainAccountCommand command, CancellationToken cancellation)
     {
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
 
@@ -41,9 +42,14 @@ internal sealed class CreateDomainAccountCommandHandler : IHandler<CreateDomainA
             throw new ApplicationException(Properties.Resources.DomainDoesNotExist);
 
         var accountId = _identifierProvider.CreateNewId();
-        var account = Account.Create(accountId, _dateTimeProvider.CurrentDateTime());
-        await _accountRepository.AddAsync(account);
+        var accountResult = Account.Create(accountId, _dateTimeProvider.CurrentDateTime());
 
+        if(accountResult.IsFailure)
+            return accountResult.Errors;
+
+        var account = accountResult.Value;
+        await _accountRepository.AddAsync(account);
+        
         var domainAccount = DomainAccount.Create(account.Id, authIdentityId, domain, _dateTimeProvider.CurrentDateTime());
             
         if (domain.IsPublic)
