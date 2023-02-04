@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Globalization;
+using Vouchers.Primitives;
 
 namespace Vouchers.Core.Domain;
 
 public sealed class UnitTypeQuantity
 {       
     public decimal Amount { get; init; }
-
     public Guid UnitTypeId { get; init; }
     public UnitType UnitType { get; init; }
 
@@ -17,11 +17,9 @@ public sealed class UnitTypeQuantity
         UnitType = unitType,
     };
     
-    public UnitTypeQuantity Add(UnitQuantity unitQuantity, CultureInfo cultureInfo = null)
-    {
-        if (UnitType.NotEquals(unitQuantity.Unit.UnitType))
-            throw new CoreException("CannotOperateWithDifferentUnitTypes", cultureInfo);
-
-        return Create(Amount + unitQuantity.Amount, UnitType);
-    }
+    public Result<UnitTypeQuantity> Add(UnitQuantity unitQuantity, CultureInfo cultureInfo = null) =>
+        Result.Create()
+            .IfTrueAddError(UnitType.NotEquals(unitQuantity.Unit.UnitType),
+                Errors.CannotOperateWithDifferentUnitTypes(cultureInfo))
+            .SetValue(Create(Amount + unitQuantity.Amount, UnitType));
 }

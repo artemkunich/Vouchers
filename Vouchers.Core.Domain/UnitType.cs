@@ -24,16 +24,16 @@ public sealed class UnitType : AggregateRoot<Guid>
     
     public Result<UnitType> IncreaseSupply(decimal amount, CultureInfo cultureInfo = null) =>
         Result.Create(this)
-            .AddErrorIf(amount <= 0, Errors.AmountIsNotPositive(cultureInfo))
-            .IfSuccess(unitType => unitType.Supply += amount)
-            .IfSuccess(unitType => unitType.IssuerAccount.IncreaseSupply(amount));
+            .IfTrueAddError(amount <= 0, Errors.AmountIsNotPositive(cultureInfo))
+            .Process(unitType => unitType.Supply += amount)
+            .MergeResultErrors(unitType => unitType.IssuerAccount.IncreaseSupply(amount));
 
     public Result<UnitType> ReduceSupply(decimal amount, CultureInfo cultureInfo = null) =>
         Result.Create(this)
-            .AddErrorIf(amount <= 0, Errors.AmountIsNotPositive(cultureInfo))
-            .AddErrorIf(Supply < amount, Errors.AmountIsGreaterThanSupply(cultureInfo))
-            .IfSuccess(unitType => unitType.Supply -= amount)
-            .IfSuccess(unitType => unitType.IssuerAccount.ReduceSupply(amount));
+            .IfTrueAddError(amount <= 0, Errors.AmountIsNotPositive(cultureInfo))
+            .IfTrueAddError(Supply < amount, Errors.AmountIsGreaterThanSupply(cultureInfo))
+            .Process(unitType => unitType.Supply -= amount)
+            .MergeResultErrors(unitType => unitType.IssuerAccount.ReduceSupply(amount));
 
     public bool CanBeRemoved() => Supply == 0;
 }

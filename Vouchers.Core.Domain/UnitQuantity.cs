@@ -6,7 +6,6 @@ namespace Vouchers.Core.Domain;
 public sealed class UnitQuantity
 {       
     public decimal Amount { get; init; }
-
     public Guid UnitId { get; init; }
     public Unit Unit { get; init; }
 

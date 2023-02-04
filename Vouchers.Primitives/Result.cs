@@ -14,28 +14,36 @@ public class Result
     {
         _errors = new List<Error>(errors);
     }
-
-    public Result AddError(Error error)
+    
+    protected Result AddError(Error error)
     {
         _errors.Add(error);
         return this;
-    } 
+    }
 
-    public Result AddErrors(params Error[] errors)
+    protected Result AddErrors(params Error[] errors)
     {
         _errors.AddRange(errors);
         return this;
     }
     
-    public Result AddErrorIf(bool condition, Error error)
+    public Result<TOut> SetValue<TOut>(TOut value)
+    {
+        if(IsSuccess)
+            return value;
+
+        return Errors;
+    }
+    
+    public virtual Result IfTrueAddError(bool condition, Error error)
     {
         if(condition)
             _errors.Add(error);
 
         return this;
     }
-    
-    public Result IfSuccess(Action predicate)
+
+    public Result Process(Action predicate)
     {
         if (IsSuccess)
             predicate();
@@ -43,46 +51,66 @@ public class Result
         return this;
     }
     
-    public Result IfSuccess<TResult>(Func<Result<TResult>> predicate)
+    public virtual Result MergeResultErrors(Result result)
     {
-        if (IsFailure)
-            return this;
-        
-        var result = predicate();
         if (result.IsFailure)
             AddErrors(result.Errors);
 
         return this;
     }
 
+    public Result MergeResultErrors(Func<Result> ifSuccessPredicate)
+    {
+        if (IsFailure)
+            return this;
+        
+        var result = ifSuccessPredicate();
+        if (result.IsFailure)
+            AddErrors(result.Errors);
+
+        return this;
+    }
+    
+    public virtual Result ForeachWhileSuccess<TValue,TResult>(IEnumerable<TValue> enumerable, Func<TValue, Result<TResult>> predicate)
+    {
+        if (IsFailure)
+            return this;
+
+        foreach (var item in enumerable)
+        {
+            var result = predicate(item);
+            if (result.IsFailure)
+            {
+                AddErrors(result.Errors);
+                break;
+            }
+        }
+        
+        return this;
+    }
+    
+    public virtual async Task<Result> ForeachWhileSuccessAsync<TValue,TResult>(IEnumerable<TValue> enumerable, Func<TValue, Task<Result<TResult>>> predicate)
+    {
+        if (IsFailure)
+            return this;
+
+        foreach (var item in enumerable)
+        {
+            var result = await predicate(item);
+            if (result.IsFailure)
+            {
+                AddErrors(result.Errors);
+                break;
+            }
+        }
+        
+        return this;
+    }
+    
     public static Result Create() => new();
     public static Result Failure(params Error[] errors) => new(errors);
     
     public static Result<TValue> Create<TValue>(TValue value) => new(value);
-    public static Result<TValue> Failure<TValue>(params Error[] errors) => new(errors); 
+    public static Result<TValue> Failure<TValue>(params Error[] errors) => new(errors);
     
-    
-    public static Result<T> Ensure<T>(T value, Func<T, bool> predicate, Error error)
-    {
-        var result = predicate(value);
-        if (result)
-            return Failure<T>(error);
-
-        return Create(value);
-    }
-    
-    public static Result<T> Process<T>(T value, Action<T> predicate)
-    {
-        predicate(value);
-        return Create(value);
-    }
-    
-    public Result<TOut> Map<TOut>(Func<TOut> ifSuccessPredicate)
-    {
-        if(IsSuccess)
-            return ifSuccessPredicate();
-
-        return Errors;
-    }
-
 }

@@ -39,10 +39,11 @@ internal sealed class CreateDomainCommandHandler : IHandler<CreateDomainCommand,
 
     public async Task<Result<Guid?>> HandleAsync(CreateDomainCommand command, CancellationToken cancellation)
     {
-        var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
+        var authIdentityIdResult = await _authIdentityProvider.GetAuthIdentityIdAsync();
+        var domainOfferResult = await authIdentityIdResult.MapAsync(_ => _domainOfferRepository.GetByIdAsync(command.OfferId));
 
-        var domainOffer = await _domainOfferRepository.GetByIdAsync(command.OfferId);
-
+        domainOfferResult.ProcessAsync(domainOffer => 
+        )
         DomainOffersPerIdentityCounter domainOffersPerIdentityCounter = null;
         if (domainOffer.MaxContractsPerIdentity is not null)
         {

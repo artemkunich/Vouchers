@@ -21,9 +21,10 @@ internal sealed class CreateDomainAccountCommandHandler : IHandler<CreateDomainA
     private readonly IRepository<Account,Guid> _accountRepository;
     private readonly IIdentifierProvider<Guid> _identifierProvider;
     private readonly IDateTimeProvider _dateTimeProvider;
-
+    private readonly ICultureInfoProvider _cultureInfoProvider;
+    
     public CreateDomainAccountCommandHandler(IAuthIdentityProvider authIdentityProvider, IReadOnlyRepository<Domain,Guid> domainRepository, 
-        IRepository<DomainAccount,Guid> domainAccountRepository, IRepository<Account,Guid> accountRepository, IIdentifierProvider<Guid> identifierProvider, IDateTimeProvider dateTimeProvider)
+        IRepository<DomainAccount,Guid> domainAccountRepository, IRepository<Account,Guid> accountRepository, IIdentifierProvider<Guid> identifierProvider, IDateTimeProvider dateTimeProvider, ICultureInfoProvider cultureInfoProvider)
     {
         _authIdentityProvider = authIdentityProvider;
         _domainRepository = domainRepository;
@@ -31,34 +32,35 @@ internal sealed class CreateDomainAccountCommandHandler : IHandler<CreateDomainA
         _accountRepository = accountRepository;
         _identifierProvider = identifierProvider;
         _dateTimeProvider = dateTimeProvider;
+        _cultureInfoProvider = cultureInfoProvider;
     }
 
     public async Task<Result<Guid>> HandleAsync(CreateDomainAccountCommand command, CancellationToken cancellation)
     {
-        var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
-
-        var domain = await _domainRepository.GetByIdAsync(command.DomainId);
-        if (domain is null)
-            throw new ApplicationException(Properties.Resources.DomainDoesNotExist);
-
-        var accountId = _identifierProvider.CreateNewId();
-        var accountResult = Account.Create(accountId, _dateTimeProvider.CurrentDateTime());
-
-        if(accountResult.IsFailure)
-            return accountResult.Errors;
-
-        var account = accountResult.Value;
-        await _accountRepository.AddAsync(account);
-        
-        var domainAccount = DomainAccount.Create(account.Id, authIdentityId, domain, _dateTimeProvider.CurrentDateTime());
-            
-        if (domain.IsPublic)
-        {
-            domainAccount.IsConfirmed = true;
-            domain.IncreaseMembersCount();
-        }
-
-        await _domainAccountRepository.AddAsync(domainAccount);
-        return domainAccount.Id;
+        var cultureInfo = _cultureInfoProvider.GetCultureInfo();
+        return await (await _authIdentityProvider.GetAuthIdentityIdAsync())
+            .ToResultAsync(async authIdentityId =>
+            {
+                var domain = await _domainRepository.GetByIdAsync(command.DomainId);
+                return (await
+                    (await Result.Create(domain)
+                        .IfValueIsNullAddError(Errors.DomainDoesNotExist(cultureInfo))
+                        .SetValue(_identifierProvider.CreateNewId())
+                        .ToResult(accountId => Account.Create(accountId, _dateTimeProvider.CurrentDateTime()))
+                        .ProcessAsync(account => _accountRepository.AddAsync(account)))
+                    .Map(account =>
+                        DomainAccount.Create(account.Id, authIdentityId, domain,
+                            _dateTimeProvider.CurrentDateTime()))
+                    .Process(domainAccount =>
+                    {
+                        if (domain.IsPublic)
+                        {
+                            domainAccount.IsConfirmed = true;
+                            domain.IncreaseMembersCount();
+                        }
+                    })
+                    .ProcessAsync(domainAccount => _domainAccountRepository.AddAsync(domainAccount)))
+                .Map(domainAccount => domainAccount.Id);
+            });
     }
 }

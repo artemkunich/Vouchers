@@ -23,14 +23,14 @@ public sealed class Account : AggregateRoot<Guid>
     
     public Result<Account> IncreaseSupply(decimal amount, CultureInfo cultureInfo = null) =>
         Result.Create(this)
-            .AddErrorIf(amount <= 0, Errors.AmountIsNotPositive(cultureInfo))
-            .IfSuccess(account => account.Supply += amount);
+            .IfTrueAddError(amount <= 0, Errors.AmountIsNotPositive(cultureInfo))
+            .Process(account => account.Supply += amount);
 
     public Result<Account> ReduceSupply(decimal amount, CultureInfo cultureInfo = null) =>
         Result.Create(this)
-            .AddErrorIf(amount <= 0, Errors.AmountIsNotPositive(cultureInfo))
-            .AddErrorIf(amount > Supply, Errors.AmountIsGreaterThanSupply(cultureInfo))
-            .IfSuccess(account => account.Supply -= amount);
+            .IfTrueAddError(amount <= 0, Errors.AmountIsNotPositive(cultureInfo))
+            .IfTrueAddError(amount > Supply, Errors.AmountIsGreaterThanSupply(cultureInfo))
+            .Process(account => account.Supply -= amount);
 
     public bool CanBeRemoved() => Supply == 0;
 }
