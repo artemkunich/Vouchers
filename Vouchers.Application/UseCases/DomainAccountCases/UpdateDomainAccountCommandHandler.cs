@@ -11,41 +11,47 @@ using Vouchers.Domains.Domain;
 
 namespace Vouchers.Application.UseCases.DomainAccountCases;
 
-internal sealed class UpdateDomainAccountCommandHandler : IHandler<UpdateDomainAccountCommand>
+internal sealed class UpdateDomainAccountCommandHandler : IHandler<UpdateDomainAccountCommand, Result>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IRepository<DomainAccount,Guid> _domainAccountRepository;
+    private readonly ICultureInfoProvider _cultureInfoProvider;
 
-    public UpdateDomainAccountCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<DomainAccount,Guid> domainAccountRepository)
+    public UpdateDomainAccountCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<DomainAccount,Guid> domainAccountRepository, ICultureInfoProvider cultureInfoProvider)
     {
         _domainAccountRepository = domainAccountRepository;
+        _cultureInfoProvider = cultureInfoProvider;
         _authIdentityProvider = authIdentityProvider;
     }
 
-    public async Task HandleAsync(UpdateDomainAccountCommand command, CancellationToken cancellation)
+    public async Task<Result> HandleAsync(UpdateDomainAccountCommand command, CancellationToken cancellation)
     {
+        var cultureInfo = _cultureInfoProvider.GetCultureInfo();
+        
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
-
+        if (authIdentityId is null)
+            return Error.NotAuthorized(cultureInfo);
+        
         var domainAccount = await _domainAccountRepository.GetByIdAsync(command.DomainAccountId);
         if (domainAccount is null)
-            throw new ApplicationException(Properties.Resources.DomainAccountDoesNotExist);
+            return Error.DebtorAccountDoesNotExist(cultureInfo);
 
         var authDomainAccount = (await _domainAccountRepository.GetByExpressionAsync(acc => acc.Domain.Id == domainAccount.Domain.Id && acc.IdentityId == authIdentityId)).FirstOrDefault();
         if (authDomainAccount is null)
-            throw new InvalidOperationException(Properties.Resources.IdentityDoesNotHaveAccountInDomain);    
+            return Error.IdentityDoesNotHaveAccountInDomain(cultureInfo);
 
         if(command.IsConfirmed is not null && domainAccount.IsConfirmed != command.IsConfirmed)
         {
-            if(!(authDomainAccount.IsAdmin || authDomainAccount.IsOwner))
-                throw new InvalidOperationException(Properties.Resources.OperationIsNotAllowed);
-
+            if (!(authDomainAccount.IsAdmin || authDomainAccount.IsOwner))
+                return Error.OperationIsNotAllowed(cultureInfo);
+            
             domainAccount.IsConfirmed = command.IsConfirmed.Value;
         }
                 
         if (command.IsIssuer is not null && domainAccount.IsIssuer != command.IsIssuer)
         {
             if (!(authDomainAccount.IsAdmin || authDomainAccount.IsOwner))
-                throw new InvalidOperationException(Properties.Resources.OperationIsNotAllowed);
+                return Error.OperationIsNotAllowed(cultureInfo);
 
             domainAccount.IsIssuer = command.IsIssuer.Value;
         }
@@ -53,11 +59,13 @@ internal sealed class UpdateDomainAccountCommandHandler : IHandler<UpdateDomainA
         if (command.IsAdmin is not null && domainAccount.IsAdmin != command.IsAdmin)
         {
             if (!authDomainAccount.IsOwner)
-                throw new InvalidOperationException(Properties.Resources.OperationIsNotAllowed);
+                return Error.OperationIsNotAllowed(cultureInfo);
 
             domainAccount.IsAdmin = command.IsAdmin.Value;
         }
 
         await _domainAccountRepository.UpdateAsync(domainAccount);
+
+        return Result.Create();
     }
 }

@@ -12,7 +12,7 @@ using Vouchers.Domains.Domain;
 
 namespace Vouchers.Application.UseCases.DomainAccountCases;
 
-internal sealed class CreateDomainAccountCommandHandler : IHandler<CreateDomainAccountCommand, Guid>
+internal sealed class CreateDomainAccountCommandHandler : IHandler<CreateDomainAccountCommand, Result<Guid>>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IReadOnlyRepository<Domain,Guid> _domainRepository;
@@ -20,9 +20,10 @@ internal sealed class CreateDomainAccountCommandHandler : IHandler<CreateDomainA
     private readonly IRepository<Account,Guid> _accountRepository;
     private readonly IIdentifierProvider<Guid> _identifierProvider;
     private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly ICultureInfoProvider _cultureInfoProvider;
 
     public CreateDomainAccountCommandHandler(IAuthIdentityProvider authIdentityProvider, IReadOnlyRepository<Domain,Guid> domainRepository, 
-        IRepository<DomainAccount,Guid> domainAccountRepository, IRepository<Account,Guid> accountRepository, IIdentifierProvider<Guid> identifierProvider, IDateTimeProvider dateTimeProvider)
+        IRepository<DomainAccount,Guid> domainAccountRepository, IRepository<Account,Guid> accountRepository, IIdentifierProvider<Guid> identifierProvider, IDateTimeProvider dateTimeProvider, ICultureInfoProvider cultureInfoProvider)
     {
         _authIdentityProvider = authIdentityProvider;
         _domainRepository = domainRepository;
@@ -30,21 +31,26 @@ internal sealed class CreateDomainAccountCommandHandler : IHandler<CreateDomainA
         _accountRepository = accountRepository;
         _identifierProvider = identifierProvider;
         _dateTimeProvider = dateTimeProvider;
+        _cultureInfoProvider = cultureInfoProvider;
     }
 
-    public async Task<Guid> HandleAsync(CreateDomainAccountCommand command, CancellationToken cancellation)
+    public async Task<Result<Guid>> HandleAsync(CreateDomainAccountCommand command, CancellationToken cancellation)
     {
+        var cultureInfo = _cultureInfoProvider.GetCultureInfo();
+        
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
-
+        if (authIdentityId is null)
+            return Error.NotAuthorized(cultureInfo);
+        
         var domain = await _domainRepository.GetByIdAsync(command.DomainId);
         if (domain is null)
-            throw new ApplicationException(Properties.Resources.DomainDoesNotExist);
+            return Error.DomainDoesNotExist(cultureInfo);
 
         var accountId = _identifierProvider.CreateNewId();
         var account = Account.Create(accountId, _dateTimeProvider.CurrentDateTime());
         await _accountRepository.AddAsync(account);
 
-        var domainAccount = DomainAccount.Create(account.Id, authIdentityId, domain, _dateTimeProvider.CurrentDateTime());
+        var domainAccount = DomainAccount.Create(account.Id, authIdentityId.Value, domain, _dateTimeProvider.CurrentDateTime());
             
         if (domain.IsPublic)
         {
