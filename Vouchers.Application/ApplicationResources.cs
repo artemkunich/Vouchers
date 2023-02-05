@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Resources;
 using System.Globalization;
-using System.Reflection;
+using System.Resources;
 
-namespace Vouchers.Core.Domain;
+namespace Vouchers.Application.UseCases;
 
-internal class CoreResources
+internal class ApplicationResources
 {
     private static ResourceManager _rm = new ResourceManager(typeof(Properties.Resources));
 

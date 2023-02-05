@@ -11,27 +11,33 @@ using Vouchers.Application.Dtos;
 using Vouchers.Application.Queries;
 using Vouchers.Application.UseCases;
 using System.Threading;
+using Vouchers.Application;
 using Vouchers.Application.Services;
 using Vouchers.Domains.Domain;
 using Vouchers.Identities.Domain;
 
 namespace Vouchers.Persistence.QueryHandlers;
 
-internal sealed class SubscribersQueryHandler : IHandler<SubscribersQuery, IEnumerable<SubscriberDto>>
+internal sealed class SubscribersQueryHandler : IHandler<SubscribersQuery, Result<IEnumerable<SubscriberDto>>>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly VouchersDbContext _dbContext;
-
-    public SubscribersQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext)
+    private readonly ICultureInfoProvider _cultureInfoProvider;
+    
+    public SubscribersQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext, ICultureInfoProvider cultureInfoProvider)
     {     
         _authIdentityProvider = authIdentityProvider;
         _dbContext = dbContext;
+        _cultureInfoProvider = cultureInfoProvider;
     }
 
-    public async Task<IEnumerable<SubscriberDto>> HandleAsync(SubscribersQuery query, CancellationToken cancellation)
+    public async Task<Result<IEnumerable<SubscriberDto>>> HandleAsync(SubscribersQuery query, CancellationToken cancellation)
     {
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
-        return await GetQuery(query, authIdentityId).ToListAsync();
+        if (authIdentityId is null)
+            return Error.NotAuthorized(_cultureInfoProvider.GetCultureInfo());
+        
+        return await GetQuery(query, authIdentityId.Value).ToListAsync(cancellation);
     }
             
 

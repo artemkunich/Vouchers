@@ -12,7 +12,7 @@ using Vouchers.Application.Services;
 
 namespace Vouchers.Application.UseCases.HolderTransactionRequestCases;
 
-internal sealed class CreateHolderTransactionRequestCommandHandler : IHandler<CreateHolderTransactionRequestCommand, Guid>
+internal sealed class CreateHolderTransactionRequestCommandHandler : IHandler<CreateHolderTransactionRequestCommand, Result<Guid>>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IReadOnlyRepository<DomainAccount,Guid> _domainAccountRepository;
@@ -20,9 +20,10 @@ internal sealed class CreateHolderTransactionRequestCommandHandler : IHandler<Cr
     private readonly IReadOnlyRepository<UnitType,Guid> _unitTypeRepository;
     private readonly IRepository<HolderTransactionRequest,Guid> _holderTransactionRequestRepository;
     private readonly IIdentifierProvider<Guid> _identifierProvider;
+    private readonly ICultureInfoProvider _cultureInfoProvider;
     public CreateHolderTransactionRequestCommandHandler(IAuthIdentityProvider authIdentityProvider, 
         IReadOnlyRepository<DomainAccount,Guid> domainAccountRepository, IReadOnlyRepository<Account,Guid> accountRepository, 
-        IReadOnlyRepository<UnitType,Guid> unitTypeRepository, IRepository<HolderTransactionRequest,Guid> holderTransactionRequestRepository, IIdentifierProvider<Guid> identifierProvider)
+        IReadOnlyRepository<UnitType,Guid> unitTypeRepository, IRepository<HolderTransactionRequest,Guid> holderTransactionRequestRepository, IIdentifierProvider<Guid> identifierProvider, ICultureInfoProvider cultureInfoProvider)
     {
         _authIdentityProvider = authIdentityProvider;
         _domainAccountRepository = domainAccountRepository;
@@ -30,15 +31,20 @@ internal sealed class CreateHolderTransactionRequestCommandHandler : IHandler<Cr
         _unitTypeRepository = unitTypeRepository;
         _holderTransactionRequestRepository = holderTransactionRequestRepository;
         _identifierProvider = identifierProvider;
+        _cultureInfoProvider = cultureInfoProvider;
     }
 
-    public async Task<Guid> HandleAsync(CreateHolderTransactionRequestCommand command, CancellationToken cancellation)
+    public async Task<Result<Guid>> HandleAsync(CreateHolderTransactionRequestCommand command, CancellationToken cancellation)
     {
+        var cultureInfo = _cultureInfoProvider.GetCultureInfo();
+        
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
-
+        if (authIdentityId is null)
+            return Error.NotAuthorized(cultureInfo);
+        
         var debtorDomainAccount = await _domainAccountRepository.GetByIdAsync(command.DebtorAccountId);
         if (debtorDomainAccount?.IdentityId != authIdentityId)
-            throw new ApplicationException(Properties.Resources.OperationIsNotAllowed);
+            return Error.OperationIsNotAllowed(cultureInfo);
 
         var debtorAccount = await _accountRepository.GetByIdAsync(command.DebtorAccountId);
 

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Vouchers.Application;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Services;
@@ -15,15 +16,17 @@ using Vouchers.Values.Domain;
 
 namespace Vouchers.Persistence.QueryHandlers;
 
-internal sealed class VoucherValueDetailQueryHandler : IHandler<Guid,VoucherValueDetailDto>
+internal sealed class VoucherValueDetailQueryHandler : IHandler<Guid,Result<VoucherValueDetailDto>>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly VouchersDbContext _dbContext;
+    private readonly ICultureInfoProvider _cultureInfoProvider;
 
-    public VoucherValueDetailQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext)
+    public VoucherValueDetailQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext, ICultureInfoProvider cultureInfoProvider)
     {
         _authIdentityProvider = authIdentityProvider;
         _dbContext = dbContext;
+        _cultureInfoProvider = cultureInfoProvider;
     }
 
     Func<CropParameters, CropParametersDto> mapCropParameters = (CropParameters cp) => cp is null ? null : new CropParametersDto
@@ -34,9 +37,11 @@ internal sealed class VoucherValueDetailQueryHandler : IHandler<Guid,VoucherValu
         Height = cp.Height,
     };
 
-    public async Task<VoucherValueDetailDto> HandleAsync(Guid valueId, CancellationToken cancellation)
+    public async Task<Result<VoucherValueDetailDto>> HandleAsync(Guid valueId, CancellationToken cancellation)
     {
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
+        if (authIdentityId is null)
+            return Error.NotAuthorized(_cultureInfoProvider.GetCultureInfo());
 
         var valueWithImage = await _dbContext.Set<VoucherValue>().Where(v => v.Id == valueId)
             .Join(
@@ -52,7 +57,7 @@ internal sealed class VoucherValueDetailQueryHandler : IHandler<Guid,VoucherValu
             ).SelectMany(
                 result => result.Images.DefaultIfEmpty(),
                 (result, image) => new {result.Value, Image = image}
-            ).FirstOrDefaultAsync();
+            ).FirstOrDefaultAsync(cancellation);
 
         if(valueWithImage is null)
             return null;

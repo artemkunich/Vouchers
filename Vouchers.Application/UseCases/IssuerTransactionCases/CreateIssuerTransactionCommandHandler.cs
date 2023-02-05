@@ -12,7 +12,7 @@ using Vouchers.Application.Services;
 
 namespace Vouchers.Application.UseCases.IssuerTransactionCases;
 
-internal sealed class CreateIssuerTransactionCommandHandler : IHandler<CreateIssuerTransactionCommand, Guid>
+internal sealed class CreateIssuerTransactionCommandHandler : IHandler<CreateIssuerTransactionCommand, Result<Guid>>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IReadOnlyRepository<DomainAccount,Guid> _domainAccountRepository;
@@ -22,10 +22,11 @@ internal sealed class CreateIssuerTransactionCommandHandler : IHandler<CreateIss
     private readonly IRepository<IssuerTransaction,Guid> _issuerTransactionRepository;
     private readonly IIdentifierProvider<Guid> _identifierProvider;
     private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly ICultureInfoProvider _cultureInfoProvider;
     public CreateIssuerTransactionCommandHandler(IAuthIdentityProvider authIdentityProvider,
         IReadOnlyRepository<DomainAccount,Guid> domainAccountRepository, IReadOnlyRepository<Account,Guid> accountRepository, 
         IReadOnlyRepository<AccountItem,Guid> accountItemRepository, IReadOnlyRepository<Unit,Guid> unitRepository, 
-        IRepository<IssuerTransaction,Guid> issuerTransactionRepository, IIdentifierProvider<Guid> identifierProvider, IDateTimeProvider dateTimeProvider) 
+        IRepository<IssuerTransaction,Guid> issuerTransactionRepository, IIdentifierProvider<Guid> identifierProvider, IDateTimeProvider dateTimeProvider, ICultureInfoProvider cultureInfoProvider) 
     {
         _authIdentityProvider = authIdentityProvider;
         _domainAccountRepository = domainAccountRepository;
@@ -35,20 +36,27 @@ internal sealed class CreateIssuerTransactionCommandHandler : IHandler<CreateIss
         _issuerTransactionRepository = issuerTransactionRepository;
         _identifierProvider = identifierProvider;
         _dateTimeProvider = dateTimeProvider;
+        _cultureInfoProvider = cultureInfoProvider;
     }
 
-    public async Task<Guid> HandleAsync(CreateIssuerTransactionCommand command, CancellationToken cancellation)
+    public async Task<Result<Guid>> HandleAsync(CreateIssuerTransactionCommand command, CancellationToken cancellation)
     {
+        var cultureInfo = _cultureInfoProvider.GetCultureInfo();
+        
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
+        if (authIdentityId is null)
+            return Error.NotAuthorized(cultureInfo);
 
         var issuerDomainAccount = await _domainAccountRepository.GetByIdAsync(command.IssuerAccountId);
         if (issuerDomainAccount?.IdentityId != authIdentityId)
-            throw new ApplicationException(Properties.Resources.OperationIsNotAllowed);
+            return Error.OperationIsNotAllowed(cultureInfo);
+        
         if (!issuerDomainAccount.IsConfirmed)
-            throw new ApplicationException(Properties.Resources.IssuerAccountIsNotActivated);
+            return Error.IssuerAccountIsNotActivated(cultureInfo);
 
         var issuerAccount = await _accountRepository.GetByIdAsync(command.IssuerAccountId);
         if (issuerAccount is null)
+            return Error.IssuerAccountDoesNotExist(cultureInfo);
             throw new ApplicationException(Properties.Resources.IssuerAccountDoesNotExist);
 
         var accountItem = (await _accountItemRepository.GetByExpressionAsync(accItem => accItem.HolderAccountId == issuerAccount.Id && accItem.Unit.Id == command.VoucherId)).FirstOrDefault();

@@ -21,7 +21,7 @@ internal sealed class IdentityQueryHandler : IHandler<string, Guid?>
 
     public async Task<Guid?> HandleAsync(string loginName, CancellationToken cancellation)
     {
-        var login = await _dbContext.Set<Login>().Include(login => login.Identity).Where(l => l.LoginName == loginName).FirstOrDefaultAsync();
+        var login = await _dbContext.Set<Login>().Include(login => login.Identity).Where(l => l.LoginName == loginName).FirstOrDefaultAsync(cancellation);
 
         return login?.Identity.Id;
     }

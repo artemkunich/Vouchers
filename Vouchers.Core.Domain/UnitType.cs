@@ -20,7 +20,7 @@ public sealed class UnitType : AggregateRoot<Guid>
     public void IncreaseSupply(decimal amount, CultureInfo cultureInfo = null)
     {
         if (amount <= 0)
-            throw new CoreException("AmountIsNotPositive", cultureInfo);
+            throw CoreException.AmountIsNotPositive;
         Supply += amount;
 
         IssuerAccount.IncreaseSupply(amount);
@@ -29,9 +29,9 @@ public sealed class UnitType : AggregateRoot<Guid>
     public void ReduceSupply(decimal amount, CultureInfo cultureInfo = null)
     {
         if (amount <= 0)
-            throw new CoreException("AmountIsNotPositive", cultureInfo);
+            throw CoreException.AmountIsNotPositive;
         if (Supply < amount)
-            throw new CoreException("AmountIsGreaterThanSupply", cultureInfo);
+            throw CoreException.AmountIsGreaterThanSupply;
         Supply -= amount;
 
         IssuerAccount.ReduceSupply(amount);

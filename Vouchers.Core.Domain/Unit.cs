@@ -19,10 +19,10 @@ public sealed class Unit : AggregateRoot<Guid>
     public static Unit Create(Guid id, DateTime validFrom, DateTime validTo, bool canBeExchanged, UnitType unitType, decimal supply, CultureInfo cultureInfo = null)
     {
         if (validTo < DateTime.Today)
-            throw new CoreException("ValidToIsLessThanToday", cultureInfo);
+            throw CoreException.ValidToIsLessThanToday;
 
         if (validFrom > validTo)
-            throw new CoreException("ValidFromIsGreaterThanValidTo", cultureInfo);
+            throw CoreException.ValidFromIsGreaterThanValidTo;
 
         return new()
         {
@@ -41,7 +41,7 @@ public sealed class Unit : AggregateRoot<Guid>
     public void IncreaseSupply(decimal amount, CultureInfo cultureInfo = null)
     {
         if (amount <= 0)
-            throw new CoreException("AmountIsNotPositive", cultureInfo);
+            throw CoreException.AmountIsNotPositive;
         Supply += amount;
 
         UnitType.IncreaseSupply(amount);
@@ -50,9 +50,9 @@ public sealed class Unit : AggregateRoot<Guid>
     public void ReduceSupply(decimal amount, CultureInfo cultureInfo = null)
     {
         if (amount <= 0)
-            throw new CoreException("AmountIsNotPositive", cultureInfo);
+            throw CoreException.AmountIsNotPositive;
         if (Supply < amount)
-            throw new CoreException("AmountIsGreaterThanSupply", cultureInfo);
+            throw CoreException.AmountIsGreaterThanSupply;
         Supply -= amount;
 
         UnitType.ReduceSupply(amount);
@@ -61,10 +61,10 @@ public sealed class Unit : AggregateRoot<Guid>
     public void SetValidFrom(DateTime validFrom, CultureInfo cultureInfo = null)
     {
         if (validFrom > ValidFrom && Supply != 0)
-            throw new CoreException("NewValidFromIsGreaterThanCurrentValidFrom", cultureInfo);
+            throw CoreException.NewValidFromIsGreaterThanCurrentValidFrom;
 
         if (validFrom > ValidTo)
-            throw new CoreException("NewValidFromIsGreaterThanCurrentValidTo", cultureInfo);
+            throw CoreException.NewValidFromIsGreaterThanCurrentValidTo;
 
         ValidFrom = validFrom;
     }
@@ -72,10 +72,10 @@ public sealed class Unit : AggregateRoot<Guid>
     public void SetValidTo(DateTime validTo, CultureInfo cultureInfo = null)
     {
         if (validTo < ValidTo && Supply != 0)
-            throw new CoreException("NewValidToIsLessThanCurrentValidFrom", cultureInfo);
+            throw CoreException.NewValidToIsLessThanCurrentValidFrom;
 
         if (ValidFrom > validTo)
-            throw new CoreException("CurrentValidFromIsGreaterThanNewValidTo", cultureInfo);
+            throw CoreException.CurrentValidFromIsGreaterThanNewValidTo;
 
         ValidTo = validTo;
     }
@@ -83,7 +83,7 @@ public sealed class Unit : AggregateRoot<Guid>
     public void SetCanBeExchanged(bool canBeExchanged, CultureInfo cultureInfo = null)
     {
         if (!canBeExchanged && CanBeExchanged && Supply != 0)
-            throw new CoreException("CannotDisableExchangeability", cultureInfo);
+            throw CoreException.CannotDisableExchangeability;
 
         CanBeExchanged = canBeExchanged;
     }

@@ -15,26 +15,33 @@ using Vouchers.Identities.Domain.DomainEvents;
 
 namespace Vouchers.Application.UseCases.IdentityCases;
 
-internal sealed class UpdateIdentityCommandHandler : IHandler<UpdateIdentityCommand>
+internal sealed class UpdateIdentityCommandHandler : IHandler<UpdateIdentityCommand, Result>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IRepository<Identity,Guid> _identityRepository;
     private readonly IAppImageService _appImageService;
-
+    private readonly ICultureInfoProvider _cultureInfoProvider;
+    
     public UpdateIdentityCommandHandler(IAuthIdentityProvider authIdentityProvider, 
-        IRepository<Identity,Guid> identityRepository, IAppImageService appImageService)
+        IRepository<Identity,Guid> identityRepository, IAppImageService appImageService, ICultureInfoProvider cultureInfoProvider)
     {
         _authIdentityProvider = authIdentityProvider;
         _identityRepository = identityRepository;
         _appImageService = appImageService;
+        _cultureInfoProvider = cultureInfoProvider;
     }
 
-    public async Task HandleAsync(UpdateIdentityCommand command, CancellationToken cancellation)
+    public async Task<Result> HandleAsync(UpdateIdentityCommand command, CancellationToken cancellation)
     {
+        var cultureInfo = _cultureInfoProvider.GetCultureInfo();
+        
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
-        var identity = await _identityRepository.GetByIdAsync(authIdentityId);
+        if (authIdentityId is null)
+            return Error.NotAuthorized(cultureInfo);
+        
+        var identity = await _identityRepository.GetByIdAsync(authIdentityId.Value);
         if (identity is null)
-            throw new ApplicationException(Properties.Resources.IdentityDoesNotExist);
+            return Error.IdentityDoesNotExist(cultureInfo);
 
         var isChanged = false;
         var identityUpdatedDomainEvent = new IdentityUpdatedDomainEvent();
@@ -90,6 +97,8 @@ internal sealed class UpdateIdentityCommandHandler : IHandler<UpdateIdentityComm
             identity.RaiseDomainEvent(identityUpdatedDomainEvent);
             await _identityRepository.UpdateAsync(identity);
         }
+        
+        return Result.Create();
                 
     }
 }

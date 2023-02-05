@@ -20,7 +20,7 @@ public sealed class UnitTypeQuantity
     public UnitTypeQuantity Add(UnitQuantity unitQuantity, CultureInfo cultureInfo = null)
     {
         if (UnitType.NotEquals(unitQuantity.Unit.UnitType))
-            throw new CoreException("CannotOperateWithDifferentUnitTypes", cultureInfo);
+            throw CoreException.CannotOperateWithDifferentUnitTypes;
 
         return Create(Amount + unitQuantity.Amount, UnitType);
     }

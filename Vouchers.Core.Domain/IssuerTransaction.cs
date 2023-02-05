@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using Vouchers.Primitives;
-using System.Globalization;
 
 namespace Vouchers.Core.Domain;
 
@@ -15,21 +14,21 @@ public sealed class IssuerTransaction : AggregateRoot<Guid>
     public Guid IssuerAccountItemId { get; init; }
     public AccountItem IssuerAccountItem { get; init; }
 
-    public static IssuerTransaction Create(Guid id, DateTime timestamp, AccountItem issuerAccountItem, decimal amount, CultureInfo cultureInfo = null)
+    public static IssuerTransaction Create(Guid id, DateTime timestamp, AccountItem issuerAccountItem, decimal amount)
     {
         var quantity = UnitQuantity.Create(amount, issuerAccountItem.Unit);
         
         if (quantity.Unit.ValidTo < DateTime.Today)
-            throw new CoreException("UnitIsExpired", cultureInfo);
+            throw CoreException.UnitIsExpired;
 
         if (quantity.Unit.UnitType.IssuerAccount.NotEquals(issuerAccountItem.HolderAccount))
-            throw new CoreException("AccountHolderAndUnitTypeIssuerAreDifferent", cultureInfo);
+            throw CoreException.AccountHolderAndUnitTypeIssuerAreDifferent;
 
         if (quantity.Unit.NotEquals(issuerAccountItem.Unit))
-            throw new CoreException("AccountItemUnitAndTransactionUnitAreDifferent", cultureInfo);
+            throw CoreException.AccountItemUnitAndTransactionUnitAreDifferent;
 
         if (quantity.Amount == 0)
-            throw new CoreException("AmountIsNotPositive", cultureInfo);
+            throw CoreException.AmountIsNotPositive;
 
         return new()
         {

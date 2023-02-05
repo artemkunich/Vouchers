@@ -27,7 +27,7 @@ internal sealed class LoginsQueryHandler : IHandler<LoginsQuery, IEnumerable<Log
     }
 
     public async Task<IEnumerable<LoginDto>> HandleAsync(LoginsQuery query, CancellationToken cancellation) =>
-        await GetQuery(query).ToListAsync();
+        await GetQuery(query).ToListAsync(cancellation);
 
 
     private IQueryable<LoginDto> GetQuery(LoginsQuery query)

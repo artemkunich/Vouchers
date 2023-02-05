@@ -12,22 +12,28 @@ using Vouchers.Domains.Domain;
 
 namespace Vouchers.Application.UseCases.DomainOfferCases;
 
-internal sealed class CreateDomainOfferCommandHandler : IHandler<CreateDomainOfferCommand, Guid>
+internal sealed class CreateDomainOfferCommandHandler : IHandler<CreateDomainOfferCommand, Result<Guid>>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IRepository<DomainOffer,Guid> _domainOfferRepository;
     private readonly IIdentifierProvider<Guid> _identifierProvider;
-    public CreateDomainOfferCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<DomainOffer,Guid> domainOfferRepository, IIdentifierProvider<Guid> identifierProvider)
+    private readonly ICultureInfoProvider _cultureInfoProvider;
+    public CreateDomainOfferCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<DomainOffer,Guid> domainOfferRepository, IIdentifierProvider<Guid> identifierProvider, ICultureInfoProvider cultureInfoProvider)
     {
         _authIdentityProvider = authIdentityProvider;
         _domainOfferRepository = domainOfferRepository;
         _identifierProvider = identifierProvider;
+        _cultureInfoProvider = cultureInfoProvider;
     }
 
-    public async Task<Guid> HandleAsync(CreateDomainOfferCommand command, CancellationToken cancellation)
+    public async Task<Result<Guid>> HandleAsync(CreateDomainOfferCommand command, CancellationToken cancellation)
     {
-        var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
+        var cultureInfo = _cultureInfoProvider.GetCultureInfo();
 
+        var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
+        if (authIdentityId is null)
+            return Error.NotAuthorized(cultureInfo);
+        
         var currency = Enum.Parse<Currency>(command.Currency);
         var currencyAmount = CurrencyAmount.Create(currency, command.Amount);
         var invoicePeriod = Enum.Parse<InvoicePeriod>(command.InvoicePeriod);

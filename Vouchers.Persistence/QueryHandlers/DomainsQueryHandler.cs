@@ -5,7 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Vouchers.Application;
 using Vouchers.Application.Dtos;
+using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Queries;
 using Vouchers.Application.Services;
 using Vouchers.Application.UseCases;
@@ -14,20 +16,24 @@ using Vouchers.Domains.Domain;
 
 namespace Vouchers.Persistence.QueryHandlers;
 
-internal sealed class DomainsQueryHandler : IHandler<DomainsQuery, IEnumerable<DomainDto>>
+internal sealed class DomainsQueryHandler : IHandler<DomainsQuery, Result<IEnumerable<DomainDto>>>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly VouchersDbContext _dbContext;
+    private readonly ICultureInfoProvider _cultureInfoProvider;
 
-    public DomainsQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext)
+    public DomainsQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext, ICultureInfoProvider cultureInfoProvider)
     {
         _authIdentityProvider = authIdentityProvider;
         _dbContext = dbContext;
+        _cultureInfoProvider = cultureInfoProvider;
     }
 
-    public async Task<IEnumerable<DomainDto>> HandleAsync(DomainsQuery query, CancellationToken cancellation)
+    public async Task<Result<IEnumerable<DomainDto>>> HandleAsync(DomainsQuery query, CancellationToken cancellation)
     {
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
+        if (authIdentityId is null)
+            return Error.NotAuthorized(_cultureInfoProvider.GetCultureInfo());
 
         var domainsQuery = _dbContext.Set<Domain>()
             .Include( domain => domain.Contract)
@@ -55,6 +61,6 @@ internal sealed class DomainsQueryHandler : IHandler<DomainsQuery, IEnumerable<D
             (result, account) => new { result.Domain, account }
         ).Where(domain => domain.account == null).Select(domain => domain.Domain).GetListPageQuery(query);
             
-        return await domainsQuery.ToListAsync();
+        return await domainsQuery.ToListAsync(cancellation);
     }
 }

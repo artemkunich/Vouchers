@@ -1,6 +1,5 @@
 ﻿using System;
 using Vouchers.Primitives;
-using System.Globalization;
 
 namespace Vouchers.Core.Domain;
 
@@ -15,21 +14,21 @@ public sealed class Account : AggregateRoot<Guid>
         CreatedDateTime = createdDateTime
     };
 
-    public void IncreaseSupply(decimal amount, CultureInfo cultureInfo = null) 
+    public void IncreaseSupply(decimal amount) 
     { 
         if(amount <= 0)
-            throw new CoreException("AmountIsNotPositive", cultureInfo);
+            throw CoreException.AmountIsNotPositive;
 
         Supply += amount;
     }
 
-    public void ReduceSupply(decimal amount, CultureInfo cultureInfo = null)
+    public void ReduceSupply(decimal amount)
     {
         if (amount <= 0)
-            throw new CoreException("AmountIsNotPositive", cultureInfo);
+            throw CoreException.AmountIsNotPositive;
 
         if (Supply < amount)
-            throw new CoreException("AmountIsGreaterThanSupply", cultureInfo);
+            throw CoreException.AmountIsGreaterThanSupply;
 
         Supply -= amount;
     }

@@ -11,39 +11,47 @@ using Vouchers.Application.Services;
 
 namespace Vouchers.Application.UseCases.VoucherValueCases;
 
-internal sealed class DeleteVoucherValueCommandHandler : IHandler<DeleteVoucherValueCommand>
+internal sealed class DeleteVoucherValueCommandHandler : IHandler<DeleteVoucherValueCommand,Result>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IRepository<VoucherValue,Guid> _valueRepository;
     private readonly IRepository<UnitType,Guid> _unitTypeRepository;
-
+    private readonly ICultureInfoProvider _cultureInfoProvider;
+    
     public DeleteVoucherValueCommandHandler(IAuthIdentityProvider authIdentityProvider, 
-        IRepository<VoucherValue,Guid> valueRepository, IRepository<UnitType,Guid> unitTypeRepository)
+        IRepository<VoucherValue,Guid> valueRepository, IRepository<UnitType,Guid> unitTypeRepository, ICultureInfoProvider cultureInfoProvider)
     {
         _authIdentityProvider = authIdentityProvider;
         _valueRepository = valueRepository;
         _unitTypeRepository = unitTypeRepository;
+        _cultureInfoProvider = cultureInfoProvider;
     }
 
-    public async Task HandleAsync(DeleteVoucherValueCommand command, CancellationToken cancellation)
+    public async Task<Result> HandleAsync(DeleteVoucherValueCommand command, CancellationToken cancellation)
     {
+        var cultureInfo = _cultureInfoProvider.GetCultureInfo();
+        
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
+        if (authIdentityId is null)
+            return Error.NotAuthorized(cultureInfo);
 
         var value = await _valueRepository.GetByIdAsync(command.VoucherValueId);
-        if(value is null)
-            throw new ApplicationException(Properties.Resources.VoucherValueDoesNotExist);
+        if (value is null)
+            return Error.VoucherValueDoesNotExist(cultureInfo);
 
         if (value.IssuerIdentityId != authIdentityId)
-            throw new ApplicationException(Properties.Resources.OperationIsNotAllowed);
+            return Error.OperationIsNotAllowed(cultureInfo);
 
         var unitType = await _unitTypeRepository.GetByIdAsync(command.VoucherValueId);
         if (unitType is null)
-            throw new ApplicationException(Properties.Resources.UnitTypeDoesNotExist);
+            return Error.UnitTypeDoesNotExist(cultureInfo);
 
         if (unitType.CanBeRemoved())
         {
             await _unitTypeRepository.RemoveAsync(unitType);
             await _valueRepository.RemoveAsync(value);
         }
+        
+        return Result.Create();
     }
 }

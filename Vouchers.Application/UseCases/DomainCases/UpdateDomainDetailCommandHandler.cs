@@ -11,31 +11,37 @@ using Vouchers.Domains.Domain;
 
 namespace Vouchers.Application.UseCases.DomainCases;
 
-internal sealed class UpdateDomainDetailCommandHandler : IHandler<UpdateDomainDetailCommand>
+internal sealed class UpdateDomainDetailCommandHandler : IHandler<UpdateDomainDetailCommand, Result>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IReadOnlyRepository<DomainAccount,Guid> _domainAccountRepository;
     private readonly IRepository<Domain,Guid> _domainRepository;
     private readonly IAppImageService _appImageService;
+    private readonly ICultureInfoProvider _cultureInfoProvider;
     public UpdateDomainDetailCommandHandler(IAuthIdentityProvider authIdentityProvider, IReadOnlyRepository<DomainAccount,Guid> domainAccountRepository, 
-        IRepository<Domain,Guid> domainRepository, IAppImageService appImageService)
+        IRepository<Domain,Guid> domainRepository, IAppImageService appImageService, ICultureInfoProvider cultureInfoProvider)
     {
         _authIdentityProvider = authIdentityProvider;
         _domainAccountRepository = domainAccountRepository;
         _domainRepository = domainRepository;
         _appImageService = appImageService;
+        _cultureInfoProvider = cultureInfoProvider;
     }
 
-    public async Task HandleAsync(UpdateDomainDetailCommand command, CancellationToken cancellation)
+    public async Task<Result> HandleAsync(UpdateDomainDetailCommand command, CancellationToken cancellation)
     {
+        var cultureInfo = _cultureInfoProvider.GetCultureInfo();
+        
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
-
+        if (authIdentityId is null)
+            return Error.NotAuthorized(cultureInfo);
+        
         var domainAccount = (await _domainAccountRepository.GetByExpressionAsync(account => account.DomainId == command.DomainId && account.IdentityId == authIdentityId)).FirstOrDefault();
         if (domainAccount is null)
-            throw new ApplicationException(Properties.Resources.DomainAccountDoesNotExist);
+            return Error.DomainAccountDoesNotExist(cultureInfo);
 
         if (!domainAccount.IsAdmin && domainAccount.Domain.Contract.PartyId != authIdentityId)
-            throw new ApplicationException(Properties.Resources.OperationIsNotAllowed);
+            return Error.OperationIsNotAllowed(cultureInfo);
 
         var requireUpdate = false;
         var domain = domainAccount.Domain;
@@ -69,5 +75,7 @@ internal sealed class UpdateDomainDetailCommandHandler : IHandler<UpdateDomainDe
 
         if (requireUpdate)
             await _domainRepository.UpdateAsync(domain);
+        
+        return Result.Create();
     }
 }

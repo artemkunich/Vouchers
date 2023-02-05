@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.UseCases;
 using System.Threading;
+using Vouchers.Application;
+using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Services;
 using Vouchers.Core.Domain;
 using Vouchers.Domains.Domain;
@@ -16,26 +18,30 @@ using Vouchers.Values.Domain;
 
 namespace Vouchers.Persistence.QueryHandlers;
 
-internal sealed class HolderTransactionRequestQueryHandler : IHandler<Guid, HolderTransactionRequestDto>
+internal sealed class HolderTransactionRequestQueryHandler : IHandler<Guid, Result<HolderTransactionRequestDto>>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly VouchersDbContext _dbContext;
-
-    public HolderTransactionRequestQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext)
+    private readonly ICultureInfoProvider _cultureInfoProvider;
+    
+    public HolderTransactionRequestQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext, ICultureInfoProvider cultureInfoProvider)
     {
         _authIdentityProvider = authIdentityProvider;
         _dbContext = dbContext;
+        _cultureInfoProvider = cultureInfoProvider;
     }
 
-    public HolderTransactionRequestDto Handle(Guid transactionRequestId, Guid authIdentityId) =>
-        GetQuery(transactionRequestId, authIdentityId).FirstOrDefault();
-
-    public async Task<HolderTransactionRequestDto> HandleAsync(Guid transactionRequestId, CancellationToken cancellation) {
+    public async Task<Result<HolderTransactionRequestDto>> HandleAsync(Guid transactionRequestId, CancellationToken cancellation) 
+    {
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
-        return await GetQuery(transactionRequestId, authIdentityId).FirstOrDefaultAsync();
+        if (authIdentityId is null)
+            return Error.NotAuthorized(_cultureInfoProvider.GetCultureInfo());
+        
+        return await GetQuery(transactionRequestId, authIdentityId.Value).FirstOrDefaultAsync(cancellation);
     }
 
-    public IQueryable<HolderTransactionRequestDto> GetQuery(Guid transactionRequestId, Guid authIdentityId) {
+    private IQueryable<HolderTransactionRequestDto> GetQuery(Guid transactionRequestId, Guid authIdentityId) 
+    {
 
         var holderTransactionRequestsWithDomainAccountsQuery = _dbContext.Set<HolderTransactionRequest>()
             .Include(req => req.CreditorAccount)

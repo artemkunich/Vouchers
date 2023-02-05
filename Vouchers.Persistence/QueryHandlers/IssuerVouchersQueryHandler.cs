@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Vouchers.Application;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Queries;
@@ -16,20 +17,24 @@ using Vouchers.Values.Domain;
 
 namespace Vouchers.Persistence.QueryHandlers;
 
-internal sealed class IssuerVouchersQueryHandler : IHandler<IssuerVouchersQuery,IEnumerable<VoucherDto>>
+internal sealed class IssuerVouchersQueryHandler : IHandler<IssuerVouchersQuery,Result<IEnumerable<VoucherDto>>>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly VouchersDbContext _dbContext;
+    private readonly ICultureInfoProvider _cultureInfoProvider;
 
-    public IssuerVouchersQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext)
+    public IssuerVouchersQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext, ICultureInfoProvider cultureInfoProvider)
     {
         _authIdentityProvider = authIdentityProvider;
         _dbContext = dbContext;
+        _cultureInfoProvider = cultureInfoProvider;
     }     
 
-    public async Task<IEnumerable<VoucherDto>> HandleAsync(IssuerVouchersQuery query, CancellationToken cancellation)
+    public async Task<Result<IEnumerable<VoucherDto>>> HandleAsync(IssuerVouchersQuery query, CancellationToken cancellation)
     {
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
+        if (authIdentityId is null)
+            return Error.NotAuthorized(_cultureInfoProvider.GetCultureInfo());
 
         var issuerDomainAccount = await _dbContext.Set<UnitType>().Where(v => v.Id == query.ValueId)
             .Join(_dbContext.Set<DomainAccount>(), u => u.IssuerAccountId, a => a.Id, (u, a) => a).FirstOrDefaultAsync();

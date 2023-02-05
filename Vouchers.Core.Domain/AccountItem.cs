@@ -1,6 +1,5 @@
 ﻿using System;
 using Vouchers.Primitives;
-using System.Globalization;
 
 namespace Vouchers.Core.Domain;
 
@@ -30,12 +29,11 @@ public sealed class AccountItem : Entity<Guid>
     {
         Balance += amount;
     }
-    public void ProcessCredit(decimal amount, CultureInfo cultureInfo = null)
+    public void ProcessCredit(decimal amount)
     {
         if (amount > Balance)
-        {
-            throw new CoreException("AmountIsGreaterThanBalance", cultureInfo);
-        }
+            throw CoreException.AmountIsGreaterThanBalance;
+        
         Balance -= amount;
     }
 }

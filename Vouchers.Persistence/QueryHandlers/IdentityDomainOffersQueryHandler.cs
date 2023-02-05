@@ -14,25 +14,31 @@ using Vouchers.Domains.Domain;
 using Vouchers.Application.Queries;
 using Vouchers.Application.UseCases;
 using System.Threading;
+using Vouchers.Application;
 using Vouchers.Application.Services;
 
 namespace Vouchers.Persistence.QueryHandlers;
 
-internal sealed class IdentityDomainOffersQueryHandler : IHandler<IdentityDomainOffersQuery, IEnumerable<DomainOfferDto>>
+internal sealed class IdentityDomainOffersQueryHandler : IHandler<IdentityDomainOffersQuery, Result<IEnumerable<DomainOfferDto>>>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly VouchersDbContext _dbContext;
-
-    public IdentityDomainOffersQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext)
+    private readonly ICultureInfoProvider _cultureInfoProvider;
+    
+    public IdentityDomainOffersQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext, ICultureInfoProvider cultureInfoProvider)
     {           
         _authIdentityProvider = authIdentityProvider;
         _dbContext = dbContext;
+        _cultureInfoProvider = cultureInfoProvider;
     }
 
-    public async Task<IEnumerable<DomainOfferDto>> HandleAsync(IdentityDomainOffersQuery query, CancellationToken cancellation)
+    public async Task<Result<IEnumerable<DomainOfferDto>>> HandleAsync(IdentityDomainOffersQuery query, CancellationToken cancellation)
     {
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
-        return await GetQuery(query, authIdentityId).ToListAsync();
+        if (authIdentityId is null)
+            return Error.NotAuthorized(_cultureInfoProvider.GetCultureInfo());
+        
+        return await GetQuery(query, authIdentityId.Value).ToListAsync(cancellation);
     }
             
 

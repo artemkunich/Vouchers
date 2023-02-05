@@ -12,21 +12,27 @@ using Vouchers.Domains.Domain;
 
 namespace Vouchers.Application.UseCases.DomainOfferCases;
 
-internal sealed class UpdateDomainOfferCommandHandler : IHandler<UpdateDomainOfferCommand>
+internal sealed class UpdateDomainOfferCommandHandler : IHandler<UpdateDomainOfferCommand,Result>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IRepository<DomainOffer,Guid> _domainOfferRepository;
-
-    public UpdateDomainOfferCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<DomainOffer,Guid> domainOfferRepository)
+    private readonly ICultureInfoProvider _cultureInfoProvider;
+    
+    public UpdateDomainOfferCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<DomainOffer,Guid> domainOfferRepository, ICultureInfoProvider cultureInfoProvider)
     {
         _authIdentityProvider = authIdentityProvider;
         _domainOfferRepository = domainOfferRepository;
+        _cultureInfoProvider = cultureInfoProvider;
     }
 
-    public async Task HandleAsync(UpdateDomainOfferCommand command, CancellationToken cancellation)
+    public async Task<Result> HandleAsync(UpdateDomainOfferCommand command, CancellationToken cancellation)
     {
+        var cultureInfo = _cultureInfoProvider.GetCultureInfo();
+        
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
-
+        if (authIdentityId is null)
+            return Error.NotAuthorized(cultureInfo);
+        
         var domainOffer = await _domainOfferRepository.GetByIdAsync(command.Id);
 
         if (command.Terminate == true)
@@ -37,7 +43,7 @@ internal sealed class UpdateDomainOfferCommandHandler : IHandler<UpdateDomainOff
                 domainOffer.ValidTo = domainOffer.ValidFrom;
 
             await _domainOfferRepository.UpdateAsync(domainOffer);
-            return;
+            return Result.Create();
         } 
 
         if(command.Description is not null && command.Description != domainOffer.Description)
@@ -46,28 +52,26 @@ internal sealed class UpdateDomainOfferCommandHandler : IHandler<UpdateDomainOff
             await _domainOfferRepository.UpdateAsync(domainOffer);
         }
 
+        var requireUpdate = false;
+        var result = Result.Create();
+        
         if (command.ValidFrom is not null && command.ValidFrom != domainOffer.ValidFrom)
-        {
-            if (domainOffer.ValidFrom <= DateTime.Now)
-                throw new ApplicationException(Properties.Resources.ValidFromCannotBeModifiedOnActiveOffers);
-
-            if (command.ValidFrom < DateTime.Now)
-                throw new ApplicationException(Properties.Resources.ValidFromCannotBeSetToPast);
-
-            domainOffer.ValidFrom = command.ValidFrom.Value;
-        }
+            result
+                .IfTrueAddError(domainOffer.ValidFrom <= DateTime.Now, Error.ValidFromCannotBeModifiedOnActiveOffers(cultureInfo))
+                .IfTrueAddError(command.ValidFrom < DateTime.Now, Error.ValidFromCannotBeSetToPast(cultureInfo))
+                .Process(() => domainOffer.ValidFrom = command.ValidFrom.Value)
+                .Process(() => requireUpdate = true);
 
         if (command.ValidTo is not null && command.ValidTo != domainOffer.ValidTo)
-        {
-            if (command.ValidTo < domainOffer.ValidFrom)
-                throw new ApplicationException(Properties.Resources.ValidToCannotBeLessThanValidFrom);
+            result
+                .IfTrueAddError(command.ValidTo < domainOffer.ValidFrom, Error.ValidToCannotBeLessThanValidFrom(cultureInfo))
+                .IfTrueAddError(command.ValidTo < DateTime.Now, Error.ValidToCannotBeLessThanCurrentDatetime(cultureInfo))
+                .Process(() => domainOffer.ValidTo = command.ValidTo.Value)
+                .Process(() => requireUpdate = true);
 
-            if (command.ValidTo < DateTime.Now)
-                throw new ApplicationException(Properties.Resources.ValidToCannotBeLessThanCurrentDatetime);
-
-            domainOffer.ValidTo = command.ValidTo.Value;
-
+        if (requireUpdate)
             await _domainOfferRepository.UpdateAsync(domainOffer);
-        }
+        
+        return result;
     }
 }

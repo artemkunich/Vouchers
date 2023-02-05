@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Vouchers.Application;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Queries;
@@ -16,20 +17,24 @@ using Vouchers.Values.Domain;
 
 namespace Vouchers.Persistence.QueryHandlers;
 
-internal sealed class IssuerValuesQueryHandler : IHandler<IssuerValuesQuery,IEnumerable<VoucherValueDto>>
+internal sealed class IssuerValuesQueryHandler : IHandler<IssuerValuesQuery,Result<IEnumerable<VoucherValueDto>>>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly VouchersDbContext _dbContext;
-
-    public IssuerValuesQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext)
+    private readonly ICultureInfoProvider _cultureInfoProvider;
+    
+    public IssuerValuesQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext, ICultureInfoProvider cultureInfoProvider)
     {
         _authIdentityProvider = authIdentityProvider;
         _dbContext = dbContext;
+        _cultureInfoProvider = cultureInfoProvider;
     }     
 
-    public async Task<IEnumerable<VoucherValueDto>> HandleAsync(IssuerValuesQuery query, CancellationToken cancellation)
+    public async Task<Result<IEnumerable<VoucherValueDto>>> HandleAsync(IssuerValuesQuery query, CancellationToken cancellation)
     {
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
+        if (authIdentityId is null)
+            return Error.NotAuthorized(_cultureInfoProvider.GetCultureInfo());
 
         var issuerDomainAccount = await _dbContext.Set<DomainAccount>().Include(a => a.Domain).FirstOrDefaultAsync(a => a.Id == query.IssuerAccountId);
         if(issuerDomainAccount is null)
@@ -58,6 +63,6 @@ internal sealed class IssuerValuesQueryHandler : IHandler<IssuerValuesQuery,IEnu
                     Description = o.Value.Description,
                     ImageId = o.Value.ImageId,
                 }
-            ).GetListPageQuery(query).ToListAsync();          
+            ).GetListPageQuery(query).ToListAsync(cancellation);          
     }
 }

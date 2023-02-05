@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Vouchers.Application;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Services;
@@ -16,17 +17,19 @@ using Vouchers.Identities.Domain;
 
 namespace Vouchers.Persistence.QueryHandlers;
 
-internal sealed class IdentityDetailQueryHandler : IHandler<Guid?, IdentityDetailDto>
+internal sealed class IdentityDetailQueryHandler : IHandler<Guid?, Result<IdentityDetailDto>>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly VouchersDbContext _dbContext;
-    public IdentityDetailQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext)
+    private readonly ICultureInfoProvider _cultureInfoProvider;
+    public IdentityDetailQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext, ICultureInfoProvider cultureInfoProvider)
     {
         _authIdentityProvider = authIdentityProvider;
         _dbContext = dbContext;
+        _cultureInfoProvider = cultureInfoProvider;
     }
 
-    Func<CropParameters, CropParametersDto> mapCropParameters = (CropParameters cp) => cp is null ? null : new CropParametersDto
+    Func<CropParameters, CropParametersDto> _mapCropParameters = (CropParameters cp) => cp is null ? null : new CropParametersDto
     {
         X = cp.X,
         Y = cp.Y,
@@ -34,9 +37,11 @@ internal sealed class IdentityDetailQueryHandler : IHandler<Guid?, IdentityDetai
         Height = cp.Height,
     };
 
-    public async Task<IdentityDetailDto> HandleAsync(Guid? accountId, CancellationToken cancellation)
+    public async Task<Result<IdentityDetailDto>> HandleAsync(Guid? accountId, CancellationToken cancellation)
     {
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
+        if (authIdentityId is null)
+            return Error.NotAuthorized(_cultureInfoProvider.GetCultureInfo());
 
         var identityId = authIdentityId;
         DomainAccount domainAccount = null;
@@ -57,7 +62,7 @@ internal sealed class IdentityDetailQueryHandler : IHandler<Guid?, IdentityDetai
         ).SelectMany(
             result => result.Images.DefaultIfEmpty(),
             (result, image) => new { result.Identity, Image = image }
-        ).FirstOrDefaultAsync();
+        ).FirstOrDefaultAsync(cancellation);
 
         return new IdentityDetailDto
         {
@@ -67,7 +72,7 @@ internal sealed class IdentityDetailQueryHandler : IHandler<Guid?, IdentityDetai
             LastName = identityWithImage.Identity.LastName,
             ImageId = identityWithImage.Image == null ? null : identityWithImage.Image.ImageId,
             CroppedImageId = identityWithImage.Image == null ? null : identityWithImage.Image.Id,
-            CropParameters = mapCropParameters(identityWithImage.Image?.CropParameters),
+            CropParameters = _mapCropParameters(identityWithImage.Image?.CropParameters),
             AccountId = accountId,
             IsAdmin = domainAccount?.IsAdmin,
             IsIssuer = domainAccount?.IsIssuer,

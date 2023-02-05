@@ -9,32 +9,38 @@ using Vouchers.Application.Dtos;
 using Vouchers.Application.Queries;
 using Vouchers.Application.UseCases;
 using System.Threading;
+using Vouchers.Application;
+using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Services;
 using Vouchers.Core.Domain;
 using Vouchers.Values.Domain;
 
 namespace Vouchers.Persistence.QueryHandlers;
 
-internal sealed class IssuerTransactionsQueryHandler : IHandler<IssuerTransactionsQuery,IEnumerable<IssuerTransactionDto>>
+internal sealed class IssuerTransactionsQueryHandler : IHandler<IssuerTransactionsQuery,Result<IEnumerable<IssuerTransactionDto>>>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly VouchersDbContext _dbContext;
-
-    public IssuerTransactionsQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext)
+    private readonly ICultureInfoProvider _cultureInfoProvider;
+    
+    public IssuerTransactionsQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext, ICultureInfoProvider cultureInfoProvider)
     {
         _authIdentityProvider = authIdentityProvider;
         _dbContext = dbContext;
+        _cultureInfoProvider = cultureInfoProvider;
     }
 
-    public async Task<IEnumerable<IssuerTransactionDto>> HandleAsync(IssuerTransactionsQuery query, CancellationToken cancellation)
+    public async Task<Result<IEnumerable<IssuerTransactionDto>>> HandleAsync(IssuerTransactionsQuery query, CancellationToken cancellation)
     {
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
-        return await GetQuery(query, authIdentityId).ToListAsync();
+        if (authIdentityId is null)
+            return Error.NotAuthorized(_cultureInfoProvider.GetCultureInfo());
+        
+        return await GetQuery(query, authIdentityId.Value).ToListAsync(cancellation);
     }
             
     IQueryable<IssuerTransactionDto> GetQuery(IssuerTransactionsQuery query, Guid authIdentityId) 
     {
-
         var issuerTransactionsQuery = _dbContext.Set<IssuerTransaction>()
             .Include(tr => tr.Quantity.Unit).ThenInclude(unit => unit.UnitType).ThenInclude(value => value.IssuerAccount)
             .Join(_dbContext.Set<VoucherValue>(), 
@@ -45,14 +51,14 @@ internal sealed class IssuerTransactionsQueryHandler : IHandler<IssuerTransactio
             .Where(o => o.Value.IssuerIdentityId == authIdentityId).Select(o => o.Transaction);
 
         if (query.MinAmount != null)
-            issuerTransactionsQuery.Where(tr => tr.Quantity.Amount >= query.MinAmount);
+            issuerTransactionsQuery = issuerTransactionsQuery.Where(tr => tr.Quantity.Amount >= query.MinAmount);
         if (query.MaxAmount != null)
-            issuerTransactionsQuery.Where(tr => tr.Quantity.Amount <= query.MaxAmount);
+            issuerTransactionsQuery = issuerTransactionsQuery.Where(tr => tr.Quantity.Amount <= query.MaxAmount);
 
         if (query.MinTimestamp != null)
-            issuerTransactionsQuery.Where(tr => tr.Timestamp >= query.MinTimestamp);
+            issuerTransactionsQuery = issuerTransactionsQuery.Where(tr => tr.Timestamp >= query.MinTimestamp);
         if (query.MaxTimestamp != null)
-            issuerTransactionsQuery.Where(tr => tr.Timestamp <= query.MaxTimestamp);
+            issuerTransactionsQuery = issuerTransactionsQuery.Where(tr => tr.Timestamp <= query.MaxTimestamp);
 
         var voucherValuesQuery = _dbContext.Set<VoucherValue>()
             .Where(value => value.IssuerIdentityId == authIdentityId);

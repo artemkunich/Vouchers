@@ -6,7 +6,9 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Vouchers.Application;
 using Vouchers.Application.Dtos;
+using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Queries;
 using Vouchers.Application.Services;
 using Vouchers.Application.UseCases;
@@ -17,22 +19,26 @@ using Vouchers.Values.Domain;
 
 namespace Vouchers.Persistence.QueryHandlers;
 
-internal sealed class DomainValuesQueryHandler : IHandler<DomainValuesQuery,IEnumerable<VoucherValueDto>>
+internal sealed class DomainValuesQueryHandler : IHandler<DomainValuesQuery,Result<IEnumerable<VoucherValueDto>>>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly VouchersDbContext _dbContext;
+    private readonly ICultureInfoProvider _cultureInfoProvider;
 
-    public DomainValuesQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext)
+    public DomainValuesQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext, ICultureInfoProvider cultureInfoProvider)
     {
         _authIdentityProvider = authIdentityProvider;
         _dbContext = dbContext;
+        _cultureInfoProvider = cultureInfoProvider;
     }
 
-    public async Task<IEnumerable<VoucherValueDto>> HandleAsync(DomainValuesQuery query, CancellationToken cancellation)
+    public async Task<Result<IEnumerable<VoucherValueDto>>> HandleAsync(DomainValuesQuery query, CancellationToken cancellation)
     {
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
+        if (authIdentityId is null)
+            return Error.NotAuthorized(_cultureInfoProvider.GetCultureInfo());
 
-        var authDomainAccounts = await _dbContext.Set<DomainAccount>().Where(a => a.IdentityId == authIdentityId && a.DomainId == query.DomainId).ToListAsync();
+        var authDomainAccounts = await _dbContext.Set<DomainAccount>().Where(a => a.IdentityId == authIdentityId && a.DomainId == query.DomainId).ToListAsync(cancellation);
 
         if (!authDomainAccounts.Any())
             return new List<VoucherValueDto>();

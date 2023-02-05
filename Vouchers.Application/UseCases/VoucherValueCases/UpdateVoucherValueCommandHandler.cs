@@ -13,30 +13,36 @@ using Vouchers.Application.Services;
 
 namespace Vouchers.Application.UseCases.VoucherValueCases;
 
-internal sealed class UpdateVoucherValueCommandHandler : IHandler<UpdateVoucherValueCommand>
+internal sealed class UpdateVoucherValueCommandHandler : IHandler<UpdateVoucherValueCommand,Result>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IRepository<VoucherValue,Guid> _voucherValueRepository;
     private readonly IAppImageService _appImageService;
-
+    private readonly ICultureInfoProvider _cultureInfoProvider;
+    
     public UpdateVoucherValueCommandHandler(IAuthIdentityProvider authIdentityProvider, IAppImageService appImageService,
-        IRepository<VoucherValue,Guid> voucherValueRepository)
+        IRepository<VoucherValue,Guid> voucherValueRepository, ICultureInfoProvider cultureInfoProvider)
     {
         _authIdentityProvider = authIdentityProvider;
         _voucherValueRepository = voucherValueRepository;
+        _cultureInfoProvider = cultureInfoProvider;
         _appImageService = appImageService;
     }
 
-    public async Task HandleAsync(UpdateVoucherValueCommand command, CancellationToken cancellation)
+    public async Task<Result> HandleAsync(UpdateVoucherValueCommand command, CancellationToken cancellation)
     {
+        var cultureInfo = _cultureInfoProvider.GetCultureInfo();
+        
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
+        if (authIdentityId is null)
+            return Error.NotAuthorized(cultureInfo);
 
         var value = await _voucherValueRepository.GetByIdAsync(command.Id);
         if (value is null)
-            throw new ApplicationException(Properties.Resources.VoucherValueDoesNotExist);
+            return Error.VoucherValueDoesNotExist(cultureInfo);
 
         if (value.IssuerIdentityId != authIdentityId)
-            throw new ApplicationException(Properties.Resources.OperationIsNotAllowed);
+            return Error.OperationIsNotAllowed(cultureInfo);
 
         var requireUpdate = false;
 
@@ -69,6 +75,8 @@ internal sealed class UpdateVoucherValueCommandHandler : IHandler<UpdateVoucherV
 
         if (requireUpdate)
             await _voucherValueRepository.UpdateAsync(value);
+        
+        return Result.Create();
     }
 
 }

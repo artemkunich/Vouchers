@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Vouchers.Primitives;
-using System.Globalization;
 
 namespace Vouchers.Core.Domain;
 
@@ -23,10 +21,10 @@ public sealed class HolderTransaction : AggregateRoot<Guid>
     public string Message { get; init; }
     public bool IsPerformed { get; private set; }
 
-    public static HolderTransaction Create(Guid id, DateTime timestamp, Account creditorAccount, Account debtorAccount, UnitType unitType, string message, CultureInfo cultureInfo = null)
+    public static HolderTransaction Create(Guid id, DateTime timestamp, Account creditorAccount, Account debtorAccount, UnitType unitType, string message)
     {
         if (creditorAccount.Equals(debtorAccount))
-            throw new CoreException("CreditorAndDebtorAreTheSame", cultureInfo);
+            throw CoreException.CreditorAndDebtorAreTheSame;
 
         return new()
         {
@@ -42,21 +40,21 @@ public sealed class HolderTransaction : AggregateRoot<Guid>
         };
     }
 
-    public void AddTransactionItem(HolderTransactionItem item, CultureInfo cultureInfo = null)
+    public void AddTransactionItem(HolderTransactionItem item)
     {
         if (item.Quantity.Unit.UnitType.NotEquals(Quantity.UnitType))
-            throw new CoreException("TransactionAndItemHaveDifferentUnitTypes", cultureInfo);
+            throw CoreException.TransactionAndItemHaveDifferentUnitTypes;
 
         if (item.Quantity.Unit.ValidTo < DateTime.Today)
-            throw new CoreException("TransactionContainsExpiredUnits", cultureInfo);
+            throw CoreException.TransactionContainsExpiredUnits;
 
         Quantity = Quantity.Add(item.Quantity);
         TransactionItems.Add(item);           
     }
     
-    public void Perform(CultureInfo cultureInfo = null) {
+    public void Perform() {
         if (Quantity.Amount == 0)
-            throw new CoreException("AmountIsNotPositive", cultureInfo);
+            throw CoreException.AmountIsNotPositive;
 
         foreach (var item in TransactionItems) {
             item.CreditAccountItem.ProcessCredit(item.Quantity.Amount);

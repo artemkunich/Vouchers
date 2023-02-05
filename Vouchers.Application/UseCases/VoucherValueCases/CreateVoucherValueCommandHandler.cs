@@ -13,7 +13,7 @@ using Vouchers.Application.Services;
 
 namespace Vouchers.Application.UseCases.VoucherValueCases;
 
-internal sealed class CreateVoucherValueCommandHandler : IHandler<CreateVoucherValueCommand, Guid>
+internal sealed class CreateVoucherValueCommandHandler : IHandler<CreateVoucherValueCommand, Result<Guid>>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IReadOnlyRepository<DomainAccount,Guid> _domainAccountRepository;
@@ -22,10 +22,11 @@ internal sealed class CreateVoucherValueCommandHandler : IHandler<CreateVoucherV
     private readonly IRepository<UnitType,Guid> _unitTypeRepository;
     private readonly IAppImageService _appImageService;
     private readonly IIdentifierProvider<Guid> _identifierProvider;
+    private readonly ICultureInfoProvider _cultureInfoProvider;
     
     public CreateVoucherValueCommandHandler(IAuthIdentityProvider authIdentityProvider, IAppImageService appImageService,
         IReadOnlyRepository<DomainAccount,Guid> domainAccountRepository, IReadOnlyRepository<Account,Guid> accountRepository,
-        IRepository<VoucherValue,Guid> voucherValueRepository, IRepository<UnitType,Guid> unitTypeRepository, IIdentifierProvider<Guid> identifierProvider)
+        IRepository<VoucherValue,Guid> voucherValueRepository, IRepository<UnitType,Guid> unitTypeRepository, IIdentifierProvider<Guid> identifierProvider, ICultureInfoProvider cultureInfoProvider)
     {
         _authIdentityProvider = authIdentityProvider;
         _domainAccountRepository = domainAccountRepository;
@@ -33,20 +34,25 @@ internal sealed class CreateVoucherValueCommandHandler : IHandler<CreateVoucherV
         _voucherValueRepository = voucherValueRepository;
         _unitTypeRepository = unitTypeRepository;
         _identifierProvider = identifierProvider;
+        _cultureInfoProvider = cultureInfoProvider;
         _appImageService = appImageService;
     }
 
-    public async Task<Guid> HandleAsync(CreateVoucherValueCommand command, CancellationToken cancellation)
+    public async Task<Result<Guid>> HandleAsync(CreateVoucherValueCommand command, CancellationToken cancellation)
     {
+        var cultureInfo = _cultureInfoProvider.GetCultureInfo();
+        
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
+        if (authIdentityId is null)
+            return Error.NotAuthorized(cultureInfo);
 
         var issuerDomainAccount = await _domainAccountRepository.GetByIdAsync(command.IssuerAccountId);
         if (issuerDomainAccount?.IdentityId != authIdentityId)
-            throw new ApplicationException(Properties.Resources.OperationIsNotAllowed);
+            return Error.OperationIsNotAllowed(cultureInfo);
         if (!issuerDomainAccount.IsConfirmed)
-            throw new ApplicationException(Properties.Resources.IssuerAccountIsNotActivated);
+            return Error.IssuerAccountIsNotActivated(cultureInfo);
         if (!issuerDomainAccount.IsIssuer)
-            throw new ApplicationException(Properties.Resources.IssuerOperationsAreNotAllowed);
+            return Error.IssuerOperationsAreNotAllowed(cultureInfo);
 
         CroppedImage image = null;
         if (command.Image is not null && command.CropParameters is not null)
@@ -64,8 +70,7 @@ internal sealed class CreateVoucherValueCommandHandler : IHandler<CreateVoucherV
         var value = VoucherValue.Create(unitType.Id, issuerDomainAccount.Domain.Id, issuerDomainAccount.IdentityId, command.Ticker);
         value.Description = command.Description;
         value.ImageId = image?.Id;
-
-
+        
         await _voucherValueRepository.AddAsync(value);
 
         return value.Id;

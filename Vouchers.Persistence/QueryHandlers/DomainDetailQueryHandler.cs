@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Vouchers.Application;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Queries;
@@ -16,10 +17,11 @@ using Vouchers.Files.Domain;
 
 namespace Vouchers.Persistence.QueryHandlers;
 
-internal sealed class DomainDetailQueryHandler : IHandler<Guid, DomainDetailDto>
+internal sealed class DomainDetailQueryHandler : IHandler<Guid, Result<DomainDetailDto>>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly VouchersDbContext _dbContext;
+    private readonly ICultureInfoProvider _cultureInfoProvider;
 
     Func<CropParameters, CropParametersDto> _mapCropParameters = (CropParameters cp) => cp is null ? null : new CropParametersDto
     {
@@ -29,15 +31,18 @@ internal sealed class DomainDetailQueryHandler : IHandler<Guid, DomainDetailDto>
         Height = cp.Height,
     };
 
-    public DomainDetailQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext)
+    public DomainDetailQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext, ICultureInfoProvider cultureInfoProvider)
     {
         _authIdentityProvider = authIdentityProvider;
         _dbContext = dbContext;
+        _cultureInfoProvider = cultureInfoProvider;
     }
 
-    public async Task<DomainDetailDto> HandleAsync(Guid domainId, CancellationToken cancellation)
+    public async Task<Result<DomainDetailDto>> HandleAsync(Guid domainId, CancellationToken cancellation)
     {
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
+        if (authIdentityId is null)
+            return Error.NotAuthorized(_cultureInfoProvider.GetCultureInfo());
 
         var domainAccountsQuery = _dbContext.Set<DomainAccount>().Where(account => account.DomainId == domainId && account.IdentityId == authIdentityId);
 

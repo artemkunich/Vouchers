@@ -14,11 +14,12 @@ using Vouchers.Domains.Domain;
 using Vouchers.Application.Queries;
 using Vouchers.Application.UseCases;
 using System.Threading;
+using Vouchers.Application;
 using Vouchers.Application.Services;
 
 namespace Vouchers.Persistence.QueryHandlers;
 
-internal sealed class DomainOffersQueryHandler : IHandler<DomainOffersQuery, IEnumerable<DomainOfferDto>>
+internal sealed class DomainOffersQueryHandler : IHandler<DomainOffersQuery, Result<IEnumerable<DomainOfferDto>>>
 {
     private readonly VouchersDbContext _dbContext;
 
@@ -27,15 +28,12 @@ internal sealed class DomainOffersQueryHandler : IHandler<DomainOffersQuery, IEn
         _dbContext = dbContext;
     }
 
-    public async Task<IEnumerable<DomainOfferDto>> HandleAsync(DomainOffersQuery query, CancellationToken cancellation)
-    {
-        return await GetQuery(query).ToListAsync();
-    }
-            
-
+    public async Task<Result<IEnumerable<DomainOfferDto>>> HandleAsync(DomainOffersQuery query, CancellationToken cancellation) =>
+        await GetQuery(query).ToListAsync(cancellation);
+    
     IQueryable<DomainOfferDto> GetQuery(DomainOffersQuery query)
     {
-        IQueryable<DomainOffer> domainOffersQuery = _dbContext.Set<DomainOffer>().Where(offer => offer.RecipientId == null /*&& domain.ValidFrom <= DateTime.Now && domain.ValidTo >= DateTime.Now*/);
+        IQueryable<DomainOffer> domainOffersQuery;
 
         if (query.RecipientId is null)
             domainOffersQuery = _dbContext.Set<DomainOffer>().Where(offer => offer.RecipientId == null);

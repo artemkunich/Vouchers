@@ -13,7 +13,7 @@ using Vouchers.Identities.Domain;
 
 namespace Vouchers.Application.UseCases.IdentityCases;
 
-internal sealed class CreateIdentityCommandHandler : IHandler<CreateIdentityCommand, Guid>
+internal sealed class CreateIdentityCommandHandler : IHandler<CreateIdentityCommand, Result<Guid>>
 {
     private readonly ILoginNameProvider _loginNameProvider;
     private readonly IRepository<Login,Guid> _loginRepository;
@@ -27,7 +27,7 @@ internal sealed class CreateIdentityCommandHandler : IHandler<CreateIdentityComm
         _identifierProvider = identifierProvider;
     }
 
-    public async Task<Guid> HandleAsync(CreateIdentityCommand command, CancellationToken cancellation)
+    public async Task<Result<Guid>> HandleAsync(CreateIdentityCommand command, CancellationToken cancellation)
     {
         var loginName = _loginNameProvider.CurrentLoginName;
         CroppedImage image = null;

@@ -10,6 +10,8 @@ using Vouchers.Application.Queries;
 using Vouchers.Application.UseCases;
 using Vouchers.Application.Services;
 using System.Threading;
+using Vouchers.Application;
+using Vouchers.Application.Infrastructure;
 using Vouchers.Core.Domain;
 using Vouchers.Domains.Domain;
 using Vouchers.Identities.Domain;
@@ -17,24 +19,29 @@ using Vouchers.Values.Domain;
 
 namespace Vouchers.Persistence.QueryHandlers;
 
-internal sealed class HolderTransactionRequestsQueryHandler : IHandler<HolderTransactionRequestsQuery,IEnumerable<HolderTransactionRequestDto>>
+internal sealed class HolderTransactionRequestsQueryHandler : IHandler<HolderTransactionRequestsQuery,Result<IEnumerable<HolderTransactionRequestDto>>>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly VouchersDbContext _dbContext;
+    private readonly ICultureInfoProvider _cultureInfoProvider;
 
-    public HolderTransactionRequestsQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext)
+    public HolderTransactionRequestsQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext, ICultureInfoProvider cultureInfoProvider)
     {
         _authIdentityProvider = authIdentityProvider;
         _dbContext = dbContext;
+        _cultureInfoProvider = cultureInfoProvider;
     }
 
-    public async Task<IEnumerable<HolderTransactionRequestDto>> HandleAsync(HolderTransactionRequestsQuery query, CancellationToken cancellation)
+    public async Task<Result<IEnumerable<HolderTransactionRequestDto>>> HandleAsync(HolderTransactionRequestsQuery query, CancellationToken cancellation)
     {
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
-        return await GetQuery(query, authIdentityId).ToListAsync();
+        if (authIdentityId is null)
+            return Error.NotAuthorized(_cultureInfoProvider.GetCultureInfo());
+        
+        return await GetQuery(query, authIdentityId.Value).ToListAsync(cancellation);
     }
 
-    public IQueryable<HolderTransactionRequestDto> GetQuery(HolderTransactionRequestsQuery query, Guid authIdentityId) {
+    private IQueryable<HolderTransactionRequestDto> GetQuery(HolderTransactionRequestsQuery query, Guid authIdentityId) {
 
         var holderTransactionRequestsWithDomainAccountsQuery = _dbContext.Set<HolderTransactionRequest>()
             .Include(req => req.CreditorAccount)

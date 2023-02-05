@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Vouchers.Primitives;
-using System.Globalization;
 
 namespace Vouchers.Core.Domain;
 
@@ -16,19 +13,19 @@ public sealed class HolderTransactionItem : Entity<Guid>
     public Guid DebitAccountItemId { get; init; }
     public AccountItem DebitAccountItem { get; init; }
 
-    public static HolderTransactionItem Create(Guid id, UnitQuantity quantity, AccountItem creditAccountItem, AccountItem debitAccountItem, CultureInfo cultureInfo = null)
+    public static HolderTransactionItem Create(Guid id, UnitQuantity quantity, AccountItem creditAccountItem, AccountItem debitAccountItem)
     {
         if (creditAccountItem.Equals(debitAccountItem))
-            throw new CoreException("CreditAndDebitAccountsAreEqual", cultureInfo);
+            throw CoreException.CreditorAndDebtorAccountsAreTheSame;
 
         if (creditAccountItem.Unit.NotEquals(quantity.Unit))
-            throw new CoreException("CreditAccountAndItemHaveDifferentUnits", cultureInfo);
+            throw CoreException.CreditAccountAndItemHaveDifferentUnits;
 
         if (debitAccountItem.Unit.NotEquals(quantity.Unit))
-            throw new CoreException("DebitAccountAndItemHaveDifferentUnits", cultureInfo);
+            throw CoreException.DebitAccountAndItemHaveDifferentUnits;
 
         if(!quantity.Unit.CanBeExchanged && creditAccountItem.HolderAccount.NotEquals(quantity.Unit.UnitType.IssuerAccount) && debitAccountItem.HolderAccount.NotEquals(quantity.Unit.UnitType.IssuerAccount))
-            throw new CoreException("ItemUnitCannotBeExchanged", cultureInfo);
+            throw CoreException.ItemUnitCannotBeExchanged;
 
         return new()
         {
