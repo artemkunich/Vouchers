@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Vouchers.API.Services;
+using Vouchers.Application;
 using Vouchers.Application.Commands.HolderTransactionRequestCommands;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
@@ -24,23 +26,16 @@ public sealed class HolderTransactionRequestsController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> Get([FromQuery] HolderTransactionRequestsQuery query)
-    {
-        var result = await _dispatcher.DispatchAsync<HolderTransactionRequestsQuery, IEnumerable<HolderTransactionRequestDto>>(query);
-        return Json(result);
-    }
+    public async Task<IActionResult> Get([FromQuery] HolderTransactionRequestsQuery query) =>
+        this.FromResult(await _dispatcher.DispatchAsync<HolderTransactionRequestsQuery, Result<IEnumerable<HolderTransactionRequestDto>>>(query));
+
 
     [HttpPost]
-    public async Task<IActionResult> Post(CreateHolderTransactionRequestCommand command)
-    {
-        var holderTransactionRequestId = await _dispatcher.DispatchAsync<CreateHolderTransactionRequestCommand, Guid>(command);
-        return Json(new { HolderTransactionRequestId = holderTransactionRequestId });
-    }
+    public async Task<IActionResult> Post(CreateHolderTransactionRequestCommand command) =>
+        this.FromResult(await _dispatcher.DispatchAsync<CreateHolderTransactionRequestCommand, Result<IdDto<Guid>>>(command));
+
 
     [HttpDelete]
-    public async Task<IActionResult> Delete(DeleteHolderTransactionRequestCommand command)
-    {
-        await _dispatcher.DispatchAsync(command);
-        return NoContent();
-    }
+    public async Task<IActionResult> Delete(DeleteHolderTransactionRequestCommand command) =>
+        this.FromResult(await _dispatcher.DispatchAsync<DeleteHolderTransactionRequestCommand,Result>(command));
 }

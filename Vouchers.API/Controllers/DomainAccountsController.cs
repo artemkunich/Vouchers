@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Vouchers.API.Services;
+using Vouchers.Application;
 using Vouchers.Application.Commands.DomainAccountCommands;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Queries;
@@ -23,23 +25,14 @@ public sealed class DomainAccountsController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> Get([FromQuery] DomainAccountsQuery query)
-    {
-        var result = await _dispatcher.DispatchAsync<DomainAccountsQuery, IEnumerable<DomainAccountDto>>(query);
-        return Json(result);
-    }
+    public async Task<IActionResult> Get([FromQuery] DomainAccountsQuery query) =>
+        this.FromResult(await _dispatcher.DispatchAsync<DomainAccountsQuery, Result<IEnumerable<DomainAccountDto>>>(query));
 
     [HttpPost]
-    public async Task<IActionResult> Post(CreateDomainAccountCommand command)
-    {
-        var domainAccountId = await _dispatcher.DispatchAsync<CreateDomainAccountCommand, Guid>(command);
-        return Json(new { DomainAccountId = domainAccountId });
-    }
+    public async Task<IActionResult> Post(CreateDomainAccountCommand command) =>
+        this.FromResult(await _dispatcher.DispatchAsync<CreateDomainAccountCommand, Result<IdDto<Guid>>>(command));
 
     [HttpPut]
-    public async Task<IActionResult> Put(UpdateDomainAccountCommand command)
-    {
-        await _dispatcher.DispatchAsync(command);
-        return NoContent();
-    }
+    public async Task<IActionResult> Put(UpdateDomainAccountCommand command) =>
+        this.FromResult(await _dispatcher.DispatchAsync<UpdateDomainAccountCommand, Result>(command));
 }

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Vouchers.Application.Commands.DomainOfferCommands;
+using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Services;
 using Vouchers.Core.Domain;
@@ -12,7 +13,7 @@ using Vouchers.Domains.Domain;
 
 namespace Vouchers.Application.UseCases.DomainOfferCases;
 
-internal sealed class CreateDomainOfferCommandHandler : IHandler<CreateDomainOfferCommand, Result<Guid>>
+internal sealed class CreateDomainOfferCommandHandler : IHandler<CreateDomainOfferCommand, Result<IdDto<Guid>>>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IRepository<DomainOffer,Guid> _domainOfferRepository;
@@ -26,13 +27,13 @@ internal sealed class CreateDomainOfferCommandHandler : IHandler<CreateDomainOff
         _cultureInfoProvider = cultureInfoProvider;
     }
 
-    public async Task<Result<Guid>> HandleAsync(CreateDomainOfferCommand command, CancellationToken cancellation)
+    public async Task<Result<IdDto<Guid>>> HandleAsync(CreateDomainOfferCommand command, CancellationToken cancellation)
     {
         var cultureInfo = _cultureInfoProvider.GetCultureInfo();
 
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
         if (authIdentityId is null)
-            return Error.NotAuthorized(cultureInfo);
+            return Error.NotRegistered(cultureInfo);
         
         var currency = Enum.Parse<Currency>(command.Currency);
         var currencyAmount = CurrencyAmount.Create(currency, command.Amount);
@@ -45,6 +46,6 @@ internal sealed class CreateDomainOfferCommandHandler : IHandler<CreateDomainOff
             currencyAmount, invoicePeriod, command.ValidFrom, validTo, command.MaxContractsPerIdentity);
         await _domainOfferRepository.AddAsync(domainOffer);
 
-        return domainOffer.Id;
+        return new IdDto<Guid>(domainOffer.Id);
     }
 }

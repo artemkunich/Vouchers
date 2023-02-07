@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Vouchers.API.Services;
+using Vouchers.Application;
 using Vouchers.Application.Commands.VoucherValueCommands;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
@@ -24,23 +26,15 @@ public sealed class IssuerValuesController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> Get([FromQuery] IssuerValuesQuery query)
-    {
-        var result = await _dispatcher.DispatchAsync<IssuerValuesQuery, IEnumerable<VoucherValueDto>>(query);
-        return Json(result);
-    }
+    public async Task<IActionResult> Get([FromQuery] IssuerValuesQuery query) =>
+        this.FromResult(await _dispatcher.DispatchAsync<IssuerValuesQuery, Result<IEnumerable<VoucherValueDto>>>(query));
 
     [HttpPost]
-    public async Task<IActionResult> Post([FromForm]CreateVoucherValueCommand command)
-    {
-        var voucherValueId = await _dispatcher.DispatchAsync<CreateVoucherValueCommand, Guid>(command);
-        return Json(new { VoucherValueId = voucherValueId });
-    }
+    public async Task<IActionResult> Post([FromForm]CreateVoucherValueCommand command) =>
+        this.FromResult(await _dispatcher.DispatchAsync<CreateVoucherValueCommand, Result<IdDto<Guid>>>(command));
 
     [HttpPut]
-    public async Task<IActionResult> Put([FromForm]UpdateVoucherValueCommand command)
-    {
-        await _dispatcher.DispatchAsync(command);
-        return Accepted();
-    }
+    public async Task<IActionResult> Put([FromForm]UpdateVoucherValueCommand command) =>
+        this.FromResult(await _dispatcher.DispatchAsync<UpdateVoucherValueCommand,Result>(command));
+
 }

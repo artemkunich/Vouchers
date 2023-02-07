@@ -31,7 +31,7 @@ internal sealed class UpdateDomainOfferCommandHandler : IHandler<UpdateDomainOff
         
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
         if (authIdentityId is null)
-            return Error.NotAuthorized(cultureInfo);
+            return Error.NotRegistered(cultureInfo);
         
         var domainOffer = await _domainOfferRepository.GetByIdAsync(command.Id);
 

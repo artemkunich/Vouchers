@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
+using Vouchers.API.Services;
 using Vouchers.Application;
 using Vouchers.Application.Commands.IdentityCommands;
 using Vouchers.Application.Dtos;
@@ -25,36 +26,18 @@ public sealed class IdentityDetailController : Controller
 
     [HttpGet]
     [Route("[controller]/{accountId:guid?}")]
-    public async Task<IActionResult> Get(Guid? accountId)
-    {
-        try
-        {
-            var detail = await _dispatcher.DispatchAsync<Guid?, IdentityDetailDto>(accountId);
-            if (detail is null)
-                return NotFound();
-
-            return Json(detail);
-        }
-        catch (NotRegisteredException)
-        {
-            return NotFound();
-        }
-    }
+    public async Task<IActionResult> Get(Guid? accountId) =>
+        this.FromResult(await _dispatcher.DispatchAsync<Guid?, Result<IdentityDetailDto>>(accountId));
 
     [HttpPost]
     [Route("[controller]")]
-    public async Task<IActionResult> Post([FromForm] CreateIdentityCommand command)
-    {
-            
-        var identityId = await _dispatcher.DispatchAsync<CreateIdentityCommand, Guid>(command);
-        return Json(new { identityId });
-    }
+    public async Task<IActionResult> Post([FromForm] CreateIdentityCommand command) =>
+        this.FromResult(await _dispatcher.DispatchAsync<CreateIdentityCommand, Result<IdDto<Guid>>>(command));
+    
 
     [HttpPut]
     [Route("[controller]")]
-    public async Task<IActionResult> Put([FromForm] UpdateIdentityCommand command)
-    {
-        await _dispatcher.DispatchAsync(command);
-        return NoContent();
-    }
+    public async Task<IActionResult> Put([FromForm] UpdateIdentityCommand command) =>
+        this.FromResult(await _dispatcher.DispatchAsync<UpdateIdentityCommand, Result>(command));
+
 }

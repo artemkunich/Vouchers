@@ -30,7 +30,7 @@ internal sealed class UpdateDomainAccountCommandHandler : IHandler<UpdateDomainA
         
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
         if (authIdentityId is null)
-            return Error.NotAuthorized(cultureInfo);
+            return Error.NotRegistered(cultureInfo);
         
         var domainAccount = await _domainAccountRepository.GetByIdAsync(command.DomainAccountId);
         if (domainAccount is null)

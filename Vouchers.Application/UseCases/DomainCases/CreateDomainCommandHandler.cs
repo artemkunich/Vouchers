@@ -12,7 +12,7 @@ using Vouchers.Domains.Domain;
 
 namespace Vouchers.Application.UseCases.DomainCases;
 
-internal sealed class CreateDomainCommandHandler : IHandler<CreateDomainCommand, Result<Guid?>>
+internal sealed class CreateDomainCommandHandler : IHandler<CreateDomainCommand, Result<Guid>>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IReadOnlyRepository<DomainOffer,Guid> _domainOfferRepository;
@@ -38,13 +38,13 @@ internal sealed class CreateDomainCommandHandler : IHandler<CreateDomainCommand,
         _cultureInfoProvider = cultureInfoProvider;
     }
 
-    public async Task<Result<Guid?>> HandleAsync(CreateDomainCommand command, CancellationToken cancellation)
+    public async Task<Result<Guid>> HandleAsync(CreateDomainCommand command, CancellationToken cancellation)
     {
         var cultureInfo = _cultureInfoProvider.GetCultureInfo();
         
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
         if (authIdentityId is null)
-            return Error.NotAuthorized(cultureInfo);
+            return Error.NotRegistered(cultureInfo);
         
         var domainOffer = await _domainOfferRepository.GetByIdAsync(command.OfferId);
 
@@ -85,13 +85,12 @@ internal sealed class CreateDomainCommandHandler : IHandler<CreateDomainCommand,
             domainAccount.IsConfirmed = true;
                 
             await _domainAccountRepository.AddAsync(domainAccount);
-            return domain.Id;
+            return Result.Create(domainContract.Id);
 
         }
-        else
-        {
-            await _domainContractRepository.AddAsync(domainContract);
-            return null;
-        }         
+
+        await _domainContractRepository.AddAsync(domainContract);
+        return Result.Create(domainContract.Id);
+       
     }
 }

@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
+using Vouchers.API.Services;
+using Vouchers.Application;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.UseCases;
@@ -27,14 +29,6 @@ public sealed class IdentityController : Controller
     public async Task<IActionResult> Get()
     {
         var loginName = _loginNameProvider.CurrentLoginName;
-        var identityId = await _dispatcher.DispatchAsync<string, Guid?>(loginName);
-        if (identityId is null)
-            return NotFound();
-
-        return Json(
-            new { 
-                IdentityId = identityId 
-            }
-        );
+        return this.FromResult(await _dispatcher.DispatchAsync<string, Result<Guid?>>(loginName));
     }
 }

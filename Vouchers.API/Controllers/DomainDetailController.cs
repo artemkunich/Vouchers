@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
+using Vouchers.API.Services;
+using Vouchers.Application;
 using Vouchers.Application.Commands.DomainCommands;
 using Vouchers.Application.Dtos;
 using Vouchers.Infrastructure;
@@ -22,18 +24,11 @@ public sealed class DomainDetailController : Controller
 
     [HttpGet]
     [Route("[controller]/{domainId:guid}")]
-    public async Task<IActionResult> Get(Guid domainId)
-    {
-        var result = await _dispatcher.DispatchAsync<Guid, DomainDetailDto>(domainId);
-        return Json(result);
-    }
+    public async Task<IActionResult> Get(Guid domainId) =>
+        this.FromResult(await _dispatcher.DispatchAsync<Guid, Result<DomainDetailDto>>(domainId));
 
     [HttpPut]
     [Route("[controller]")]
-    public async Task<IActionResult> Put([FromForm] UpdateDomainDetailCommand command)
-    {
-        await _dispatcher.DispatchAsync(command);
-
-        return Accepted();
-    }
+    public async Task<IActionResult> Put([FromForm] UpdateDomainDetailCommand command) =>
+        this.FromResult(await _dispatcher.DispatchAsync<UpdateDomainDetailCommand, Result>(command));
 }

@@ -35,7 +35,7 @@ internal sealed class UpdateVoucherValueCommandHandler : IHandler<UpdateVoucherV
         
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
         if (authIdentityId is null)
-            return Error.NotAuthorized(cultureInfo);
+            return Error.NotRegistered(cultureInfo);
 
         var value = await _voucherValueRepository.GetByIdAsync(command.Id);
         if (value is null)

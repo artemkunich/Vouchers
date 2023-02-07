@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Vouchers.API.Services;
+using Vouchers.Application;
 using Vouchers.Application.Commands.HolderTransactionCommands;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
@@ -24,16 +26,10 @@ public sealed class HolderTransactionsController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> Get([FromQuery] HolderTransactionsQuery query)
-    {
-        var result = await _dispatcher.DispatchAsync<HolderTransactionsQuery, IEnumerable<HolderTransactionDto>>(query);
-        return Json(result);
-    }
+    public async Task<IActionResult> Get([FromQuery] HolderTransactionsQuery query) =>
+        this.FromResult(await _dispatcher.DispatchAsync<HolderTransactionsQuery, Result<IEnumerable<HolderTransactionDto>>>(query));
 
     [HttpPost]
-    public async Task<IActionResult> Post(CreateHolderTransactionCommand command)
-    {
-        var holderTransactionId = await _dispatcher.DispatchAsync<CreateHolderTransactionCommand, Guid>(command);
-        return Json(new { HolderTransactionId = holderTransactionId });
-    }
+    public async Task<IActionResult> Post(CreateHolderTransactionCommand command) =>
+        this.FromResult(await _dispatcher.DispatchAsync<CreateHolderTransactionCommand, Result<IdDto<Guid>>>(command));
 }

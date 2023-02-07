@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Vouchers.API.Services;
+using Vouchers.Application;
 using Vouchers.Application.Commands.IssuerTransactionCommands;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
@@ -24,16 +26,10 @@ public sealed class IssuerTransactionsController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> Get([FromQuery] IssuerValuesQuery query)
-    {
-        var result = await _dispatcher.DispatchAsync<IssuerValuesQuery, IEnumerable<IssuerTransactionDto>>(query);
-        return Json(result);
-    }
+    public async Task<IActionResult> Get([FromQuery] IssuerValuesQuery query) =>
+        this.FromResult(await _dispatcher.DispatchAsync<IssuerValuesQuery, Result<IEnumerable<IssuerTransactionDto>>>(query));
 
     [HttpPost]
-    public async Task<IActionResult> Post(CreateIssuerTransactionCommand command)
-    {
-        var issuerTransactionId = await _dispatcher.DispatchAsync<CreateIssuerTransactionCommand, Guid>(command);
-        return Json(new { IssuerTransactionId = issuerTransactionId });
-    }
+    public async Task<IActionResult> Post(CreateIssuerTransactionCommand command) =>
+        this.FromResult(await _dispatcher.DispatchAsync<CreateIssuerTransactionCommand, Result<IdDto<Guid>>>(command));
 }

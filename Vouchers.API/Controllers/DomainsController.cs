@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Vouchers.API.Services;
+using Vouchers.Application;
 using Vouchers.Application.Commands.DomainCommands;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Queries;
@@ -23,20 +25,10 @@ public sealed class DomainsController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> Get([FromQuery] DomainsQuery query)
-    {
-        var result = await _dispatcher.DispatchAsync<DomainsQuery, IEnumerable<DomainDto>>(query);
-        return Json(result);
-    }
+    public async Task<IActionResult> Get([FromQuery] DomainsQuery query) =>
+        this.FromResult(await _dispatcher.DispatchAsync<DomainsQuery, Result<IEnumerable<DomainDto>>>(query));
 
     [HttpPost]
-    public async Task<IActionResult> Post(CreateDomainCommand command)
-    {
-        var domainId = await _dispatcher.DispatchAsync<CreateDomainCommand, Guid?>(command);
-
-        if (domainId is null)
-            return Accepted();
-
-        return Json(new { DomainId = domainId });
-    }
+    public async Task<IActionResult> Post(CreateDomainCommand command) =>
+        this.FromResult(await _dispatcher.DispatchAsync<CreateDomainCommand, Result<IdDto<Guid>>>(command));
 }

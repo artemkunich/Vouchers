@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Vouchers.API.Services;
+using Vouchers.Application;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Queries;
@@ -23,9 +25,6 @@ public sealed class HolderValuesController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> Get([FromQuery] HolderValuesQuery query)
-    {
-        var result = await _dispatcher.DispatchAsync<HolderValuesQuery, IEnumerable<VoucherValueDto>>(query);
-        return Json(result);
-    }
+    public async Task<IActionResult> Get([FromQuery] HolderValuesQuery query) =>
+        this.FromResult(await _dispatcher.DispatchAsync<HolderValuesQuery, Result<IEnumerable<VoucherValueDto>>>(query));
 }

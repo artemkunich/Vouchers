@@ -37,7 +37,7 @@ internal sealed class UpdateIdentityCommandHandler : IHandler<UpdateIdentityComm
         
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
         if (authIdentityId is null)
-            return Error.NotAuthorized(cultureInfo);
+            return Error.NotRegistered(cultureInfo);
         
         var identity = await _identityRepository.GetByIdAsync(authIdentityId.Value);
         if (identity is null)

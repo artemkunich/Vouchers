@@ -8,11 +8,12 @@ using System.Threading.Tasks;
 using System.Threading;
 using Vouchers.Values.Domain;
 using System.Linq;
+using Vouchers.Application.Dtos;
 using Vouchers.Application.Services;
 
 namespace Vouchers.Application.UseCases.VoucherCases;
 
-internal sealed class CreateVoucherCommandHandler : IHandler<CreateVoucherCommand, Result<Guid>>
+internal sealed class CreateVoucherCommandHandler : IHandler<CreateVoucherCommand, Result<IdDto<Guid>>>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IReadOnlyRepository<VoucherValue,Guid> _voucherValueRepository;
@@ -31,13 +32,13 @@ internal sealed class CreateVoucherCommandHandler : IHandler<CreateVoucherComman
         _cultureInfoProvider = cultureInfoProvider;
     }
 
-    public async Task<Result<Guid>> HandleAsync(CreateVoucherCommand command, CancellationToken cancellation)
+    public async Task<Result<IdDto<Guid>>> HandleAsync(CreateVoucherCommand command, CancellationToken cancellation)
     {
         var cultureInfo = _cultureInfoProvider.GetCultureInfo();
         
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
         if (authIdentityId is null)
-            return Error.NotAuthorized(cultureInfo);
+            return Error.NotRegistered(cultureInfo);
 
         var value = await _voucherValueRepository.GetByIdAsync(command.VoucherValueId);
 
@@ -54,6 +55,6 @@ internal sealed class CreateVoucherCommandHandler : IHandler<CreateVoucherComman
 
         await _unitRepository.AddAsync(unit);
 
-        return unit.Id;
+        return new IdDto<Guid>(unit.Id);
     }
 }

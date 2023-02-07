@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Vouchers.Application.Commands.IdentityCommands;
+using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Services;
 using Vouchers.Core.Domain;
@@ -13,7 +14,7 @@ using Vouchers.Identities.Domain;
 
 namespace Vouchers.Application.UseCases.IdentityCases;
 
-internal sealed class CreateIdentityCommandHandler : IHandler<CreateIdentityCommand, Result<Guid>>
+internal sealed class CreateIdentityCommandHandler : IHandler<CreateIdentityCommand, Result<IdDto<Guid>>>
 {
     private readonly ILoginNameProvider _loginNameProvider;
     private readonly IRepository<Login,Guid> _loginRepository;
@@ -27,7 +28,7 @@ internal sealed class CreateIdentityCommandHandler : IHandler<CreateIdentityComm
         _identifierProvider = identifierProvider;
     }
 
-    public async Task<Result<Guid>> HandleAsync(CreateIdentityCommand command, CancellationToken cancellation)
+    public async Task<Result<IdDto<Guid>>> HandleAsync(CreateIdentityCommand command, CancellationToken cancellation)
     {
         var loginName = _loginNameProvider.CurrentLoginName;
         CroppedImage image = null;
@@ -46,6 +47,6 @@ internal sealed class CreateIdentityCommandHandler : IHandler<CreateIdentityComm
 
         await _loginRepository.AddAsync(login);
 
-        return identity.Id;
+        return new IdDto<Guid>(identity.Id);
     }
 }

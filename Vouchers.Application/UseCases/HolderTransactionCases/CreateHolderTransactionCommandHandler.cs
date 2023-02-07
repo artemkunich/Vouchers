@@ -8,11 +8,12 @@ using Vouchers.Core.Domain;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Domains.Domain;
 using Vouchers.Application.Commands.HolderTransactionCommands;
+using Vouchers.Application.Dtos;
 using Vouchers.Application.Services;
 
 namespace Vouchers.Application.UseCases.HolderTransactionCases;
 
-internal sealed class CreateHolderTransactionCommandHandler : IHandler<CreateHolderTransactionCommand, Result<Guid>>
+internal sealed class CreateHolderTransactionCommandHandler : IHandler<CreateHolderTransactionCommand, Result<IdDto<Guid>>>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IReadOnlyRepository<DomainAccount,Guid> _domainAccountRepository;
@@ -44,13 +45,13 @@ internal sealed class CreateHolderTransactionCommandHandler : IHandler<CreateHol
         _cultureInfoProvider = cultureInfoProvider;
     }
 
-    public async Task<Result<Guid>> HandleAsync(CreateHolderTransactionCommand command, CancellationToken cancellation)
+    public async Task<Result<IdDto<Guid>>> HandleAsync(CreateHolderTransactionCommand command, CancellationToken cancellation)
     {
         var cultureInfo = _cultureInfoProvider.GetCultureInfo();
         
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
         if (authIdentityId is null)
-            return Error.NotAuthorized(cultureInfo);
+            return Error.NotRegistered(cultureInfo);
         
         var creditorDomainAccount = await _domainAccountRepository.GetByIdAsync(command.CreditorAccountId);
         if (creditorDomainAccount?.IdentityId != authIdentityId)
@@ -113,11 +114,11 @@ internal sealed class CreateHolderTransactionCommandHandler : IHandler<CreateHol
         {
             transaction.Perform();
             await _holderTransactionRepository.AddAsync(transaction);
-            return transaction.Id;
+            return new IdDto<Guid>(transaction.Id);
         }
 
         holderTransactionRequest.Perform(transaction);
         await _holderTransactionRequestRepository.UpdateAsync(holderTransactionRequest);
-        return transaction.Id;
+        return new IdDto<Guid>(transaction.Id);
     }
 }

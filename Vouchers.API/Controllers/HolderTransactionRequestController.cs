@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Vouchers.API.Services;
+using Vouchers.Application;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Queries;
@@ -23,12 +25,6 @@ public sealed class HolderTransactionRequestController : Controller
 
     [HttpGet]
     [Route("[controller]/{transactionRequestId:guid}")]
-    public async Task<IActionResult> Get(Guid transactionRequestId)
-    {
-        var holderTransactionRequest = await _dispatcher.DispatchAsync<Guid, HolderTransactionRequestDto>(transactionRequestId);
-        if(holderTransactionRequest is null)
-            return NotFound();
-
-        return Json(holderTransactionRequest);
-    }
+    public async Task<IActionResult> Get(Guid transactionRequestId) =>
+        this.FromResult(await _dispatcher.DispatchAsync<Guid, Result<HolderTransactionRequestDto>>(transactionRequestId));
 }

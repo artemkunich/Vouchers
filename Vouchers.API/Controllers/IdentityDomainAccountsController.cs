@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Vouchers.API.Services;
+using Vouchers.Application;
 using Vouchers.Application.Commands;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
@@ -24,9 +26,7 @@ public sealed class IdentityDomainAccountsController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> Get([FromQuery] IdentityDomainAccountsQuery query)
-    {
-        var result = await _dispatcher.DispatchAsync<IdentityDomainAccountsQuery, IEnumerable<DomainAccountDto>>(query);
-        return Json(result);
-    }
+    public async Task<IActionResult> Get([FromQuery] IdentityDomainAccountsQuery query) => 
+        this.FromResult(await _dispatcher.DispatchAsync<IdentityDomainAccountsQuery, Result<IEnumerable<DomainAccountDto>>>(query));
+    
 }

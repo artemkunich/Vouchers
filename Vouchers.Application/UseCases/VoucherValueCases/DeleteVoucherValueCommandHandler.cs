@@ -33,7 +33,7 @@ internal sealed class DeleteVoucherValueCommandHandler : IHandler<DeleteVoucherV
         
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
         if (authIdentityId is null)
-            return Error.NotAuthorized(cultureInfo);
+            return Error.NotRegistered(cultureInfo);
 
         var value = await _valueRepository.GetByIdAsync(command.VoucherValueId);
         if (value is null)

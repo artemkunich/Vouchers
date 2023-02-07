@@ -8,11 +8,12 @@ using System.Threading.Tasks;
 using System.Threading;
 using Vouchers.Domains.Domain;
 using System.Linq;
+using Vouchers.Application.Dtos;
 using Vouchers.Application.Services;
 
 namespace Vouchers.Application.UseCases.HolderTransactionRequestCases;
 
-internal sealed class CreateHolderTransactionRequestCommandHandler : IHandler<CreateHolderTransactionRequestCommand, Result<Guid>>
+internal sealed class CreateHolderTransactionRequestCommandHandler : IHandler<CreateHolderTransactionRequestCommand, Result<IdDto<Guid>>>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IReadOnlyRepository<DomainAccount,Guid> _domainAccountRepository;
@@ -34,13 +35,13 @@ internal sealed class CreateHolderTransactionRequestCommandHandler : IHandler<Cr
         _cultureInfoProvider = cultureInfoProvider;
     }
 
-    public async Task<Result<Guid>> HandleAsync(CreateHolderTransactionRequestCommand command, CancellationToken cancellation)
+    public async Task<Result<IdDto<Guid>>> HandleAsync(CreateHolderTransactionRequestCommand command, CancellationToken cancellation)
     {
         var cultureInfo = _cultureInfoProvider.GetCultureInfo();
         
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
         if (authIdentityId is null)
-            return Error.NotAuthorized(cultureInfo);
+            return Error.NotRegistered(cultureInfo);
         
         var debtorDomainAccount = await _domainAccountRepository.GetByIdAsync(command.DebtorAccountId);
         if (debtorDomainAccount?.IdentityId != authIdentityId)
@@ -64,6 +65,6 @@ internal sealed class CreateHolderTransactionRequestCommandHandler : IHandler<Cr
 
         await _holderTransactionRequestRepository.AddAsync(request);
 
-        return request.Id;
+        return new IdDto<Guid>(request.Id);
     }
 }

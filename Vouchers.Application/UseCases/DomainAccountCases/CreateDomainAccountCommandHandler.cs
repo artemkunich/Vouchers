@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Vouchers.Application.Commands.DomainAccountCommands;
+using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Services;
 using Vouchers.Core.Domain;
@@ -12,7 +13,7 @@ using Vouchers.Domains.Domain;
 
 namespace Vouchers.Application.UseCases.DomainAccountCases;
 
-internal sealed class CreateDomainAccountCommandHandler : IHandler<CreateDomainAccountCommand, Result<Guid>>
+internal sealed class CreateDomainAccountCommandHandler : IHandler<CreateDomainAccountCommand, Result<IdDto<Guid>>>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IReadOnlyRepository<Domain,Guid> _domainRepository;
@@ -34,13 +35,13 @@ internal sealed class CreateDomainAccountCommandHandler : IHandler<CreateDomainA
         _cultureInfoProvider = cultureInfoProvider;
     }
 
-    public async Task<Result<Guid>> HandleAsync(CreateDomainAccountCommand command, CancellationToken cancellation)
+    public async Task<Result<IdDto<Guid>>> HandleAsync(CreateDomainAccountCommand command, CancellationToken cancellation)
     {
         var cultureInfo = _cultureInfoProvider.GetCultureInfo();
         
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
         if (authIdentityId is null)
-            return Error.NotAuthorized(cultureInfo);
+            return Error.NotRegistered(cultureInfo);
         
         var domain = await _domainRepository.GetByIdAsync(command.DomainId);
         if (domain is null)
@@ -59,6 +60,6 @@ internal sealed class CreateDomainAccountCommandHandler : IHandler<CreateDomainA
         }
 
         await _domainAccountRepository.AddAsync(domainAccount);
-        return domainAccount.Id;
+        return new IdDto<Guid>(domainAccount.Id);
     }
 }

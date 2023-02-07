@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Vouchers.API.Services;
+using Vouchers.Application;
 using Vouchers.Application.Commands.DomainOfferCommands;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
@@ -21,22 +23,16 @@ public sealed class DomainOffersController : Controller
     {
         _dispatcher = dispatcher;
     }
-     [HttpGet]
-    public async Task<IActionResult> Get([FromQuery] DomainOffersQuery query)
-    {
-        var result = await _dispatcher.DispatchAsync<DomainOffersQuery, IEnumerable<DomainOfferDto>>(query);
-        return Json(result);
-    }
-     [HttpPost]
-    public async Task<IActionResult> Post(CreateDomainOfferCommand command)
-    {
-        var offerId = await _dispatcher.DispatchAsync<CreateDomainOfferCommand, Guid>(command);
-        return Json(new { OfferId = offerId });
-    }
-     [HttpPut]
-    public async Task<IActionResult> Put(UpdateDomainOfferCommand command)
-    {
-        await _dispatcher.DispatchAsync(command);
-        return NoContent();
-    }
+     
+    [HttpGet]
+    public async Task<IActionResult> Get([FromQuery] DomainOffersQuery query) =>
+        this.FromResult(await _dispatcher.DispatchAsync<DomainOffersQuery, Result<IEnumerable<DomainOfferDto>>>(query));
+    
+    [HttpPost]
+    public async Task<IActionResult> Post(CreateDomainOfferCommand command) =>
+        this.FromResult(await _dispatcher.DispatchAsync<CreateDomainOfferCommand, Result<IdDto<Guid>>>(command));
+
+    [HttpPut]
+    public async Task<IActionResult> Put(UpdateDomainOfferCommand command) =>
+        this.FromResult(await _dispatcher.DispatchAsync<UpdateDomainOfferCommand, Result>(command));
 }

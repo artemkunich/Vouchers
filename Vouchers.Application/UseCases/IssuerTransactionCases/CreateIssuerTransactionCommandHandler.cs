@@ -8,11 +8,12 @@ using Vouchers.Core.Domain;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Domains.Domain;
 using Vouchers.Application.Commands.IssuerTransactionCommands;
+using Vouchers.Application.Dtos;
 using Vouchers.Application.Services;
 
 namespace Vouchers.Application.UseCases.IssuerTransactionCases;
 
-internal sealed class CreateIssuerTransactionCommandHandler : IHandler<CreateIssuerTransactionCommand, Result<Guid>>
+internal sealed class CreateIssuerTransactionCommandHandler : IHandler<CreateIssuerTransactionCommand, Result<IdDto<Guid>>>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IReadOnlyRepository<DomainAccount,Guid> _domainAccountRepository;
@@ -39,13 +40,13 @@ internal sealed class CreateIssuerTransactionCommandHandler : IHandler<CreateIss
         _cultureInfoProvider = cultureInfoProvider;
     }
 
-    public async Task<Result<Guid>> HandleAsync(CreateIssuerTransactionCommand command, CancellationToken cancellation)
+    public async Task<Result<IdDto<Guid>>> HandleAsync(CreateIssuerTransactionCommand command, CancellationToken cancellation)
     {
         var cultureInfo = _cultureInfoProvider.GetCultureInfo();
         
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
         if (authIdentityId is null)
-            return Error.NotAuthorized(cultureInfo);
+            return Error.NotRegistered(cultureInfo);
 
         var issuerDomainAccount = await _domainAccountRepository.GetByIdAsync(command.IssuerAccountId);
         if (issuerDomainAccount?.IdentityId != authIdentityId)
@@ -57,7 +58,6 @@ internal sealed class CreateIssuerTransactionCommandHandler : IHandler<CreateIss
         var issuerAccount = await _accountRepository.GetByIdAsync(command.IssuerAccountId);
         if (issuerAccount is null)
             return Error.IssuerAccountDoesNotExist(cultureInfo);
-            throw new ApplicationException(Properties.Resources.IssuerAccountDoesNotExist);
 
         var accountItem = (await _accountItemRepository.GetByExpressionAsync(accItem => accItem.HolderAccountId == issuerAccount.Id && accItem.Unit.Id == command.VoucherId)).FirstOrDefault();
         if (accountItem is null)
@@ -78,6 +78,6 @@ internal sealed class CreateIssuerTransactionCommandHandler : IHandler<CreateIss
 
         await _issuerTransactionRepository.AddAsync(transaction);
 
-        return transaction.Id;
+        return new IdDto<Guid>(transaction.Id);
     }
 }

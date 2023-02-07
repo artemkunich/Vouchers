@@ -34,7 +34,7 @@ internal sealed class DeleteHolderTransactionRequestCommandHandler : IHandler<De
         
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
         if (authIdentityId is null)
-            return Error.NotAuthorized(cultureInfo);
+            return Error.NotRegistered(cultureInfo);
 
         var transactionRequest = await _holderTransactionRequestRepository.GetByIdAsync(command.HolderTransactionRequestId);
         if (transactionRequest is null)

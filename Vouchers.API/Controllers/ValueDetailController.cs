@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
+using Vouchers.API.Services;
+using Vouchers.Application;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Infrastructure;
@@ -22,12 +24,7 @@ public sealed class ValueDetailController : Controller
 
     [HttpGet]
     [Route("[controller]/{valueId:guid}")]
-    public async Task<IActionResult> Get(Guid valueId)
-    {
-        var result = await _dispatcher.DispatchAsync<Guid, VoucherValueDetailDto>(valueId);
-        if(result is null)
-            return NotFound();
-
-        return Json(result);
-    }
+    public async Task<IActionResult> Get(Guid valueId) => 
+        this.FromResult(await _dispatcher.DispatchAsync<Guid, Result<VoucherValueDetailDto>>(valueId));
+    
 }
