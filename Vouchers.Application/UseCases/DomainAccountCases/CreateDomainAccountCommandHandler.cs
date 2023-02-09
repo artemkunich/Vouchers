@@ -13,7 +13,7 @@ using Vouchers.Domains.Domain;
 
 namespace Vouchers.Application.UseCases.DomainAccountCases;
 
-internal sealed class CreateDomainAccountCommandHandler : IHandler<CreateDomainAccountCommand, Result<IdDto<Guid>>>
+internal sealed class CreateDomainAccountCommandHandler : IHandler<CreateDomainAccountCommand, IdDto<Guid>>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IReadOnlyRepository<Domain,Guid> _domainRepository;

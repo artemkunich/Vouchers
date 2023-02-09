@@ -12,7 +12,7 @@ using Vouchers.Application.Services;
 
 namespace Vouchers.Application.UseCases.HolderTransactionRequestCases;
 
-internal sealed class DeleteHolderTransactionRequestCommandHandler : IHandler<DeleteHolderTransactionRequestCommand,Result>
+internal sealed class DeleteHolderTransactionRequestCommandHandler : IHandler<DeleteHolderTransactionRequestCommand>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IReadOnlyRepository<DomainAccount,Guid> _domainAccountRepository;

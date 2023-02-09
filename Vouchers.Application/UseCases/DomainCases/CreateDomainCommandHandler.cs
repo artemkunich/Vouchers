@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Vouchers.Application.Commands.DomainCommands;
+using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Services;
 using Vouchers.Core.Domain;
@@ -12,7 +13,7 @@ using Vouchers.Domains.Domain;
 
 namespace Vouchers.Application.UseCases.DomainCases;
 
-internal sealed class CreateDomainCommandHandler : IHandler<CreateDomainCommand, Result<Guid>>
+internal sealed class CreateDomainCommandHandler : IHandler<CreateDomainCommand, IdDto<Guid>>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IReadOnlyRepository<DomainOffer,Guid> _domainOfferRepository;
@@ -38,7 +39,7 @@ internal sealed class CreateDomainCommandHandler : IHandler<CreateDomainCommand,
         _cultureInfoProvider = cultureInfoProvider;
     }
 
-    public async Task<Result<Guid>> HandleAsync(CreateDomainCommand command, CancellationToken cancellation)
+    public async Task<Result<IdDto<Guid>>> HandleAsync(CreateDomainCommand command, CancellationToken cancellation)
     {
         var cultureInfo = _cultureInfoProvider.GetCultureInfo();
         
@@ -85,12 +86,12 @@ internal sealed class CreateDomainCommandHandler : IHandler<CreateDomainCommand,
             domainAccount.IsConfirmed = true;
                 
             await _domainAccountRepository.AddAsync(domainAccount);
-            return Result.Create(domainContract.Id);
+            return new IdDto<Guid>(domainContract.Id);
 
         }
 
         await _domainContractRepository.AddAsync(domainContract);
-        return Result.Create(domainContract.Id);
+        return new IdDto<Guid>(domainContract.Id);
        
     }
 }

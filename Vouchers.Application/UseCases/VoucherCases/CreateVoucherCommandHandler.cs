@@ -13,7 +13,7 @@ using Vouchers.Application.Services;
 
 namespace Vouchers.Application.UseCases.VoucherCases;
 
-internal sealed class CreateVoucherCommandHandler : IHandler<CreateVoucherCommand, Result<IdDto<Guid>>>
+internal sealed class CreateVoucherCommandHandler : IHandler<CreateVoucherCommand, IdDto<Guid>>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IReadOnlyRepository<VoucherValue,Guid> _voucherValueRepository;

@@ -12,7 +12,7 @@ using Vouchers.Identities.Domain;
 
 namespace Vouchers.Persistence.QueryHandlers;
 
-internal sealed class IdentityQueryHandler : IHandler<string, Result<IdDto<Guid?>>>
+internal sealed class IdentityQueryHandler : IHandler<string, IdDto<Guid?>>
 {
     VouchersDbContext _dbContext;
 

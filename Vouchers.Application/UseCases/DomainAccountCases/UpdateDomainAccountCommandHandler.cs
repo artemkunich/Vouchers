@@ -11,7 +11,7 @@ using Vouchers.Domains.Domain;
 
 namespace Vouchers.Application.UseCases.DomainAccountCases;
 
-internal sealed class UpdateDomainAccountCommandHandler : IHandler<UpdateDomainAccountCommand, Result>
+internal sealed class UpdateDomainAccountCommandHandler : IHandler<UpdateDomainAccountCommand>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IRepository<DomainAccount,Guid> _domainAccountRepository;

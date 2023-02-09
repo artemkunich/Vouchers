@@ -17,7 +17,7 @@ using Vouchers.Files.Domain;
 
 namespace Vouchers.Persistence.QueryHandlers;
 
-internal sealed class DomainDetailQueryHandler : IHandler<Guid, Result<DomainDetailDto>>
+internal sealed class DomainDetailQueryHandler : IHandler<DomainDetailQuery, DomainDetailDto>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly VouchersDbContext _dbContext;
@@ -38,12 +38,13 @@ internal sealed class DomainDetailQueryHandler : IHandler<Guid, Result<DomainDet
         _cultureInfoProvider = cultureInfoProvider;
     }
 
-    public async Task<Result<DomainDetailDto>> HandleAsync(Guid domainId, CancellationToken cancellation)
+    public async Task<Result<DomainDetailDto>> HandleAsync(DomainDetailQuery query, CancellationToken cancellation)
     {
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
         if (authIdentityId is null)
             return Error.NotAuthorized(_cultureInfoProvider.GetCultureInfo());
 
+        var domainId = query.Id;
         var domainAccountsQuery = _dbContext.Set<DomainAccount>().Where(account => account.DomainId == domainId && account.IdentityId == authIdentityId);
 
         var domainWithImage = await _dbContext.Set<Domain>().Join(domainAccountsQuery, domain => domain.Id, account => account.DomainId, (domain, account) => domain)

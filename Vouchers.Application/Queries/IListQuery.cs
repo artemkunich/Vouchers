@@ -4,11 +4,11 @@ using System.Text;
 
 namespace Vouchers.Application.Queries;
 
-public abstract class ListQuery : IListQuery
+public interface IListQuery
 {
     public string OrderBy { get; init; }
 
-    public int PageIndex { get; init; } = 0;
+    public int PageIndex { get; init; } 
 
-    public int PageSize { get; init; } = 10;
+    public int PageSize { get; init; }
 }

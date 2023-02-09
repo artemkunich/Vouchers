@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Vouchers.Application;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
+using Vouchers.Application.Queries;
 using Vouchers.Application.Services;
 using Vouchers.Application.UseCases;
 using Vouchers.Core.Domain;
@@ -17,7 +18,7 @@ using Vouchers.Identities.Domain;
 
 namespace Vouchers.Persistence.QueryHandlers;
 
-internal sealed class IdentityDetailQueryHandler : IHandler<Guid?, Result<IdentityDetailDto>>
+internal sealed class IdentityDetailQueryHandler : IHandler<IdentityDetailQuery, IdentityDetailDto>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly VouchersDbContext _dbContext;
@@ -37,13 +38,14 @@ internal sealed class IdentityDetailQueryHandler : IHandler<Guid?, Result<Identi
         Height = cp.Height,
     };
 
-    public async Task<Result<IdentityDetailDto>> HandleAsync(Guid? accountId, CancellationToken cancellation)
+    public async Task<Result<IdentityDetailDto>> HandleAsync(IdentityDetailQuery query, CancellationToken cancellation)
     {
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
         if (authIdentityId is null)
             return Error.NotAuthorized(_cultureInfoProvider.GetCultureInfo());
 
         var identityId = authIdentityId;
+        var accountId = query.AccountId;
         DomainAccount domainAccount = null;
         if (accountId is not null)
         {

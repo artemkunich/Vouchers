@@ -19,7 +19,7 @@ using Vouchers.Domains.Domain;
 
 namespace Vouchers.Persistence.QueryHandlers;
 
-internal sealed class IdentityDomainAccountsQueryHandler : IHandler<IdentityDomainAccountsQuery, Result<IEnumerable<DomainAccountDto>>>
+internal sealed class IdentityDomainAccountsQueryHandler : IHandler<IdentityDomainAccountsQuery, IEnumerable<DomainAccountDto>>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly VouchersDbContext _dbContext;

@@ -11,7 +11,7 @@ using Vouchers.Application.Services;
 
 namespace Vouchers.Application.UseCases.VoucherCases;
 
-internal sealed class UpdateVoucherCommandHandler : IHandler<UpdateVoucherCommand,Result>
+internal sealed class UpdateVoucherCommandHandler : IHandler<UpdateVoucherCommand>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly ICultureInfoProvider _cultureInfoProvider;

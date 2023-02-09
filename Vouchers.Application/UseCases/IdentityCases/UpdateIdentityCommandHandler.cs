@@ -15,7 +15,7 @@ using Vouchers.Identities.Domain.DomainEvents;
 
 namespace Vouchers.Application.UseCases.IdentityCases;
 
-internal sealed class UpdateIdentityCommandHandler : IHandler<UpdateIdentityCommand, Result>
+internal sealed class UpdateIdentityCommandHandler : IHandler<UpdateIdentityCommand>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IRepository<Identity,Guid> _identityRepository;

@@ -12,7 +12,7 @@ using Vouchers.Domains.Domain;
 
 namespace Vouchers.Application.UseCases.DomainOfferCases;
 
-internal sealed class UpdateDomainOfferCommandHandler : IHandler<UpdateDomainOfferCommand,Result>
+internal sealed class UpdateDomainOfferCommandHandler : IHandler<UpdateDomainOfferCommand>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IRepository<DomainOffer,Guid> _domainOfferRepository;

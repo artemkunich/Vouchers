@@ -19,7 +19,7 @@ using Vouchers.Application.Services;
 
 namespace Vouchers.Persistence.QueryHandlers;
 
-internal sealed class DomainOffersQueryHandler : IHandler<DomainOffersQuery, Result<IEnumerable<DomainOfferDto>>>
+internal sealed class DomainOffersQueryHandler : IHandler<DomainOffersQuery, IEnumerable<DomainOfferDto>>
 {
     private readonly VouchersDbContext _dbContext;
 

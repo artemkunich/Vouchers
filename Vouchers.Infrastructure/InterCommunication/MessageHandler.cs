@@ -40,7 +40,7 @@ public class MessageHandler<TMessage,TResult> : IMessageHandler<TMessage,TResult
         var messageConsumer = ConsumedMessage.Create(messageConsumerId, messageId.Value, consumer, _dateTimeProvider.CurrentDateTime());
         _dbContext.Set<ConsumedMessage>().Add(messageConsumer);
         
-        TResult result = await _handler.HandleAsync(message, token);
+        var result = await _handler.HandleAsync(message, token);
 
         if (_dbContext.ChangeTracker.HasChanges())
             await _dbContext.SaveChangesAsync(token);

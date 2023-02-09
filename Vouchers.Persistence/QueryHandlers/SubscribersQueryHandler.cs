@@ -18,7 +18,7 @@ using Vouchers.Identities.Domain;
 
 namespace Vouchers.Persistence.QueryHandlers;
 
-internal sealed class SubscribersQueryHandler : IHandler<SubscribersQuery, Result<IEnumerable<SubscriberDto>>>
+internal sealed class SubscribersQueryHandler : IHandler<SubscribersQuery, IEnumerable<SubscriberDto>>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly VouchersDbContext _dbContext;

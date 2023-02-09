@@ -107,6 +107,14 @@ public class Startup
             .AddRepositories(Configuration)
             .AddAppServices(Configuration)
             .AddHandlers(Configuration);
+        
+        services
+            .AddMvc(o => o.Conventions.Add(
+                new GenericControllerRouteConvention()
+            ))
+            .ConfigureApplicationPartManager(m => 
+                m.FeatureProviders.Add(new GenericTypeControllerFeatureProvider()
+                ));
 
     }
 
@@ -136,7 +144,7 @@ public class Startup
         app.UseCors("default");
 
         var localizeOptions = app.ApplicationServices.GetService<IOptions<RequestLocalizationOptions>>();
-        if(localizeOptions is not null)
+        if (localizeOptions is not null)
             app.UseRequestLocalization(localizeOptions.Value);
 
         app.UseAuthentication();

@@ -8,10 +8,10 @@ namespace Vouchers.Application.UseCases;
 
 public interface IHandler<in TRequest>
 {
-    Task HandleAsync(TRequest request, CancellationToken cancellation);
+    Task<Result> HandleAsync(TRequest request, CancellationToken cancellation);
 }
 
 public interface IHandler<in TRequest, TResponse>
 {
-    Task<TResponse> HandleAsync(TRequest request, CancellationToken cancellation);
+    Task<Result<TResponse>> HandleAsync(TRequest request, CancellationToken cancellation);
 }

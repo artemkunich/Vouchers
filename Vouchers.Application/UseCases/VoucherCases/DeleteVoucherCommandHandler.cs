@@ -11,7 +11,7 @@ using Vouchers.Application.Services;
 
 namespace Vouchers.Application.UseCases.VoucherCases;
 
-internal sealed class DeleteVoucherCommandHandler : IHandler<DeleteVoucherCommand,Result>
+internal sealed class DeleteVoucherCommandHandler : IHandler<DeleteVoucherCommand>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IReadOnlyRepository<VoucherValue,Guid> _voucherValueRepository;

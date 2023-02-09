@@ -37,12 +37,12 @@ export const api = {
     putIssuerVoucher: (token: User, issuerVoucher: any) => putJson("IssuerVouchers", issuerVoucher, token.access_token),
 
     postIssuerTransaction: (token: User, transaction: any) => postJson("IssuerTransactions", transaction, token.access_token),
-    getValueDetail: (token: User, id: string) => getById("ValueDetail", id, token.access_token),
+    getValueDetail: (token: User, id: string) => getById("VoucherValueDetail", id, token.access_token),
 
     getHolderValues: (token: User, query: any) => getByQuery("HolderValues", serializeToQuery(query), token.access_token),
     getHolderVouchers: (token: User, query: any) => getByQuery("HolderVouchers", serializeToQuery(query), token.access_token),
 
-    postHolderTransaction: (token: User, transaction: any) => postJson("HolderTransactions", transaction, token.access_token),
+    postHolderTransaction: (token: User, transaction: any) => postJson("HolderTransaction", transaction, token.access_token),
     getHolderTransactions: (token: User, query: any) => getByQuery("HolderTransactions", serializeToQuery(query), token.access_token),
     
     getTransactionRequests: (token: User, query: any) => getByQuery("HolderTransactionRequests", serializeToQuery(query), token.access_token),

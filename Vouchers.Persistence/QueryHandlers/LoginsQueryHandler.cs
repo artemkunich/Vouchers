@@ -14,6 +14,7 @@ using Vouchers.Domains.Domain;
 using Vouchers.Application.Queries;
 using Vouchers.Application.UseCases;
 using System.Threading;
+using Vouchers.Application;
 
 namespace Vouchers.Persistence.QueryHandlers;
 
@@ -26,7 +27,7 @@ internal sealed class LoginsQueryHandler : IHandler<LoginsQuery, IEnumerable<Log
         _dbContext = dbContext;
     }
 
-    public async Task<IEnumerable<LoginDto>> HandleAsync(LoginsQuery query, CancellationToken cancellation) =>
+    public async Task<Result<IEnumerable<LoginDto>>> HandleAsync(LoginsQuery query, CancellationToken cancellation) =>
         await GetQuery(query).ToListAsync(cancellation);
 
 

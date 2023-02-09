@@ -10,7 +10,8 @@ public class IdentityUpdatedEventHandler : IHandler<IdentityUpdatedDomainEvent>
     {
     }
     
-    public async Task HandleAsync(IdentityUpdatedDomainEvent @event, CancellationToken cancellation)
+    public async Task<Result> HandleAsync(IdentityUpdatedDomainEvent @event, CancellationToken cancellation)
     {
+        return Result.Create();
     }
 }

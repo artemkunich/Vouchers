@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Vouchers.Application;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
+using Vouchers.Application.Queries;
 using Vouchers.Application.Services;
 using Vouchers.Application.UseCases;
 using Vouchers.Domains.Domain;
@@ -16,7 +17,7 @@ using Vouchers.Values.Domain;
 
 namespace Vouchers.Persistence.QueryHandlers;
 
-internal sealed class VoucherValueDetailQueryHandler : IHandler<Guid,Result<VoucherValueDetailDto>>
+internal sealed class VoucherValueDetailQueryHandler : IHandler<VoucherValueDetailQuery,VoucherValueDetailDto>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly VouchersDbContext _dbContext;
@@ -37,12 +38,14 @@ internal sealed class VoucherValueDetailQueryHandler : IHandler<Guid,Result<Vouc
         Height = cp.Height,
     };
 
-    public async Task<Result<VoucherValueDetailDto>> HandleAsync(Guid valueId, CancellationToken cancellation)
+    public async Task<Result<VoucherValueDetailDto>> HandleAsync(VoucherValueDetailQuery query, CancellationToken cancellation)
     {
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
         if (authIdentityId is null)
             return Error.NotAuthorized(_cultureInfoProvider.GetCultureInfo());
 
+        var valueId = query.Id;
+        
         var valueWithImage = await _dbContext.Set<VoucherValue>().Where(v => v.Id == valueId)
             .Join(
                 _dbContext.Set<DomainAccount>().Where(acc => acc.IdentityId == authIdentityId),
