@@ -5,7 +5,7 @@ namespace Vouchers.Application.UseCases;
 
 internal class ApplicationResources
 {
-    private static ResourceManager _rm = new ResourceManager(typeof(Properties.Resources));
+    private static readonly ResourceManager _rm = new(typeof(Properties.Resources));
 
     public static string GetString(string resourceKey, CultureInfo cultureInfo) => _rm.GetString(resourceKey, cultureInfo);
 

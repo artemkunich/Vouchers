@@ -6,6 +6,7 @@ using Vouchers.Application.Dtos;
 
 namespace Vouchers.Application.Commands.DomainCommands;
 
+[ApplicationRoles(ApplicationRole.User)]
 public sealed class UpdateDomainDetailCommand
 {
     public Guid DomainId { get; set; }

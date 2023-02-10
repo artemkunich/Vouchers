@@ -1,5 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Vouchers.API.Services;
 using Vouchers.Application.Queries;
@@ -7,6 +8,7 @@ using Vouchers.Application.UseCases;
 
 namespace Vouchers.API.Controllers;
 
+[Authorize]
 public class GenericQueryController<TQuery, TDtos> : Controller where TQuery : ListQuery where TDtos : class 
 {
     private readonly IHandler<TQuery,TDtos> _handler;

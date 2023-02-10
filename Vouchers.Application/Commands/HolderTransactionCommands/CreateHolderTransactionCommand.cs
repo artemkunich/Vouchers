@@ -7,6 +7,7 @@ using Vouchers.Core.Domain;
 
 namespace Vouchers.Application.Commands.HolderTransactionCommands;
 
+[ApplicationRoles(ApplicationRole.User)]
 public sealed class CreateHolderTransactionCommand
 {
     public Guid? HolderTransactionRequestId { get; set; }

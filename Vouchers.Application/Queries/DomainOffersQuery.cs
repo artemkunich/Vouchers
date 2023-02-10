@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Vouchers.Application.Queries;
 
+[ApplicationRoles(ApplicationRole.Manager)]
 public sealed class DomainOffersQuery : ListQuery
 {
     public string Name { get; set; }

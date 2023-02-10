@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Vouchers.Application.Commands.HolderTransactionRequestCommands;
 
+[ApplicationRoles(ApplicationRole.User)]
 public sealed class CreateHolderTransactionRequestCommand
 {
     public Guid? CreditorAccountId { get; set; }

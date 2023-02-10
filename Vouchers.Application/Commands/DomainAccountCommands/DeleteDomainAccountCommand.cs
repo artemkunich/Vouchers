@@ -5,6 +5,7 @@ using Vouchers.Application.Dtos;
 
 namespace Vouchers.Application.Commands.DomainAccountCommands;
 
+[ApplicationRoles(ApplicationRole.User)]
 public sealed class DeleteDomainAccountCommand
 {      
 }

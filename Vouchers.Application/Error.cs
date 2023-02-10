@@ -12,22 +12,29 @@ public class Error : IEquatable<Error>
     public Error(string code, string message)
     {
         Code = code;
-        Message = code;
+        Message = message;
     }
 
-
-    public bool Equals(Error? other)
+    public bool Equals(object other)
     {
         if (other is null)
             return false;
 
-        if (Code == other.Code)
-            return true;
+        if(other is Error error)
+            return Code == error.Code;
 
         return false;
     }
+    
+    public bool Equals(Error other)
+    {
+        if (other is null)
+            return false;
 
-    public static bool operator ==(Error? a, Error? b)
+        return Code == other.Code;
+    }
+
+    public static bool operator ==(Error a, Error b)
     {
         if (a is null && b is null)
             return true;
@@ -38,7 +45,7 @@ public class Error : IEquatable<Error>
         return a.Equals(b);
     }
 
-    public static bool operator !=(Error? a, Error? b) => !(a == b);
+    public static bool operator !=(Error a, Error b) => !(a == b);
 
     public static Error Create(string code, CultureInfo cultureInfo) =>
         new(code, ApplicationResources.GetString(code, cultureInfo));

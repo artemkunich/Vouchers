@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Vouchers.Core.Domain;
 using Vouchers.Application.Commands.VoucherValueCommands;
 using Vouchers.Application.Infrastructure;

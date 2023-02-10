@@ -53,63 +53,7 @@ public class Result
         
         return this;
     }
-    
-    public virtual Result MergeResultErrors(Result result)
-    {
-        if (result.IsFailure)
-            AddErrors(result.Errors);
 
-        return this;
-    }
-
-    public Result MergeResultErrors(Func<Result> ifSuccessPredicate)
-    {
-        if (IsFailure)
-            return this;
-        
-        var result = ifSuccessPredicate();
-        if (result.IsFailure)
-            AddErrors(result.Errors);
-
-        return this;
-    }
-    
-    public virtual Result ForeachWhileSuccess<TValue,TResult>(IEnumerable<TValue> enumerable, Func<TValue, Result<TResult>> predicate)
-    {
-        if (IsFailure)
-            return this;
-
-        foreach (var item in enumerable)
-        {
-            var result = predicate(item);
-            if (result.IsFailure)
-            {
-                AddErrors(result.Errors);
-                break;
-            }
-        }
-        
-        return this;
-    }
-    
-    public virtual async Task<Result> ForeachWhileSuccessAsync<TValue,TResult>(IEnumerable<TValue> enumerable, Func<TValue, Task<Result<TResult>>> predicate)
-    {
-        if (IsFailure)
-            return this;
-
-        foreach (var item in enumerable)
-        {
-            var result = await predicate(item);
-            if (result.IsFailure)
-            {
-                AddErrors(result.Errors);
-                break;
-            }
-        }
-        
-        return this;
-    }
-    
     public static Result Create() => new();
     public static Result Failure(params Error[] errors) => new(errors);
     

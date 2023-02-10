@@ -8,7 +8,7 @@ namespace Vouchers.Application;
 
 public class Result<TValue> : Result
 {
-    private readonly TValue? _value;
+    private readonly TValue _value;
 
     protected internal Result(TValue value, params Error[] errors) : base(errors)
     {
@@ -82,54 +82,10 @@ public class Result<TValue> : Result
         
         return this;
     }
-    
-    public override Result<TValue> MergeResultErrors(Result result)
-    {
-        if (result.IsFailure)
-            AddErrors(result.Errors);
-
-        return this;
-    }
-    
-    public Result<TValue> MergeResultErrors(Func<TValue,Result> ifSuccessPredicate)
-    {
-        if (IsFailure)
-            return this;
-        
-        var result = ifSuccessPredicate(Value);
-        if (result.IsFailure)
-            AddErrors(result.Errors);
-
-        return this;
-    }
-
-    public async Task<Result<TValue>> MergeResultErrorsAsync(Func<TValue,Task<Result>> ifSuccessPredicate)
-    {
-        if (IsFailure)
-            return this;
-        
-        var result = await ifSuccessPredicate(Value);
-        if (result.IsFailure)
-            AddErrors(result.Errors);
-
-        return this;
-    }
-
 
     public Result<TOut> Map<TOut>(Func<TValue, TOut> ifSuccessPredicate) =>
         IsSuccess ? ifSuccessPredicate(Value) : Errors;
     
     public async Task<Result<TOut>> MapAsync<TOut>(Func<TValue, Task<TOut>> ifSuccessPredicate) =>
-        IsSuccess ? await ifSuccessPredicate(Value) : Errors;
-
-    
-    
-    public Result<TOut> ToResult<TOut>(Result<TOut> result) =>
-        IsSuccess ? result : Errors;
-    
-    public Result<TOut> ToResult<TOut>(Func<TValue, Result<TOut>> ifSuccessPredicate) =>
-        IsSuccess ? ifSuccessPredicate(Value) : Errors;
-    
-    public async Task<Result<TOut>> ToResultAsync<TOut>(Func<TValue, Task<Result<TOut>>> ifSuccessPredicate) =>
         IsSuccess ? await ifSuccessPredicate(Value) : Errors;
 }

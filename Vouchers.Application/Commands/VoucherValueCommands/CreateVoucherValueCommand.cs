@@ -7,6 +7,7 @@ using Vouchers.Application.Dtos;
 
 namespace Vouchers.Application.Commands.VoucherValueCommands;
 
+[ApplicationRoles(ApplicationRole.User)]
 public sealed class CreateVoucherValueCommand
 {
     [Required]

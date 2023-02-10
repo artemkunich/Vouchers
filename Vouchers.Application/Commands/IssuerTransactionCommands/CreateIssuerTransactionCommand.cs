@@ -5,6 +5,7 @@ using System.Text;
 
 namespace Vouchers.Application.Commands.IssuerTransactionCommands;
 
+[ApplicationRoles(ApplicationRole.User)]
 public sealed class CreateIssuerTransactionCommand
 {
     [Required]

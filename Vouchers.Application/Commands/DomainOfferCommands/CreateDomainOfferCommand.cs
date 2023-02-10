@@ -6,6 +6,7 @@ using Vouchers.Application.Dtos;
 
 namespace Vouchers.Application.Commands.DomainOfferCommands;
 
+[ApplicationRoles(ApplicationRole.Manager)]
 public sealed class CreateDomainOfferCommand
 {
     [Required]

@@ -4,6 +4,7 @@ using System.Text;
 
 namespace Vouchers.Application.Queries;
 
+[ApplicationRoles(ApplicationRole.User)]
 public sealed class IssuerTransactionsQuery : ListQuery
 {
     public string Ticker { get; set; }

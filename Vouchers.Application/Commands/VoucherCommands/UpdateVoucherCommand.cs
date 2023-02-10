@@ -6,6 +6,7 @@ using Vouchers.Application.Dtos;
 
 namespace Vouchers.Application.Commands.VoucherCommands;
 
+[ApplicationRoles(ApplicationRole.User)]
 public sealed class UpdateVoucherCommand
 {
     [Required]

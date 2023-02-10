@@ -5,6 +5,7 @@ using System.Text;
 
 namespace Vouchers.Application.Queries;
 
+[ApplicationRoles(ApplicationRole.Admin)]
 public sealed class LoginsQuery : ListQuery
 {
     public string LoginName { get; set; }
