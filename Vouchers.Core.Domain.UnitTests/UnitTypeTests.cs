@@ -2,31 +2,33 @@ using FluentAssertions;
 
 namespace Vouchers.Core.Domain.UnitTests;
 
-public class AccountTests
+public class UnitTypeTests
 {
-    private readonly Account _account;
+    private readonly UnitType _unitType;
     
-    public AccountTests()
+    public UnitTypeTests()
     {
-        var id = Guid.NewGuid();
-        var date = DateTime.Now;
-        _account = Account.Create(id, date);
+        var issuerAccountId = Guid.NewGuid();
+        var issuerAccount = Account.Create(issuerAccountId, DateTime.Now);
+
+        var unitTypeId = Guid.NewGuid();
+        _unitType = UnitType.Create(unitTypeId, issuerAccount);
     }
 
     [Fact]
     public void IncreaseSupply_IncreasesSupplyByAmount_ReduceSupply_ReducesSupplyByAmount()
     {
         var amount = 1;
-        var expectedIncreasedSupply = _account.Supply + amount;
+        var expectedIncreasedSupply = _unitType.Supply + amount;
         
-        _account.IncreaseSupply(amount);
-        _account.Supply
+        _unitType.IncreaseSupply(amount);
+        _unitType.Supply
             .Should()
             .Be(expectedIncreasedSupply);
         
         var expectedReducedSupply = expectedIncreasedSupply - amount;
-        _account.ReduceSupply(amount);
-        _account.Supply
+        _unitType.ReduceSupply(amount);
+        _unitType.Supply
             .Should()
             .Be(expectedReducedSupply);
     }
@@ -34,9 +36,9 @@ public class AccountTests
     [Fact]
     public void IncreaseSupply_ByNotPositiveAmount_ThrowsCoreException()
     {
-        var increaseSupplyByZeroAmount = () => _account.IncreaseSupply(0);
-        var increaseSupplyByNegativeAmount = () => _account.IncreaseSupply(-1);
-        
+        var increaseSupplyByZeroAmount = () => _unitType.IncreaseSupply(0);
+        var increaseSupplyByNegativeAmount = () => _unitType.IncreaseSupply(-1);
+
         increaseSupplyByZeroAmount
             .Should()
             .Throw<CoreException>()
@@ -47,13 +49,13 @@ public class AccountTests
             .Throw<CoreException>()
             .WithMessage(CoreException.AmountIsNotPositive.Message);
     }
-
+    
     [Fact]
     public void ReduceSupply_ByNotPositiveAmount_ThrowsCoreException()
     {
-        var reduceSupplyByZeroAmount = () => _account.ReduceSupply(0);
-        var reduceSupplyByNegativeAmount = () => _account.ReduceSupply(-1);
-        
+        var reduceSupplyByZeroAmount = () => _unitType.IncreaseSupply(0);
+        var reduceSupplyByNegativeAmount = () => _unitType.IncreaseSupply(-1);
+
         reduceSupplyByZeroAmount
             .Should()
             .Throw<CoreException>()
@@ -68,12 +70,15 @@ public class AccountTests
     [Fact]
     public void ReduceSupply_ByAmountGreaterThenSupply_ThrowsCoreException()
     {
-        _account.IncreaseSupply(1);
-        
-        var reduceSupplyByAmountGreaterThenSupply = () => _account.ReduceSupply(_account.Supply + 1);
+        _unitType.IncreaseSupply(1);
+        var amount = _unitType.Supply + 1;
+
+        var reduceSupplyByAmountGreaterThenSupply = () => _unitType.ReduceSupply(amount);
+
         reduceSupplyByAmountGreaterThenSupply
             .Should()
             .Throw<CoreException>()
             .WithMessage(CoreException.AmountIsGreaterThanSupply.Message);
+
     }
 }

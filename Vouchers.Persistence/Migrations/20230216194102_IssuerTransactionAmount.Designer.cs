@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Vouchers.Persistence;
 
@@ -11,9 +12,11 @@ using Vouchers.Persistence;
 namespace Vouchers.Persistence.Migrations
 {
     [DbContext(typeof(VouchersDbContext))]
-    partial class VouchersDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230216194102_IssuerTransactionAmount")]
+    partial class IssuerTransactionAmount
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -109,10 +112,6 @@ namespace Vouchers.Persistence.Migrations
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal>("Amount")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<Guid>("CreditAccountItemId")
                         .HasColumnType("uniqueidentifier");
@@ -710,9 +709,41 @@ namespace Vouchers.Persistence.Migrations
                         .HasForeignKey("HolderTransactionId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.OwnsOne("Vouchers.Core.Domain.UnitQuantity", "Quantity", b1 =>
+                        {
+                            b1.Property<Guid>("HolderTransactionItemId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<decimal>("Amount")
+                                .HasPrecision(18, 2)
+                                .HasColumnType("decimal(18,2)");
+
+                            b1.Property<Guid>("UnitId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.HasKey("HolderTransactionItemId");
+
+                            b1.HasIndex("UnitId");
+
+                            b1.ToTable("HolderTransactionItem");
+
+                            b1.WithOwner()
+                                .HasForeignKey("HolderTransactionItemId");
+
+                            b1.HasOne("Vouchers.Core.Domain.Unit", "Unit")
+                                .WithMany()
+                                .HasForeignKey("UnitId")
+                                .OnDelete(DeleteBehavior.Restrict)
+                                .IsRequired();
+
+                            b1.Navigation("Unit");
+                        });
+
                     b.Navigation("CreditAccountItem");
 
                     b.Navigation("DebitAccountItem");
+
+                    b.Navigation("Quantity");
                 });
 
             modelBuilder.Entity("Vouchers.Core.Domain.HolderTransactionRequest", b =>

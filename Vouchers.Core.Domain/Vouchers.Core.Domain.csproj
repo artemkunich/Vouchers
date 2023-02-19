@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>$(MSBuildProjectName).UnitTests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+  
+  <ItemGroup>
     <ProjectReference Include="..\Vouchers.Primitives\Vouchers.Primitives.csproj" />
   </ItemGroup>
 

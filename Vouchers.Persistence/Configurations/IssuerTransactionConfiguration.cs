@@ -16,16 +16,7 @@ internal class IssuerTransactionConfiguration : IEntityTypeConfiguration<IssuerT
 
         builder.HasKey(transaction => transaction.Id);
             
-        builder
-            .OwnsOne(transaction => transaction.Quantity)
-            .Property(quantity => quantity.Amount)
-            .HasPrecision(18, 2);
-
-        builder
-            .OwnsOne(transaction => transaction.Quantity)
-            .HasOne(quantity => quantity.Unit)
-            .WithMany()
-            .OnDelete(DeleteBehavior.Restrict); 
+        builder.Property(transaction => transaction.Amount).HasPrecision(18,2);
 
         builder
             .HasOne(transaction => transaction.IssuerAccountItem)

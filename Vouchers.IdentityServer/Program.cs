@@ -46,7 +46,7 @@ var idBuilder = builder.Services.AddIdentityServer(options =>
     options.Events.RaiseFailureEvents = true;
     options.Events.RaiseSuccessEvents = true;
 
-    options.IssuerUri = "http://vouchers.identityserver";
+    options.IssuerUri = "http://vouchers.identity-server";
 
     // see https://identityserver4.readthedocs.io/en/latest/topics/resources.html
     options.EmitStaticAudienceClaim = true;

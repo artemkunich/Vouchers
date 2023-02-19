@@ -47,7 +47,7 @@ internal sealed class HolderTransactionsQueryHandler : IHandler<HolderTransactio
             .Include(tr => tr.CreditorAccount)
             .Include(tr => tr.DebtorAccount)
             .Include(tr => tr.Quantity.UnitType).ThenInclude(unit => unit.IssuerAccount)
-            .Include(tr => tr.TransactionItems)
+            .Include(tr => tr.TransactionItems).ThenInclude(item=>item.DebitAccountItem).ThenInclude(item=> item.Unit).ThenInclude(unit=>unit.UnitType)
             .Join(
                 _dbContext.Set<DomainAccount>(),
                 tr => tr.DebtorAccountId,
@@ -157,14 +157,14 @@ internal sealed class HolderTransactionsQueryHandler : IHandler<HolderTransactio
                 Message = t.Transaction.Message,
                 Items = t.Transaction.TransactionItems.Select(item => new VoucherQuantityDto
                 {
-                    Amount = item.Quantity.Amount,
+                    Amount = item.Amount,
                     Unit = new VoucherDto
                     {
-                        Id = item.Quantity.Unit.Id,
-                        ValidFrom = item.Quantity.Unit.ValidFrom,
-                        ValidTo = item.Quantity.Unit.ValidTo,
-                        CanBeExchanged = item.Quantity.Unit.CanBeExchanged,
-                        Supply = item.Quantity.Unit.Supply,
+                        Id = item.DebitAccountItem.Unit.Id,
+                        ValidFrom = item.DebitAccountItem.Unit.ValidFrom,
+                        ValidTo = item.DebitAccountItem.Unit.ValidTo,
+                        CanBeExchanged = item.DebitAccountItem.Unit.CanBeExchanged,
+                        Supply = item.DebitAccountItem.Unit.Supply,
                         Balance = 0
                     }
                 })

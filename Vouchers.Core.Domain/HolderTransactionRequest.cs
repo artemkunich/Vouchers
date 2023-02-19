@@ -46,7 +46,7 @@ public sealed class HolderTransactionRequest : AggregateRoot<Guid>
         }
         
         if (creditorAccount is not null && debtorAccount.Equals(creditorAccount))
-            throw CoreException.CreditorAndDebtorAreTheSame;
+            throw CoreException.CreditorAndDebtorAccountsAreTheSame;
 
         return new()
         {
@@ -73,7 +73,7 @@ public sealed class HolderTransactionRequest : AggregateRoot<Guid>
     public void Perform(HolderTransaction transaction)
     {
         if(Transaction != null)
-            throw CoreException.TransactionIsAlreadyPerformed;
+            throw CoreException.TransactionRequestIsAlreadyPerformed;
 
         if (CreditorAccount != null && CreditorAccount.NotEquals(transaction.CreditorAccount))
             throw CoreException.RequestCreditorIsNotSatisfiedByTransaction;
@@ -89,13 +89,13 @@ public sealed class HolderTransactionRequest : AggregateRoot<Guid>
 
         foreach (var item in transaction.TransactionItems)
         {
-            if (MaxDurationBeforeValidityStart is not null && item.Quantity.Unit.ValidFrom > DateTime.Now.Add(MaxDurationBeforeValidityStart.Value))
+            if (MaxDurationBeforeValidityStart is not null && item.Unit.ValidFrom > DateTime.Now.Add(MaxDurationBeforeValidityStart.Value))
                 throw CoreException.RequestMaxValidFromIsNotSatisfiedByTransaction;
 
-            if (MinDurationBeforeValidityEnd is not null && item.Quantity.Unit.ValidTo < DateTime.Now.Add(MinDurationBeforeValidityEnd.Value))
+            if (MinDurationBeforeValidityEnd is not null && item.Unit.ValidTo < DateTime.Now.Add(MinDurationBeforeValidityEnd.Value))
                 throw CoreException.RequestMinValidToIsNotSatisfiedByTransaction;
 
-            if (MustBeExchangeable && !item.Quantity.Unit.CanBeExchanged)
+            if (MustBeExchangeable && !item.Unit.CanBeExchanged)
                 throw CoreException.RequestMustBeExchangeableIsNotSatisfiedByTransaction;
         }
 

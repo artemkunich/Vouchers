@@ -42,18 +42,18 @@ internal sealed class IssuerTransactionsQueryHandler : IHandler<IssuerTransactio
     IQueryable<IssuerTransactionDto> GetQuery(IssuerTransactionsQuery query, Guid authIdentityId) 
     {
         var issuerTransactionsQuery = _dbContext.Set<IssuerTransaction>()
-            .Include(tr => tr.Quantity.Unit).ThenInclude(unit => unit.UnitType).ThenInclude(value => value.IssuerAccount)
+            .Include(tr => tr.IssuerAccountItem.Unit).ThenInclude(unit => unit.UnitType).ThenInclude(value => value.IssuerAccount)
             .Join(_dbContext.Set<VoucherValue>(), 
-                t => t.Quantity.Unit.UnitTypeId,
+                t => t.IssuerAccountItem.Unit.UnitTypeId,
                 v => v.Id,
                 (t,v) => new { Transaction = t, Value = v }
             )
             .Where(o => o.Value.IssuerIdentityId == authIdentityId).Select(o => o.Transaction);
 
         if (query.MinAmount != null)
-            issuerTransactionsQuery = issuerTransactionsQuery.Where(tr => tr.Quantity.Amount >= query.MinAmount);
+            issuerTransactionsQuery = issuerTransactionsQuery.Where(tr => tr.Amount >= query.MinAmount);
         if (query.MaxAmount != null)
-            issuerTransactionsQuery = issuerTransactionsQuery.Where(tr => tr.Quantity.Amount <= query.MaxAmount);
+            issuerTransactionsQuery = issuerTransactionsQuery.Where(tr => tr.Amount <= query.MaxAmount);
 
         if (query.MinTimestamp != null)
             issuerTransactionsQuery = issuerTransactionsQuery.Where(tr => tr.Timestamp >= query.MinTimestamp);
@@ -65,7 +65,7 @@ internal sealed class IssuerTransactionsQueryHandler : IHandler<IssuerTransactio
 
         return issuerTransactionsQuery.Join(
             voucherValuesQuery,
-            t => t.Quantity.Unit.UnitTypeId,
+            t => t.IssuerAccountItem.Unit.UnitTypeId,
             v => v.Id,
             (t, v) => new IssuerTransactionDto {
                 Id = t.Id,
@@ -74,11 +74,11 @@ internal sealed class IssuerTransactionsQueryHandler : IHandler<IssuerTransactio
                 Unit = new VoucherDto
                 {
                     Id = v.Id,
-                    ValidFrom = t.Quantity.Unit.ValidFrom,
-                    ValidTo = t.Quantity.Unit.ValidTo,
-                    CanBeExchanged = t.Quantity.Unit.CanBeExchanged,
+                    ValidFrom = t.IssuerAccountItem.Unit.ValidFrom,
+                    ValidTo = t.IssuerAccountItem.Unit.ValidTo,
+                    CanBeExchanged = t.IssuerAccountItem.Unit.CanBeExchanged,
                 },                 
-                Amount = t.Quantity.Amount
+                Amount = t.Amount
             }
         ).GetListPageQuery(query);
     }

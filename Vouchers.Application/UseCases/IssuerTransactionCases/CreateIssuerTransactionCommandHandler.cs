@@ -64,7 +64,7 @@ internal sealed class CreateIssuerTransactionCommandHandler : IHandler<CreateIss
             {
                 var unit = await _unitRepository.GetByIdAsync(command.VoucherId);
                 var accountItemId = _identifierProvider.CreateNewId();
-                accountItem = AccountItem.Create(accountItemId, issuerAccount, 0, unit);
+                accountItem = AccountItem.Create(accountItemId, issuerAccount, unit);
             }
             else
                 throw new ApplicationException(Properties.Resources.IssuerDoesNotHaveAccountItemForUnit, issuerDomainAccount.Id, command.VoucherId);

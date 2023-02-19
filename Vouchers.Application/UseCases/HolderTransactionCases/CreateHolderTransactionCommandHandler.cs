@@ -101,13 +101,11 @@ internal sealed class CreateHolderTransactionCommandHandler : IHandler<CreateHol
             {
                 var voucherId = _identifierProvider.CreateNewId();
                 var voucher = await _unitRepository.GetByIdAsync(item.Item1);
-                debitAccountItem = AccountItem.Create(voucherId, debtorAccount, 0, voucher);
+                debitAccountItem = AccountItem.Create(voucherId, debtorAccount, voucher);
             }
 
             var transactionItemId = _identifierProvider.CreateNewId();
-            var transactionItem = HolderTransactionItem.Create(transactionItemId,
-                UnitQuantity.Create(item.Item2, debitAccountItem.Unit), creditAccountItem, debitAccountItem);
-            transaction.AddTransactionItem(transactionItem);
+            HolderTransactionItem.Create(transactionItemId, item.Item2, creditAccountItem, debitAccountItem, transaction);
         }
     
         if (holderTransactionRequest is null)

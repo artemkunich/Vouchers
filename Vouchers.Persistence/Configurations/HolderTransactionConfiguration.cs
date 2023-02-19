@@ -40,7 +40,7 @@ internal class HolderTransactionConfiguration : IEntityTypeConfiguration<HolderT
 
         builder
             .HasMany(transaction => transaction.TransactionItems)
-            .WithOne()
+            .WithOne(item => item.HolderTransaction)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.Property(transaction => transaction.IsPerformed);

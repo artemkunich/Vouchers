@@ -11,6 +11,9 @@ public sealed class UnitQuantity
 
     public static UnitQuantity Create(decimal amount, Unit unit)
     {
+        if(amount <= 0)
+            throw CoreException.AmountIsNotPositive;
+        
         return new()
         {
             Amount = amount,

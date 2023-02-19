@@ -17,16 +17,7 @@ internal class HolderTransactionItemConfiguration : IEntityTypeConfiguration<Hol
         builder.HasKey(item => item.Id);
         builder.Property(item => item.Id).IsRequired().ValueGeneratedNever();
 
-        builder
-            .OwnsOne(item => item.Quantity)
-            .Property(quantity => quantity.Amount)
-            .HasPrecision(18, 2);
-
-        builder
-            .OwnsOne(item => item.Quantity)
-            .HasOne(quantity => quantity.Unit)
-            .WithMany()
-            .OnDelete(DeleteBehavior.Restrict);
+        builder.Property(item => item.Amount).HasPrecision(18,2);
 
         builder
             .HasOne(item => item.CreditAccountItem)

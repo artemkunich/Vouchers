@@ -64,7 +64,7 @@ internal sealed class UpdateVoucherCommandHandler : IHandler<UpdateVoucherComman
         }
         if (command.CanBeExchanged is not null && command.CanBeExchanged != unit.CanBeExchanged)
         {
-            unit.SetCanBeExchanged(command.CanBeExchanged.Value, cultureInfo);
+            unit.SetCanBeExchanged(command.CanBeExchanged.Value);
             requireUpdate = true;
         }
 

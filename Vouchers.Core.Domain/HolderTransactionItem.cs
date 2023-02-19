@@ -5,39 +5,50 @@ namespace Vouchers.Core.Domain;
 
 public sealed class HolderTransactionItem : Entity<Guid>
 {
-    public UnitQuantity Quantity { get; init; }
-
+    public Guid HolderTransactionId { get; init; }
+    public HolderTransaction HolderTransaction { get; init; }
+    public decimal Amount { get; init; }
+    public Unit Unit => DebitAccountItem.Unit;
+    
     public Guid CreditAccountItemId { get; init; }
     public AccountItem CreditAccountItem { get; init; }
 
     public Guid DebitAccountItemId { get; init; }
     public AccountItem DebitAccountItem { get; init; }
 
-    public static HolderTransactionItem Create(Guid id, UnitQuantity quantity, AccountItem creditAccountItem, AccountItem debitAccountItem)
+    public static HolderTransactionItem Create(Guid id, decimal amount, AccountItem creditAccountItem, AccountItem debitAccountItem, HolderTransaction holderTransaction)
     {
+        if (amount <= 0)
+            throw CoreException.AmountIsNotPositive;
+        
         if (creditAccountItem.Equals(debitAccountItem))
             throw CoreException.CreditorAndDebtorAccountsAreTheSame;
 
-        if (creditAccountItem.Unit.NotEquals(quantity.Unit))
-            throw CoreException.CreditAccountAndItemHaveDifferentUnits;
+        if (creditAccountItem.Unit.NotEquals(debitAccountItem.Unit))
+            throw CoreException.CreditAccountAndDebitAccountHaveDifferentUnits;
 
-        if (debitAccountItem.Unit.NotEquals(quantity.Unit))
-            throw CoreException.DebitAccountAndItemHaveDifferentUnits;
+        var unit = creditAccountItem.Unit;
 
-        if(!quantity.Unit.CanBeExchanged && creditAccountItem.HolderAccount.NotEquals(quantity.Unit.UnitType.IssuerAccount) && debitAccountItem.HolderAccount.NotEquals(quantity.Unit.UnitType.IssuerAccount))
+        if(!unit.CanBeExchanged && creditAccountItem.HolderAccount.NotEquals(unit.UnitType.IssuerAccount) && debitAccountItem.HolderAccount.NotEquals(unit.UnitType.IssuerAccount))
             throw CoreException.ItemUnitCannotBeExchanged;
 
-        return new()
+        var newHolderTransactionItem = new HolderTransactionItem
         {
             Id = id,
-            Quantity = quantity,
+            Amount = amount,
 
             CreditAccountItemId = creditAccountItem.Id,
             CreditAccountItem = creditAccountItem,
 
             DebitAccountItemId = debitAccountItem.Id,
             DebitAccountItem = debitAccountItem,
+            
+            HolderTransactionId = holderTransaction.Id,
+            HolderTransaction = holderTransaction
         };
-    }
+        
+        holderTransaction.AddTransactionItem(newHolderTransactionItem);
 
+        return newHolderTransactionItem;
+    }
 }

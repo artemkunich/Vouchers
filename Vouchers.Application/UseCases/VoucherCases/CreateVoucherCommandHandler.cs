@@ -18,8 +18,9 @@ internal sealed class CreateVoucherCommandHandler : IHandler<CreateVoucherComman
     private readonly IRepository<Unit,Guid> _unitRepository;
     private readonly IIdentifierProvider<Guid> _identifierProvider;
     private readonly ICultureInfoProvider _cultureInfoProvider;
+    private readonly IDateTimeProvider _dateTimeProvider;
     public CreateVoucherCommandHandler(IAuthIdentityProvider authIdentityProvider, IReadOnlyRepository<VoucherValue,Guid> voucherValueRepository, 
-        IReadOnlyRepository<UnitType,Guid> unitTypeRepository, IRepository<Unit,Guid> unitRepository, IIdentifierProvider<Guid> identifierProvider, ICultureInfoProvider cultureInfoProvider)
+        IReadOnlyRepository<UnitType,Guid> unitTypeRepository, IRepository<Unit,Guid> unitRepository, IIdentifierProvider<Guid> identifierProvider, ICultureInfoProvider cultureInfoProvider, IDateTimeProvider dateTimeProvider)
     {
         _authIdentityProvider = authIdentityProvider;
         _voucherValueRepository = voucherValueRepository;
@@ -27,6 +28,7 @@ internal sealed class CreateVoucherCommandHandler : IHandler<CreateVoucherComman
         _unitRepository = unitRepository;
         _identifierProvider = identifierProvider;
         _cultureInfoProvider = cultureInfoProvider;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     public async Task<Result<IdDto<Guid>>> HandleAsync(CreateVoucherCommand command, CancellationToken cancellation)
@@ -47,8 +49,9 @@ internal sealed class CreateVoucherCommandHandler : IHandler<CreateVoucherComman
 
         var unitType = await _unitTypeRepository.GetByIdAsync(command.VoucherValueId);
 
+        var currentDateTime = _dateTimeProvider.CurrentDateTime();
         var unitId = _identifierProvider.CreateNewId();
-        var unit = Unit.Create(unitId, command.ValidFrom, command.ValidTo ?? DateTime.MaxValue, command.CanBeExchanged, unitType, 0);
+        var unit = Unit.Create(unitId, command.ValidFrom, command.ValidTo ?? DateTime.MaxValue, currentDateTime, command.CanBeExchanged, unitType);
 
         await _unitRepository.AddAsync(unit);
 
