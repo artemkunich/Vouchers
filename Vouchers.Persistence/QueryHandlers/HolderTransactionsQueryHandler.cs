@@ -19,7 +19,7 @@ using Vouchers.Values.Domain;
 
 namespace Vouchers.Persistence.QueryHandlers;
 
-internal sealed class HolderTransactionsQueryHandler : IHandler<HolderTransactionsQuery,IEnumerable<HolderTransactionDto>>
+internal sealed class HolderTransactionsQueryHandler : IHandler<HolderTransactionsQuery,IReadOnlyList<HolderTransactionDto>>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly VouchersDbContext _dbContext;
@@ -32,7 +32,7 @@ internal sealed class HolderTransactionsQueryHandler : IHandler<HolderTransactio
         _cultureInfoProvider = cultureInfoProvider;
     }
 
-    public async Task<Result<IEnumerable<HolderTransactionDto>>> HandleAsync(HolderTransactionsQuery query, CancellationToken cancellation)
+    public async Task<Result<IReadOnlyList<HolderTransactionDto>>> HandleAsync(HolderTransactionsQuery query, CancellationToken cancellation)
     {
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
         if (authIdentityId is null)

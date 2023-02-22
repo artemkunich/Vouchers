@@ -12,7 +12,7 @@ using Vouchers.Application;
 
 namespace Vouchers.Persistence.QueryHandlers;
 
-internal sealed class DomainOffersQueryHandler : IHandler<DomainOffersQuery, IEnumerable<DomainOfferDto>>
+internal sealed class DomainOffersQueryHandler : IHandler<DomainOffersQuery, IReadOnlyList<DomainOfferDto>>
 {
     private readonly VouchersDbContext _dbContext;
 
@@ -21,7 +21,7 @@ internal sealed class DomainOffersQueryHandler : IHandler<DomainOffersQuery, IEn
         _dbContext = dbContext;
     }
 
-    public async Task<Result<IEnumerable<DomainOfferDto>>> HandleAsync(DomainOffersQuery query, CancellationToken cancellation) =>
+    public async Task<Result<IReadOnlyList<DomainOfferDto>>> HandleAsync(DomainOffersQuery query, CancellationToken cancellation) =>
         await GetQuery(query).ToListAsync(cancellation);
     
     IQueryable<DomainOfferDto> GetQuery(DomainOffersQuery query)

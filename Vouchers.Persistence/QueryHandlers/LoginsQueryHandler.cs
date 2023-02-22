@@ -11,7 +11,7 @@ using Vouchers.Application;
 
 namespace Vouchers.Persistence.QueryHandlers;
 
-internal sealed class LoginsQueryHandler : IHandler<LoginsQuery, IEnumerable<LoginDto>>
+internal sealed class LoginsQueryHandler : IHandler<LoginsQuery, IReadOnlyList<LoginDto>>
 {
     VouchersDbContext _dbContext;
 
@@ -20,7 +20,7 @@ internal sealed class LoginsQueryHandler : IHandler<LoginsQuery, IEnumerable<Log
         _dbContext = dbContext;
     }
 
-    public async Task<Result<IEnumerable<LoginDto>>> HandleAsync(LoginsQuery query, CancellationToken cancellation) =>
+    public async Task<Result<IReadOnlyList<LoginDto>>> HandleAsync(LoginsQuery query, CancellationToken cancellation) =>
         await GetQuery(query).ToListAsync(cancellation);
 
 

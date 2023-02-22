@@ -13,8 +13,8 @@ public sealed class HolderTransaction : AggregateRoot<Guid>
     public Guid DebtorAccountId { get; init; }
     public Account DebtorAccount { get; init; }
     public UnitTypeQuantity Quantity { get; private set; }
-    public IEnumerable<HolderTransactionItem> TransactionItems => _transactionItems;
-    private ICollection<HolderTransactionItem> _transactionItems;
+    public IReadOnlyList<HolderTransactionItem> TransactionItems => _transactionItems.AsReadOnly();
+    private List<HolderTransactionItem> _transactionItems;
 
     public string Message { get; init; }
     public bool IsPerformed { get; private set; }
