@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Vouchers.Core.Domain.Exceptions;
 
 namespace Vouchers.Core.Domain.UnitTests;
 
@@ -34,41 +35,37 @@ public class UnitTypeTests
     }
     
     [Fact]
-    public void IncreaseSupply_ByNotPositiveAmount_ThrowsCoreException()
+    public void IncreaseSupply_ByNotPositiveAmount_ThrowsNotPositiveAmountException()
     {
         var increaseSupplyByZeroAmount = () => _unitType.IncreaseSupply(0);
         var increaseSupplyByNegativeAmount = () => _unitType.IncreaseSupply(-1);
 
         increaseSupplyByZeroAmount
             .Should()
-            .Throw<CoreException>()
-            .WithMessage(CoreException.AmountIsNotPositive.Message);
+            .Throw<NotPositiveAmountException>();
         
         increaseSupplyByNegativeAmount
             .Should()
-            .Throw<CoreException>()
-            .WithMessage(CoreException.AmountIsNotPositive.Message);
+            .Throw<NotPositiveAmountException>();
     }
     
     [Fact]
-    public void ReduceSupply_ByNotPositiveAmount_ThrowsCoreException()
+    public void ReduceSupply_ByNotPositiveAmount_ThrowsNotPositiveAmountException()
     {
         var reduceSupplyByZeroAmount = () => _unitType.IncreaseSupply(0);
         var reduceSupplyByNegativeAmount = () => _unitType.IncreaseSupply(-1);
 
         reduceSupplyByZeroAmount
             .Should()
-            .Throw<CoreException>()
-            .WithMessage(CoreException.AmountIsNotPositive.Message);
+            .Throw<NotPositiveAmountException>();
         
         reduceSupplyByNegativeAmount
             .Should()
-            .Throw<CoreException>()
-            .WithMessage(CoreException.AmountIsNotPositive.Message);
+            .Throw<NotPositiveAmountException>();
     }
     
     [Fact]
-    public void ReduceSupply_ByAmountGreaterThenSupply_ThrowsCoreException()
+    public void ReduceSupply_ByAmountGreaterThenSupply_ThrowsAmountIsGreaterThanSupplyExceptionn()
     {
         _unitType.IncreaseSupply(1);
         var amount = _unitType.Supply + 1;
@@ -77,8 +74,7 @@ public class UnitTypeTests
 
         reduceSupplyByAmountGreaterThenSupply
             .Should()
-            .Throw<CoreException>()
-            .WithMessage(CoreException.AmountIsGreaterThanSupply.Message);
+            .Throw<AmountIsGreaterThanSupplyException>();
 
     }
 }

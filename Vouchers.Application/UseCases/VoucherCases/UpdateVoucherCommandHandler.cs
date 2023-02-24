@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Vouchers.Core.Domain;
 using Vouchers.Application.Commands.VoucherCommands;
 using Vouchers.Application.Infrastructure;
 using System.Threading.Tasks;
 using System.Threading;
+using Vouchers.Application.Abstractions;
 using Vouchers.Values.Domain;
 using Vouchers.Application.Services;
+using Unit = Vouchers.Core.Domain.Unit;
 
 namespace Vouchers.Application.UseCases.VoucherCases;
 
-internal sealed class UpdateVoucherCommandHandler : IHandler<UpdateVoucherCommand>
+internal sealed class UpdateVoucherCommandHandler : IHandler<UpdateVoucherCommand, Abstractions.Unit>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly ICultureInfoProvider _cultureInfoProvider;
@@ -27,13 +28,11 @@ internal sealed class UpdateVoucherCommandHandler : IHandler<UpdateVoucherComman
         _unitRepository = unitRepository;
     }
 
-    public async Task<Result> HandleAsync(UpdateVoucherCommand command, CancellationToken cancellation)
+    public async Task<Result<Abstractions.Unit>> HandleAsync(UpdateVoucherCommand command, CancellationToken cancellation)
     {
         var cultureInfo = _cultureInfoProvider.GetCultureInfo();
         
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
-        if (authIdentityId is null)
-            return Error.NotRegistered(cultureInfo);
 
         var value = await _voucherValueRepository.GetByIdAsync(command.VoucherValueId);
         if (value is null)
@@ -71,6 +70,6 @@ internal sealed class UpdateVoucherCommandHandler : IHandler<UpdateVoucherComman
         if(requireUpdate)
             await _unitRepository.UpdateAsync(unit);
         
-        return Result.Create();
+        return Abstractions.Unit.Value;
     }
 }

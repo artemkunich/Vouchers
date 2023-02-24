@@ -7,6 +7,7 @@ using Vouchers.Application.Infrastructure;
 using Vouchers.Values.Domain;
 using System.Threading.Tasks;
 using System.Threading;
+using Vouchers.Application.Abstractions;
 using Vouchers.Application.Dtos;
 using Vouchers.Files.Domain;
 using Vouchers.Domains.Domain;
@@ -21,13 +22,14 @@ internal sealed class CreateVoucherValueCommandHandler : IHandler<CreateVoucherV
     private readonly IReadOnlyRepository<Account,Guid> _accountRepository;
     private readonly IRepository<VoucherValue,Guid> _voucherValueRepository;
     private readonly IRepository<UnitType,Guid> _unitTypeRepository;
+    private readonly IRepository<CroppedImage, Guid> _croppedRepository;
     private readonly IAppImageService _appImageService;
     private readonly IIdentifierProvider<Guid> _identifierProvider;
     private readonly ICultureInfoProvider _cultureInfoProvider;
     
     public CreateVoucherValueCommandHandler(IAuthIdentityProvider authIdentityProvider, IAppImageService appImageService,
         IReadOnlyRepository<DomainAccount,Guid> domainAccountRepository, IReadOnlyRepository<Account,Guid> accountRepository,
-        IRepository<VoucherValue,Guid> voucherValueRepository, IRepository<UnitType,Guid> unitTypeRepository, IIdentifierProvider<Guid> identifierProvider, ICultureInfoProvider cultureInfoProvider)
+        IRepository<VoucherValue,Guid> voucherValueRepository, IRepository<UnitType,Guid> unitTypeRepository, IIdentifierProvider<Guid> identifierProvider, ICultureInfoProvider cultureInfoProvider, IRepository<CroppedImage, Guid> croppedRepository)
     {
         _authIdentityProvider = authIdentityProvider;
         _domainAccountRepository = domainAccountRepository;
@@ -36,6 +38,7 @@ internal sealed class CreateVoucherValueCommandHandler : IHandler<CreateVoucherV
         _unitTypeRepository = unitTypeRepository;
         _identifierProvider = identifierProvider;
         _cultureInfoProvider = cultureInfoProvider;
+        _croppedRepository = croppedRepository;
         _appImageService = appImageService;
     }
 
@@ -44,8 +47,6 @@ internal sealed class CreateVoucherValueCommandHandler : IHandler<CreateVoucherV
         var cultureInfo = _cultureInfoProvider.GetCultureInfo();
         
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
-        if (authIdentityId is null)
-            return Error.NotRegistered(cultureInfo);
 
         var issuerDomainAccount = await _domainAccountRepository.GetByIdAsync(command.IssuerAccountId);
         if (issuerDomainAccount?.IdentityId != authIdentityId)
@@ -55,11 +56,13 @@ internal sealed class CreateVoucherValueCommandHandler : IHandler<CreateVoucherV
         if (!issuerDomainAccount.IsIssuer)
             return Error.IssuerOperationsAreNotAllowed(cultureInfo);
 
-        CroppedImage image = null;
+        CroppedImage croppedImage = null;
         if (command.Image is not null && command.CropParameters is not null)
         {
             var imageStream = command.Image.OpenReadStream();
-            image = await _appImageService.CreateCroppedImageAsync(imageStream, command.CropParameters);
+            croppedImage = await _appImageService.CreateCroppedImageAsync(imageStream, command.CropParameters);
+            
+            await _croppedRepository.AddAsync(croppedImage);
         }
 
         var account = await _accountRepository.GetByIdAsync(command.IssuerAccountId);
@@ -70,7 +73,7 @@ internal sealed class CreateVoucherValueCommandHandler : IHandler<CreateVoucherV
 
         var value = VoucherValue.Create(unitType.Id, issuerDomainAccount.Domain.Id, issuerDomainAccount.IdentityId, command.Ticker);
         value.Description = command.Description;
-        value.ImageId = image?.Id;
+        value.ImageId = croppedImage?.Id;
         
         await _voucherValueRepository.AddAsync(value);
 

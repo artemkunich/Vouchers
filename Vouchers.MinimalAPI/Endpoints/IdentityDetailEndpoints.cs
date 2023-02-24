@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Vouchers.MinimalAPI.Filters;
 using Vouchers.Application;
+using Vouchers.Application.Abstractions;
 using Vouchers.Application.Commands.DomainAccountCommands;
 using Vouchers.Application.Commands.IdentityCommands;
 using Vouchers.Application.Dtos;
@@ -37,7 +38,7 @@ internal static class IdentityDetailEndpoints
         return Results.Ok(new { identityId });
     }
     
-    private static async Task<IResult> PutIdentityDetail(IFormParameterProvider<UpdateIdentityCommand> formParameterProvider, IHandler<UpdateIdentityCommand> handler, CancellationToken token)
+    private static async Task<IResult> PutIdentityDetail(IFormParameterProvider<UpdateIdentityCommand> formParameterProvider, IHandler<UpdateIdentityCommand,Unit> handler, CancellationToken token)
     {
         var command = formParameterProvider.GetParameter();
         

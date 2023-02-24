@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Vouchers.Application;
+using Vouchers.Application.Abstractions;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Queries;
@@ -32,8 +33,6 @@ internal sealed class DomainsQueryHandler : IHandler<DomainsQuery, IReadOnlyList
     public async Task<Result<IReadOnlyList<DomainDto>>> HandleAsync(DomainsQuery query, CancellationToken cancellation)
     {
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
-        if (authIdentityId is null)
-            return Error.NotAuthorized(_cultureInfoProvider.GetCultureInfo());
 
         var domainsQuery = _dbContext.Set<Domain>()
             .Include( domain => domain.Contract)

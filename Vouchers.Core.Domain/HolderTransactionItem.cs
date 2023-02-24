@@ -1,4 +1,5 @@
 ﻿using System;
+using Vouchers.Core.Domain.Exceptions;
 using Vouchers.Primitives;
 
 namespace Vouchers.Core.Domain;
@@ -19,18 +20,18 @@ public sealed class HolderTransactionItem : Entity<Guid>
     public static HolderTransactionItem Create(Guid id, decimal amount, AccountItem creditAccountItem, AccountItem debitAccountItem, HolderTransaction holderTransaction)
     {
         if (amount <= 0)
-            throw CoreException.AmountIsNotPositive;
+            throw new NotPositiveAmountException();
         
         if (creditAccountItem.Equals(debitAccountItem))
-            throw CoreException.CreditorAndDebtorAccountsAreTheSame;
+            throw new CreditorAndDebtorAccountsAreEqualException();
 
         if (creditAccountItem.Unit.NotEquals(debitAccountItem.Unit))
-            throw CoreException.CreditAccountAndDebitAccountHaveDifferentUnits;
+            throw new CreditAccountAndDebitAccountHaveDifferentUnitsException();
 
         var unit = creditAccountItem.Unit;
 
         if(!unit.CanBeExchanged && creditAccountItem.HolderAccount.NotEquals(unit.UnitType.IssuerAccount) && debitAccountItem.HolderAccount.NotEquals(unit.UnitType.IssuerAccount))
-            throw CoreException.ItemUnitCannotBeExchanged;
+            throw new ItemUnitCannotBeExchangedException();
 
         var newHolderTransactionItem = new HolderTransactionItem
         {

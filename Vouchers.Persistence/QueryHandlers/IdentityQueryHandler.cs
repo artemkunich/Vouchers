@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Vouchers.Application;
+using Vouchers.Application.Abstractions;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.UseCases;
 using Vouchers.Identities.Domain;

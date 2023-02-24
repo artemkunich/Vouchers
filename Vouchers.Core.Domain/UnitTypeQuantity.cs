@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using Vouchers.Core.Domain.Exceptions;
 
 namespace Vouchers.Core.Domain;
 
@@ -13,7 +14,7 @@ public sealed class UnitTypeQuantity
     public static UnitTypeQuantity Create(decimal amount, UnitType unitType)
     {
         if(amount < 0)
-            throw CoreException.AmountIsNegative;
+            throw new NegativeAmountException();
         
         return new()
         {
@@ -26,7 +27,7 @@ public sealed class UnitTypeQuantity
     public UnitTypeQuantity Add(UnitQuantity unitQuantity)
     {
         if (UnitType.NotEquals(unitQuantity.Unit.UnitType))
-            throw CoreException.CannotOperateWithDifferentUnitTypes;
+            throw new DifferentUnitTypesException();
 
         return Create(Amount + unitQuantity.Amount, UnitType);
     }

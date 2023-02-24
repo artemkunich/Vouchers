@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using Vouchers.Core.Domain.Exceptions;
 using Vouchers.Primitives;
 
 namespace Vouchers.Core.Domain;
@@ -17,21 +18,21 @@ public sealed class UnitType : AggregateRoot<Guid>
         IssuerAccount = issuerAccount,
     };
 
-    public void IncreaseSupply(decimal amount, CultureInfo cultureInfo = null)
+    public void IncreaseSupply(decimal amount)
     {
         if (amount <= 0)
-            throw CoreException.AmountIsNotPositive;
+            throw new NotPositiveAmountException();
         Supply += amount;
 
         IssuerAccount.IncreaseSupply(amount);
     }
 
-    public void ReduceSupply(decimal amount, CultureInfo cultureInfo = null)
+    public void ReduceSupply(decimal amount)
     {
         if (amount <= 0)
-            throw CoreException.AmountIsNotPositive;
+            throw new NotPositiveAmountException();
         if (Supply < amount)
-            throw CoreException.AmountIsGreaterThanSupply;
+            throw new AmountIsGreaterThanSupplyException();
         Supply -= amount;
 
         IssuerAccount.ReduceSupply(amount);

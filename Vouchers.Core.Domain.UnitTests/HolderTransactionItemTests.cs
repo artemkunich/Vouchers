@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Vouchers.Core.Domain.Exceptions;
 
 namespace Vouchers.Core.Domain.UnitTests;
 
@@ -27,7 +28,7 @@ public class HolderTransactionItemTests
     }
 
     [Fact]
-    public void Create_WithNotPositiveAmount_ThrowsCoreException()
+    public void Create_WithNotPositiveAmount_ThrowsNotPositiveAmountException()
     {
         var issuerTransaction = IssuerTransaction.Create(Guid.NewGuid(), DateTime.Now, _issuerAccountItem, 1);
         issuerTransaction.Perform();
@@ -42,13 +43,11 @@ public class HolderTransactionItemTests
 
         createWithZeroAmount
             .Should()
-            .Throw<CoreException>()
-            .WithMessage(CoreException.AmountIsNotPositive.Message);
+            .Throw<NotPositiveAmountException>();
         
         createWithNegativeAmount
             .Should()
-            .Throw<CoreException>()
-            .WithMessage(CoreException.AmountIsNotPositive.Message);
+            .Throw<NotPositiveAmountException>();
         
     }
 
@@ -67,8 +66,7 @@ public class HolderTransactionItemTests
         
         createWithIssuerAccountItems
             .Should()
-            .Throw<CoreException>()
-            .WithMessage(CoreException.CreditorAndDebtorAccountsAreTheSame.Message);
+            .Throw<CreditorAndDebtorAccountsAreEqualException>();
         
         HolderTransactionItem.Create(Guid.NewGuid(), 1, _issuerAccountItem, holderAccountItem, transactionFromIssuerToHolder);
         transactionFromIssuerToHolder.Perform();
@@ -78,12 +76,11 @@ public class HolderTransactionItemTests
         
         createWithBobAccountItems
             .Should()
-            .Throw<CoreException>()
-            .WithMessage(CoreException.CreditorAndDebtorAccountsAreTheSame.Message);
+            .Throw<CreditorAndDebtorAccountsAreEqualException>();
     }
     
     [Fact]
-    public void Create_WithAccountItemsWithAnotherUnit_ThrowsCoreException()
+    public void Create_WithAccountItemsWithAnotherUnit_ThrowsCreditAccountAndDebitAccountHaveDifferentUnitsException()
     {
         var anotherUnitValidFrom = DateTime.Now;
         var anotherUnitValidTo = anotherUnitValidFrom.AddHours(1);
@@ -100,12 +97,11 @@ public class HolderTransactionItemTests
 
         createWithAnotherUnit
             .Should()
-            .Throw<CoreException>()
-            .WithMessage(CoreException.CreditAccountAndDebitAccountHaveDifferentUnits.Message);
+            .Throw<CreditAccountAndDebitAccountHaveDifferentUnitsException>();
     }
     
     [Fact]
-    public void Create_FromHolderToAnotherHolderWithNotChangeableUnit_ThrowsCoreException()
+    public void Create_FromHolderToAnotherHolderWithNotChangeableUnit_ThrowsItemUnitCannotBeExchangedException()
     {
         var notChangeableUnitValidFrom = DateTime.Now;
         var notChangeableUnitValidTo = notChangeableUnitValidFrom.AddHours(1);
@@ -132,13 +128,12 @@ public class HolderTransactionItemTests
         var createTransactionFromHolderToAnotherHolder = () => HolderTransactionItem.Create(Guid.NewGuid(), 1, holderAccountItem, anotherHolderAccountItem, transactionFromHolderToAnotherHolder);
         createTransactionFromHolderToAnotherHolder
             .Should()
-            .Throw<CoreException>()
-            .WithMessage(CoreException.ItemUnitCannotBeExchanged.Message);
+            .Throw<ItemUnitCannotBeExchangedException>();
         
     }
     
     [Fact]
-    public void Create_WithTheSameIdInTheSameTransaction_ThrowsCoreException()
+    public void Create_WithTheSameIdInTheSameTransaction_ThrowsTransactionAlreadyContainsItemException()
     {
         var issuerTransaction = IssuerTransaction.Create(Guid.NewGuid(), DateTime.Now, _issuerAccountItem, 1);
         issuerTransaction.Perform();
@@ -155,12 +150,11 @@ public class HolderTransactionItemTests
         createWithAmount();
         createWithAmount
             .Should()
-            .Throw<CoreException>()
-            .WithMessage(CoreException.TransactionAlreadyContainsItem.Message);
+            .Throw<TransactionAlreadyContainsItemException>();
     }
     
     [Fact]
-    public void Create_WithExpiredUnit_ThrowsCoreException()
+    public void Create_WithExpiredUnit_ThrowsTransactionContainsExpiredUnitsException()
     {
         var issuerTransaction = IssuerTransaction.Create(Guid.NewGuid(), DateTime.Now, _issuerAccountItem, 1);
         issuerTransaction.Perform();
@@ -179,7 +173,6 @@ public class HolderTransactionItemTests
         
         createWithAmount
             .Should()
-            .Throw<CoreException>()
-            .WithMessage(CoreException.TransactionContainsExpiredUnits.Message);
+            .Throw<TransactionContainsExpiredUnitsException>();
     }
 }

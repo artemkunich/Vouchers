@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Vouchers.Core.Domain.Exceptions;
 
 namespace Vouchers.Core.Domain.UnitTests;
 
@@ -20,17 +21,16 @@ public class UnitTypeQuantityTests
     }
 
     [Fact]
-    public void Create_WithNegativeAmount_ThrowsCoreException()
+    public void Create_WithNegativeAmount_ThrowsNegativeAmountException()
     {
         var createUnitQuantityWithNegativeAmount = () => UnitTypeQuantity.Create(-1, _unitType);
         createUnitQuantityWithNegativeAmount
             .Should()
-            .Throw<CoreException>()
-            .WithMessage(CoreException.AmountIsNegative.Message);
+            .Throw<NegativeAmountException>();
     }
 
     [Fact]
-    public void Add_UnitQuantityWithAnotherUnitType_ThrowsCoreException()
+    public void Add_UnitQuantityWithAnotherUnitType_ThrowsDifferentUnitTypesException()
     {
         var anotherUnitTypeId = Guid.NewGuid();
         var anotherUnitType = UnitType.Create(anotherUnitTypeId, _issuerAccount);
@@ -44,8 +44,7 @@ public class UnitTypeQuantityTests
         var addWithDifferentUnitType = () => _unitTypeQuantity.Add(anotherUnitQuantity);
         addWithDifferentUnitType
             .Should()
-            .Throw<CoreException>()
-            .WithMessage(CoreException.CannotOperateWithDifferentUnitTypes.Message);
+            .Throw<DifferentUnitTypesException>();
     }
     
     [Fact]

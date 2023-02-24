@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Vouchers.Core.Domain.Exceptions;
 
 namespace Vouchers.Core.Domain.UnitTests;
 
@@ -32,48 +33,43 @@ public class AccountTests
     }
     
     [Fact]
-    public void IncreaseSupply_ByNotPositiveAmount_ThrowsCoreException()
+    public void IncreaseSupply_ByNotPositiveAmount_ThrowsNotPositiveAmountException()
     {
         var increaseSupplyByZeroAmount = () => _account.IncreaseSupply(0);
         var increaseSupplyByNegativeAmount = () => _account.IncreaseSupply(-1);
         
         increaseSupplyByZeroAmount
             .Should()
-            .Throw<CoreException>()
-            .WithMessage(CoreException.AmountIsNotPositive.Message);
+            .Throw<NotPositiveAmountException>();
         
         increaseSupplyByNegativeAmount
             .Should()
-            .Throw<CoreException>()
-            .WithMessage(CoreException.AmountIsNotPositive.Message);
+            .Throw<NotPositiveAmountException>();
     }
 
     [Fact]
-    public void ReduceSupply_ByNotPositiveAmount_ThrowsCoreException()
+    public void ReduceSupply_ByNotPositiveAmount_ThrowsNotPositiveAmountException()
     {
         var reduceSupplyByZeroAmount = () => _account.ReduceSupply(0);
         var reduceSupplyByNegativeAmount = () => _account.ReduceSupply(-1);
         
         reduceSupplyByZeroAmount
             .Should()
-            .Throw<CoreException>()
-            .WithMessage(CoreException.AmountIsNotPositive.Message);
+            .Throw<NotPositiveAmountException>();
         
         reduceSupplyByNegativeAmount
             .Should()
-            .Throw<CoreException>()
-            .WithMessage(CoreException.AmountIsNotPositive.Message);
+            .Throw<NotPositiveAmountException>();
     }
     
     [Fact]
-    public void ReduceSupply_ByAmountGreaterThenSupply_ThrowsCoreException()
+    public void ReduceSupply_ByAmountGreaterThenSupply_ThrowsAmountIsGreaterThanSupplyException()
     {
         _account.IncreaseSupply(1);
         
         var reduceSupplyByAmountGreaterThenSupply = () => _account.ReduceSupply(_account.Supply + 1);
         reduceSupplyByAmountGreaterThenSupply
             .Should()
-            .Throw<CoreException>()
-            .WithMessage(CoreException.AmountIsGreaterThanSupply.Message);
+            .Throw<AmountIsGreaterThanSupplyException>();
     }
 }

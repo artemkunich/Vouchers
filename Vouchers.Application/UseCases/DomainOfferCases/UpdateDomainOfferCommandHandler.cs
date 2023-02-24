@@ -4,15 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Vouchers.Application.Abstractions;
 using Vouchers.Application.Commands.DomainOfferCommands;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Services;
-using Vouchers.Core.Domain;
 using Vouchers.Domains.Domain;
+using Unit = Vouchers.Core.Domain.Unit;
 
 namespace Vouchers.Application.UseCases.DomainOfferCases;
 
-internal sealed class UpdateDomainOfferCommandHandler : IHandler<UpdateDomainOfferCommand>
+internal sealed class UpdateDomainOfferCommandHandler : IHandler<UpdateDomainOfferCommand,Abstractions.Unit>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IRepository<DomainOffer,Guid> _domainOfferRepository;
@@ -25,14 +26,9 @@ internal sealed class UpdateDomainOfferCommandHandler : IHandler<UpdateDomainOff
         _cultureInfoProvider = cultureInfoProvider;
     }
 
-    public async Task<Result> HandleAsync(UpdateDomainOfferCommand command, CancellationToken cancellation)
+    public async Task<Result<Abstractions.Unit>> HandleAsync(UpdateDomainOfferCommand command, CancellationToken cancellation)
     {
         var cultureInfo = _cultureInfoProvider.GetCultureInfo();
-        
-        var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
-        if (authIdentityId is null)
-            return Error.NotRegistered(cultureInfo);
-        
         var domainOffer = await _domainOfferRepository.GetByIdAsync(command.Id);
 
         if (command.Terminate == true)
@@ -43,7 +39,7 @@ internal sealed class UpdateDomainOfferCommandHandler : IHandler<UpdateDomainOff
                 domainOffer.ValidTo = domainOffer.ValidFrom;
 
             await _domainOfferRepository.UpdateAsync(domainOffer);
-            return Result.Create();
+            return Abstractions.Unit.Value;
         } 
 
         if(command.Description is not null && command.Description != domainOffer.Description)
@@ -53,7 +49,7 @@ internal sealed class UpdateDomainOfferCommandHandler : IHandler<UpdateDomainOff
         }
 
         var requireUpdate = false;
-        var result = Result.Create();
+        var result = Result.Create(Abstractions.Unit.Value);
         
         if (command.ValidFrom is not null && command.ValidFrom != domainOffer.ValidFrom)
             result

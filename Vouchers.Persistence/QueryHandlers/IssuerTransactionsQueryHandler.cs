@@ -10,6 +10,7 @@ using Vouchers.Application.Queries;
 using Vouchers.Application.UseCases;
 using System.Threading;
 using Vouchers.Application;
+using Vouchers.Application.Abstractions;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Services;
 using Vouchers.Core.Domain;
@@ -33,10 +34,8 @@ internal sealed class IssuerTransactionsQueryHandler : IHandler<IssuerTransactio
     public async Task<Result<IReadOnlyList<IssuerTransactionDto>>> HandleAsync(IssuerTransactionsQuery query, CancellationToken cancellation)
     {
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
-        if (authIdentityId is null)
-            return Error.NotAuthorized(_cultureInfoProvider.GetCultureInfo());
-        
-        return await GetQuery(query, authIdentityId.Value).ToListAsync(cancellation);
+
+        return await GetQuery(query, authIdentityId).ToListAsync(cancellation);
     }
             
     IQueryable<IssuerTransactionDto> GetQuery(IssuerTransactionsQuery query, Guid authIdentityId) 

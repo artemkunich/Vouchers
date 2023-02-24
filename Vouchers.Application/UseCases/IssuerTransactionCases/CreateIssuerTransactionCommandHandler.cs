@@ -2,12 +2,14 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Vouchers.Application.Abstractions;
 using Vouchers.Core.Domain;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Domains.Domain;
 using Vouchers.Application.Commands.IssuerTransactionCommands;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Services;
+using Unit = Vouchers.Core.Domain.Unit;
 
 namespace Vouchers.Application.UseCases.IssuerTransactionCases;
 
@@ -43,8 +45,6 @@ internal sealed class CreateIssuerTransactionCommandHandler : IHandler<CreateIss
         var cultureInfo = _cultureInfoProvider.GetCultureInfo();
         
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
-        if (authIdentityId is null)
-            return Error.NotRegistered(cultureInfo);
 
         var issuerDomainAccount = await _domainAccountRepository.GetByIdAsync(command.IssuerAccountId);
         if (issuerDomainAccount?.IdentityId != authIdentityId)
@@ -67,7 +67,7 @@ internal sealed class CreateIssuerTransactionCommandHandler : IHandler<CreateIss
                 accountItem = AccountItem.Create(accountItemId, issuerAccount, unit);
             }
             else
-                throw new ApplicationException(Properties.Resources.IssuerDoesNotHaveAccountItemForUnit, issuerDomainAccount.Id, command.VoucherId);
+                return Error.IssuerDoesNotHaveAccountItemForUnit(cultureInfo);
         }
 
         var transactionId = _identifierProvider.CreateNewId();

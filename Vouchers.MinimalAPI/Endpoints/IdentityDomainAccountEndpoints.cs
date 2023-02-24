@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Vouchers.Application.Abstractions;
 using Vouchers.MinimalAPI.Filters;
 using Vouchers.Application.Commands.DomainAccountCommands;
 using Vouchers.Application.Dtos;

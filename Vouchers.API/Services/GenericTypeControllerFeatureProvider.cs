@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Vouchers.API.Controllers;
+using Vouchers.Application.Abstractions;
 using Vouchers.Application.Queries;
 using Vouchers.Application.UseCases;
 using Vouchers.Persistence;
@@ -66,33 +67,6 @@ public class GenericTypeControllerFeatureProvider : IApplicationFeatureProvider<
                     );
                 }
                 
-            }
-        }
-        
-        candidates = applicationAssembly.GetTypes().Union(persistenceAssembly.GetTypes()).Where(t =>
-            !t.IsAbstract && !t.IsInterface && !t.IsGenericType &&
-            t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IHandler<>))).ToArray();
-        
-        foreach (var candidate in candidates)
-        {
-            var candidateInterface = candidate.GetInterfaces().First(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IHandler<>));
-            var genericArguments = candidateInterface.GetGenericArguments().ToArray();
-            
-            var genericRequestType = genericArguments.First();
-
-            if (!genericRequestType.Name.EndsWith("Command")) continue;
-            
-            if (genericRequestType.GetProperties().Select(p => p.PropertyType).Any(t => t.IsAssignableTo(typeof(IFormFile))))
-            {
-                feature.Controllers.Add(
-                    typeof(GenericCommandFormController<>).MakeGenericType(genericRequestType).GetTypeInfo()
-                );
-            }
-            else
-            {
-                feature.Controllers.Add(
-                    typeof(GenericCommandJsonController<>).MakeGenericType(genericRequestType).GetTypeInfo()
-                );
             }
         }
     }

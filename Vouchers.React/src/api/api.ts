@@ -7,8 +7,8 @@ import { UpdateDomainAccountCommand, UpdateDomainDetailCommand } from '../types/
 
 export const api = {
     getIdentityDetail: (token: User, query: any) => getByQuery("IdentityDetail", serializeToQuery(query), token.access_token),
-    postIdentityDetail: (token: User, form: FormData) => postForm("IdentityDetail", form, token.access_token),
-    putIdentityDetail: (token: User, form: FormData) => putForm("IdentityDetail", form, token.access_token),
+    postIdentityDetail: (token: User, form: FormData) => postForm("Identity", form, token.access_token),
+    putIdentityDetail: (token: User, form: FormData) => putForm("Identity", form, token.access_token),
 
     getDomainOffers: (token: User, query: any) => getByQuery("DomainOffers", serializeToQuery(query), token.access_token),
     postDomainOffer: (token: User, offer: any) => postJson("DomainOffers", offer, token.access_token),
@@ -29,14 +29,14 @@ export const api = {
     putDomainAccount: (token: User, command: UpdateDomainAccountCommand): Promise<boolean | undefined> => putJson("DomainAccounts", command, token.access_token),
 
     getValues: (token: User, query: any) => getByQuery("IssuerValues", serializeToQuery(query), token.access_token),
-    postValue: (token: User, form: FormData) => postForm("IssuerValues", form, token.access_token),
-    putValue: (token: User, form: FormData) => putForm("IssuerValues", form, token.access_token),
+    postValue: (token: User, form: FormData) => postForm("VoucherValue", form, token.access_token),
+    putValue: (token: User, form: FormData) => putForm("VoucherValue", form, token.access_token),
 
     getIssuerVouchers: (token: User, query: any) => getByQuery("IssuerVouchers", serializeToQuery(query), token.access_token),
-    postIssuerVoucher: (token: User, issuerVoucher: any) => postJson("IssuerVouchers", issuerVoucher, token.access_token),
-    putIssuerVoucher: (token: User, issuerVoucher: any) => putJson("IssuerVouchers", issuerVoucher, token.access_token),
+    postIssuerVoucher: (token: User, issuerVoucher: any) => postJson("Voucher", issuerVoucher, token.access_token),
+    putIssuerVoucher: (token: User, issuerVoucher: any) => putJson("Voucher", issuerVoucher, token.access_token),
 
-    postIssuerTransaction: (token: User, transaction: any) => postJson("IssuerTransactions", transaction, token.access_token),
+    postIssuerTransaction: (token: User, transaction: any) => postJson("IssuerTransaction", transaction, token.access_token),
     getValueDetail: (token: User, id: string) => getById("VoucherValueDetail", id, token.access_token),
 
     getHolderValues: (token: User, query: any) => getByQuery("HolderValues", serializeToQuery(query), token.access_token),

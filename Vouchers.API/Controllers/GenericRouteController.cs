@@ -3,20 +3,20 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Vouchers.API.Services;
-using Vouchers.Application.UseCases;
+using Vouchers.Infrastructure.Pipeline;
 
 namespace Vouchers.API.Controllers;
 
 [Authorize]
 public class GenericRouteController<TQuery, TDto> : Controller where TDto : class 
 {
-    private readonly IHandler<TQuery,TDto> _handler;
+    private readonly IPipeline<TQuery,TDto> _pipeline;
 
-    public GenericRouteController(IHandler<TQuery,TDto> handler)
+    public GenericRouteController(IPipeline<TQuery,TDto> pipeline)
     {
-        _handler = handler;
+        _pipeline = pipeline;
     }
     
     public async Task<IActionResult> HandleQuery([FromRoute]TQuery query, CancellationToken cancellationToken) => 
-        this.FromResult(await _handler.HandleAsync(query,cancellationToken));
+        this.FromResult(await _pipeline.HandleAsync(query,cancellationToken));
 }

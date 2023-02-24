@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Vouchers.Application.Abstractions;
 using Vouchers.Application.Commands.DomainOfferCommands;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
@@ -29,12 +30,6 @@ internal sealed class CreateDomainOfferCommandHandler : IHandler<CreateDomainOff
 
     public async Task<Result<IdDto<Guid>>> HandleAsync(CreateDomainOfferCommand command, CancellationToken cancellation)
     {
-        var cultureInfo = _cultureInfoProvider.GetCultureInfo();
-
-        var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
-        if (authIdentityId is null)
-            return Error.NotRegistered(cultureInfo);
-        
         var currency = Enum.Parse<Currency>(command.Currency);
         var currencyAmount = CurrencyAmount.Create(currency, command.Amount);
         var invoicePeriod = Enum.Parse<InvoicePeriod>(command.InvoicePeriod);

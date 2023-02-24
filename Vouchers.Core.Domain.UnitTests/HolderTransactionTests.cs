@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Vouchers.Core.Domain.Exceptions;
 
 namespace Vouchers.Core.Domain.UnitTests;
 
@@ -38,8 +39,7 @@ public class HolderTransactionTests
 
         createTransactionFromIssuerToIssuer
             .Should()
-            .Throw<CoreException>()
-            .WithMessage(CoreException.CreditorAndDebtorAccountsAreTheSame.Message);
+            .Throw<CreditorAndDebtorAccountsAreEqualException>();
         
         var holderAccountId = Guid.NewGuid();
         var holderAccount = Account.Create(holderAccountId, DateTime.Now);
@@ -52,8 +52,7 @@ public class HolderTransactionTests
         var createTransactionFromHolderHolder = () => HolderTransaction.Create(Guid.NewGuid(), DateTime.Now, holderAccount, holderAccount, _unitType, "");
         createTransactionFromHolderHolder
             .Should()
-            .Throw<CoreException>()
-            .WithMessage(CoreException.CreditorAndDebtorAccountsAreTheSame.Message);
+            .Throw<CreditorAndDebtorAccountsAreEqualException>();
 
     }
     

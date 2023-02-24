@@ -1,17 +1,18 @@
 using System.Threading;
 using System.Threading.Tasks;
+using Vouchers.Application.Abstractions;
 using Vouchers.Identities.Domain.DomainEvents;
 
 namespace Vouchers.Application.UseCases.IdentityCases;
 
-public class IdentityUpdatedEventHandler : IHandler<IdentityUpdatedDomainEvent>
+public class IdentityUpdatedEventHandler : IHandler<IdentityUpdatedDomainEvent,Unit>
 {
     public IdentityUpdatedEventHandler()
     {
     }
     
-    public async Task<Result> HandleAsync(IdentityUpdatedDomainEvent @event, CancellationToken cancellation)
+    public async Task<Result<Unit>> HandleAsync(IdentityUpdatedDomainEvent @event, CancellationToken cancellation)
     {
-        return Result.Create();
+        return Unit.Value;
     }
 }

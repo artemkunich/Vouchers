@@ -4,12 +4,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Vouchers.Application.UseCases;
-
-public interface IHandler<in TRequest>
-{
-    Task<Result> HandleAsync(TRequest request, CancellationToken cancellation);
-}
+namespace Vouchers.Application.Abstractions;
 
 public interface IHandler<in TRequest, TResponse>
 {

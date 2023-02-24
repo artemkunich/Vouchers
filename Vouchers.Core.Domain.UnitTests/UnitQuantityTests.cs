@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Vouchers.Core.Domain.Exceptions;
 using Xunit.Sdk;
 
 namespace Vouchers.Core.Domain.UnitTests;
@@ -41,19 +42,17 @@ public class UnitQuantityTests
     }
     
     [Fact]
-    public void Create_WithNotPositiveAmount_ThrowsCoreException()
+    public void Create_WithNotPositiveAmount_ThrowsNotPositiveAmountException()
     {
         var createUnitQuantityByZeroAmount = () => UnitQuantity.Create(0, _unit);
         var createUnitQuantityByNegativeAmount = () => UnitQuantity.Create(-1, _unit);
 
         createUnitQuantityByZeroAmount
             .Should()
-            .Throw<CoreException>()
-            .WithMessage(CoreException.AmountIsNotPositive.Message);
+            .Throw<NotPositiveAmountException>();
         
         createUnitQuantityByNegativeAmount
             .Should()
-            .Throw<CoreException>()
-            .WithMessage(CoreException.AmountIsNotPositive.Message);
+            .Throw<NotPositiveAmountException>();
     }
 }

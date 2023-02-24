@@ -2,7 +2,7 @@ using System;
 using System.Globalization;
 using Vouchers.Application.UseCases;
 
-namespace Vouchers.Application;
+namespace Vouchers.Application.Abstractions;
 
 public class Error : IEquatable<Error>
 {
@@ -59,10 +59,7 @@ public class Error : IEquatable<Error>
     
     public static Error OperationIsNotAllowed(CultureInfo cultureInfo = null) => 
         Create("OperationIsNotAllowed", cultureInfo);
-    
-    public static Error NotAuthorized(CultureInfo cultureInfo = null) => 
-        Create("NotAuthorized", cultureInfo);
-    
+
     public static Error NotRegistered(CultureInfo cultureInfo = null) => 
         Create("NotRegistered", cultureInfo);
     
@@ -124,12 +121,16 @@ public class Error : IEquatable<Error>
     public static Error IssuerAccountDoesNotExist(CultureInfo cultureInfo = null) => 
         Create ("IssuerAccountDoesNotExist", cultureInfo);
     
+    public static Error IssuerDoesNotHaveAccountItemForUnit(CultureInfo cultureInfo = null) => 
+        Create ("IssuerDoesNotHaveAccountItemForUnit", cultureInfo);
+    
     public static Error VoucherDoesNotExist(CultureInfo cultureInfo = null) => 
         Create ("VoucherDoesNotExist", cultureInfo);
     
     public static Error IssuerOperationsAreNotAllowed(CultureInfo cultureInfo = null) => 
         Create ("IssuerOperationsAreNotAllowed", cultureInfo);
     
-    
-    
+    public static Error ImageDoesNotExist(CultureInfo cultureInfo = null) => 
+        Create ("ImageDoesNotExist", cultureInfo);
+
 }

@@ -4,7 +4,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Vouchers.Application;
+namespace Vouchers.Application.Abstractions;
 
 public class Result<TValue> : Result
 {

@@ -9,6 +9,7 @@ using Vouchers.Application.UseCases;
 using Vouchers.Application.Services;
 using System.Threading;
 using Vouchers.Application;
+using Vouchers.Application.Abstractions;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Core.Domain;
 using Vouchers.Domains.Domain;
@@ -33,10 +34,8 @@ internal sealed class HolderTransactionRequestsQueryHandler : IHandler<HolderTra
     public async Task<Result<IReadOnlyList<HolderTransactionRequestDto>>> HandleAsync(HolderTransactionRequestsQuery query, CancellationToken cancellation)
     {
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
-        if (authIdentityId is null)
-            return Error.NotAuthorized(_cultureInfoProvider.GetCultureInfo());
-        
-        return await GetQuery(query, authIdentityId.Value).ToListAsync(cancellation);
+
+        return await GetQuery(query, authIdentityId).ToListAsync(cancellation);
     }
 
     private IQueryable<HolderTransactionRequestDto> GetQuery(HolderTransactionRequestsQuery query, Guid authIdentityId) {

@@ -15,6 +15,7 @@ using Vouchers.Application.Queries;
 using Vouchers.Application.UseCases;
 using System.Threading;
 using Vouchers.Application;
+using Vouchers.Application.Abstractions;
 using Vouchers.Application.Services;
 
 namespace Vouchers.Persistence.QueryHandlers;
@@ -35,10 +36,8 @@ internal sealed class IdentityDomainOffersQueryHandler : IHandler<IdentityDomain
     public async Task<Result<IReadOnlyList<DomainOfferDto>>> HandleAsync(IdentityDomainOffersQuery query, CancellationToken cancellation)
     {
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
-        if (authIdentityId is null)
-            return Error.NotAuthorized(_cultureInfoProvider.GetCultureInfo());
-        
-        return await GetQuery(query, authIdentityId.Value).ToListAsync(cancellation);
+
+        return await GetQuery(query, authIdentityId).ToListAsync(cancellation);
     }
             
 

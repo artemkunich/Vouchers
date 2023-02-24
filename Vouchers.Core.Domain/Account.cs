@@ -1,4 +1,5 @@
 ﻿using System;
+using Vouchers.Core.Domain.Exceptions;
 using Vouchers.Primitives;
 
 namespace Vouchers.Core.Domain;
@@ -17,7 +18,7 @@ public sealed class Account : AggregateRoot<Guid>
     public void IncreaseSupply(decimal amount) 
     { 
         if(amount <= 0)
-            throw CoreException.AmountIsNotPositive;
+            throw new NotPositiveAmountException();
 
         Supply += amount;
     }
@@ -25,10 +26,10 @@ public sealed class Account : AggregateRoot<Guid>
     public void ReduceSupply(decimal amount)
     {
         if (amount <= 0)
-            throw CoreException.AmountIsNotPositive;
+            throw new NotPositiveAmountException();
 
         if (Supply < amount)
-            throw CoreException.AmountIsGreaterThanSupply;
+            throw new AmountIsGreaterThanSupplyException();
 
         Supply -= amount;
     }

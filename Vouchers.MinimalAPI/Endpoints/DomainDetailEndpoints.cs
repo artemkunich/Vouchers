@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Vouchers.Application.Abstractions;
 using Vouchers.Application.Commands.DomainCommands;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Queries;
@@ -23,7 +24,7 @@ internal static class DomainDetailEndpoints
         return Results.Ok(result);
     }
     
-    private static async Task<IResult> PutDomainDetail(IFormParameterProvider<UpdateDomainDetailCommand> formParameterProvider, IHandler<UpdateDomainDetailCommand> handler, HttpContext ctx, CancellationToken token)
+    private static async Task<IResult> PutDomainDetail(IFormParameterProvider<UpdateDomainDetailCommand> formParameterProvider, IHandler<UpdateDomainDetailCommand,Unit> handler, HttpContext ctx, CancellationToken token)
     {
         var command = formParameterProvider.GetParameter();
         await handler.HandleAsync(command, token);

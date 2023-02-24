@@ -3,13 +3,14 @@ using Vouchers.Core.Domain;
 using Vouchers.Application.Infrastructure;
 using System.Threading.Tasks;
 using System.Threading;
+using Vouchers.Application.Abstractions;
 using Vouchers.Domains.Domain;
 using Vouchers.Application.Commands.HolderTransactionRequestCommands;
 using Vouchers.Application.Services;
 
 namespace Vouchers.Application.UseCases.HolderTransactionRequestCases;
 
-internal sealed class DeleteHolderTransactionRequestCommandHandler : IHandler<DeleteHolderTransactionRequestCommand>
+internal sealed class DeleteHolderTransactionRequestCommandHandler : IHandler<DeleteHolderTransactionRequestCommand, Abstractions.Unit>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IReadOnlyRepository<DomainAccount,Guid> _domainAccountRepository;
@@ -25,13 +26,11 @@ internal sealed class DeleteHolderTransactionRequestCommandHandler : IHandler<De
         _cultureInfoProvider = cultureInfoProvider;
     }
 
-    public async Task<Result> HandleAsync(DeleteHolderTransactionRequestCommand command, CancellationToken cancellation)
+    public async Task<Result<Abstractions.Unit>> HandleAsync(DeleteHolderTransactionRequestCommand command, CancellationToken cancellation)
     {
         var cultureInfo = _cultureInfoProvider.GetCultureInfo();
         
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
-        if (authIdentityId is null)
-            return Error.NotRegistered(cultureInfo);
 
         var transactionRequest = await _holderTransactionRequestRepository.GetByIdAsync(command.HolderTransactionRequestId);
         if (transactionRequest is null)
@@ -46,6 +45,6 @@ internal sealed class DeleteHolderTransactionRequestCommandHandler : IHandler<De
 
         await _holderTransactionRequestRepository.RemoveAsync(transactionRequest);
         
-        return Result.Create();
+        return Abstractions.Unit.Value;
     }
 }

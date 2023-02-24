@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Vouchers.Core.Domain.Exceptions;
 
 namespace Vouchers.Core.Domain.UnitTests;
 
@@ -41,7 +42,7 @@ public class UnitTests
     }
     
     [Fact]
-    public void Create_WithValidToLessThenNow_ThrowsCoreException()
+    public void Create_WithValidToLessThenNow_ThrowsValidToIsLessThanCurrentDateTimeException()
     {
         var currentDateTime = DateTime.Now;
         var validFrom = currentDateTime.AddHours(-1);
@@ -51,12 +52,11 @@ public class UnitTests
         var createUnitWithValidToLessThenNow = () => Unit.Create(unitId, validFrom, validTo, currentDateTime, true, _unitType);
         createUnitWithValidToLessThenNow
             .Should()
-            .Throw<CoreException>()
-            .WithMessage(CoreException.ValidToIsLessThanToday.Message);
+            .Throw<ValidToIsLessThanCurrentDateTimeException>();
     }
     
     [Fact]
-    public void Create_WithValidToLessThenValidFrom_ThrowsCoreException()
+    public void Create_WithValidToLessThenValidFrom_ThrowsValidFromIsGreaterThanValidToException()
     {
         var currentDateTime = DateTime.Now;
         var validTo = currentDateTime.AddMinutes(1);
@@ -66,54 +66,48 @@ public class UnitTests
         var createUnitWithValidToLessThenThenValidFrom = () => Unit.Create(unitId, validFrom, validTo, currentDateTime, true, _unitType);
         createUnitWithValidToLessThenThenValidFrom
             .Should()
-            .Throw<CoreException>()
-            .WithMessage(CoreException.ValidFromIsGreaterThanValidTo.Message);
+            .Throw<ValidFromIsGreaterThanValidToException>();
     }
     
     [Fact]
-    public void IncreaseSupply_ByNotPositiveAmount_ThrowsCoreException()
+    public void IncreaseSupply_ByNotPositiveAmount_ThrowsNotPositiveAmountException()
     {
         var increaseSupplyByZeroAmount = () => _unit.IncreaseSupply(0);
         var increaseSupplyByNegativeAmount = () => _unit.IncreaseSupply(-1);
 
         increaseSupplyByZeroAmount
             .Should()
-            .Throw<CoreException>()
-            .WithMessage(CoreException.AmountIsNotPositive.Message);
+            .Throw<NotPositiveAmountException>();
         
         increaseSupplyByNegativeAmount
             .Should()
-            .Throw<CoreException>()
-            .WithMessage(CoreException.AmountIsNotPositive.Message);
+            .Throw<NotPositiveAmountException>();
     }
     
     [Fact]
-    public void ReduceSupply_ByNotPositiveAmount_ThrowsCoreException()
+    public void ReduceSupply_ByNotPositiveAmount_ThrowsNotPositiveAmountException()
     {
         var reduceSupplyByZeroAmount = () => _unit.ReduceSupply(0);
         var reduceSupplyByNegativeAmount = () => _unit.ReduceSupply(-1);
 
         reduceSupplyByZeroAmount
             .Should()
-            .Throw<CoreException>()
-            .WithMessage(CoreException.AmountIsNotPositive.Message);
+            .Throw<NotPositiveAmountException>();
         
         reduceSupplyByNegativeAmount
             .Should()
-            .Throw<CoreException>()
-            .WithMessage(CoreException.AmountIsNotPositive.Message);
+            .Throw<NotPositiveAmountException>();
     }
     
     [Fact]
-    public void ReduceSupply_ByAmountGreaterThenSupply_ThrowsCoreException()
+    public void ReduceSupply_ByAmountGreaterThenSupply_ThrowsAmountIsGreaterThanSupplyException()
     {
         _unit.IncreaseSupply(1);
         
         var reduceSupplyByAmountGreaterThenSupply = () => _unit.ReduceSupply(_unit.Supply + 1);
         reduceSupplyByAmountGreaterThenSupply
             .Should()
-            .Throw<CoreException>()
-            .WithMessage(CoreException.AmountIsGreaterThanSupply.Message);
+            .Throw<AmountIsGreaterThanSupplyException>();
         
     }
 }

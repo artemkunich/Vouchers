@@ -20,11 +20,11 @@ public class AuthIdentityProvider : IAuthIdentityProvider
         _loginRepository = loginRepository;
     }
 
-    public async Task<Guid?> GetAuthIdentityIdAsync()
+    public async Task<Guid> GetAuthIdentityIdAsync()
     {
         var loginName = _loginNameProvider.CurrentLoginName;
         var login = (await _loginRepository.GetByExpressionAsync(login => login.LoginName == loginName)).FirstOrDefault();
         
-        return login?.IdentityId;
+        return login?.IdentityId ?? Guid.Empty;
     }
 }

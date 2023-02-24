@@ -10,6 +10,7 @@ using Vouchers.Application.Queries;
 using Vouchers.Application.UseCases;
 using System.Threading;
 using Vouchers.Application;
+using Vouchers.Application.Abstractions;
 using Vouchers.Application.Services;
 using Vouchers.Domains.Domain;
 
@@ -31,10 +32,8 @@ internal sealed class DomainAccountsQueryHandler : IHandler<DomainAccountsQuery,
     public async Task<Result<IReadOnlyList<DomainAccountDto>>> HandleAsync(DomainAccountsQuery query, CancellationToken cancellation)
     {
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
-        if (authIdentityId is null)
-            return Error.NotAuthorized(_cultureInfoProvider.GetCultureInfo());
-        
-        return await GetQuery(query, authIdentityId.Value).ToListAsync(cancellation);
+
+        return await GetQuery(query, authIdentityId).ToListAsync(cancellation);
     }    
 
     private IQueryable<DomainAccountDto> GetQuery(DomainAccountsQuery query, Guid authIdentityId) {

@@ -4,9 +4,11 @@ using Vouchers.Application.Commands.VoucherCommands;
 using Vouchers.Application.Infrastructure;
 using System.Threading.Tasks;
 using System.Threading;
+using Vouchers.Application.Abstractions;
 using Vouchers.Values.Domain;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Services;
+using Unit = Vouchers.Core.Domain.Unit;
 
 namespace Vouchers.Application.UseCases.VoucherCases;
 
@@ -36,8 +38,6 @@ internal sealed class CreateVoucherCommandHandler : IHandler<CreateVoucherComman
         var cultureInfo = _cultureInfoProvider.GetCultureInfo();
         
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
-        if (authIdentityId is null)
-            return Error.NotRegistered(cultureInfo);
 
         var value = await _voucherValueRepository.GetByIdAsync(command.VoucherValueId);
 

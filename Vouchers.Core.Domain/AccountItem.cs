@@ -1,4 +1,5 @@
 ﻿using System;
+using Vouchers.Core.Domain.Exceptions;
 using Vouchers.Primitives;
 
 namespace Vouchers.Core.Domain;
@@ -31,7 +32,7 @@ public sealed class AccountItem : Entity<Guid>
     public void ProcessDebit(decimal amount)
     {
         if (amount <= 0)
-            throw CoreException.AmountIsNotPositive;
+            throw new NotPositiveAmountException();
         
         Balance += amount;
     }
@@ -44,10 +45,10 @@ public sealed class AccountItem : Entity<Guid>
     public void ProcessCredit(decimal amount)
     {
         if (amount <= 0)
-            throw CoreException.AmountIsNotPositive;
+            throw new NotPositiveAmountException();
         
         if (amount > Balance)
-            throw CoreException.AmountIsGreaterThanBalance;
+            throw new AmountIsGreaterThanBalanceException();
         
         Balance -= amount;
     }

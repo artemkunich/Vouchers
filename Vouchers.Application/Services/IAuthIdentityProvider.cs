@@ -8,5 +8,5 @@ namespace Vouchers.Application.Services;
 
 public interface IAuthIdentityProvider
 {
-    Task<Guid?> GetAuthIdentityIdAsync();
+    Task<Guid> GetAuthIdentityIdAsync();
 }

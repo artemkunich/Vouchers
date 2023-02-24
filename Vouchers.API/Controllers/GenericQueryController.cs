@@ -4,20 +4,20 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Vouchers.API.Services;
 using Vouchers.Application.Queries;
-using Vouchers.Application.UseCases;
+using Vouchers.Infrastructure.Pipeline;
 
 namespace Vouchers.API.Controllers;
 
 [Authorize]
 public class GenericQueryController<TQuery, TDtos> : Controller where TQuery : ListQuery where TDtos : class 
 {
-    private readonly IHandler<TQuery,TDtos> _handler;
+    private readonly IPipeline<TQuery,TDtos> _pipeline;
 
-    public GenericQueryController(IHandler<TQuery,TDtos> handler)
+    public GenericQueryController(IPipeline<TQuery,TDtos> pipeline)
     {
-        _handler = handler;
+        _pipeline = pipeline;
     }
     
     public async Task<IActionResult> HandleQuery([FromQuery]TQuery query, CancellationToken cancellationToken) => 
-        this.FromResult(await _handler.HandleAsync(query,cancellationToken));
+        this.FromResult(await _pipeline.HandleAsync(query,cancellationToken));
 }

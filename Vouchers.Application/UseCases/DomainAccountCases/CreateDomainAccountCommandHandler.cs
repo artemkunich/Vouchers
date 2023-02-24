@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Vouchers.Application.Abstractions;
 using Vouchers.Application.Commands.DomainAccountCommands;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
@@ -40,9 +41,7 @@ internal sealed class CreateDomainAccountCommandHandler : IHandler<CreateDomainA
         var cultureInfo = _cultureInfoProvider.GetCultureInfo();
         
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
-        if (authIdentityId is null)
-            return Error.NotRegistered(cultureInfo);
-        
+
         var domain = await _domainRepository.GetByIdAsync(command.DomainId);
         if (domain is null)
             return Error.DomainDoesNotExist(cultureInfo);
@@ -51,7 +50,7 @@ internal sealed class CreateDomainAccountCommandHandler : IHandler<CreateDomainA
         var account = Account.Create(accountId, _dateTimeProvider.CurrentDateTime());
         await _accountRepository.AddAsync(account);
 
-        var domainAccount = DomainAccount.Create(account.Id, authIdentityId.Value, domain, _dateTimeProvider.CurrentDateTime());
+        var domainAccount = DomainAccount.Create(account.Id, authIdentityId, domain, _dateTimeProvider.CurrentDateTime());
             
         if (domain.IsPublic)
         {

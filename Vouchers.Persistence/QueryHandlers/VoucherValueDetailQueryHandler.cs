@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Vouchers.Application;
+using Vouchers.Application.Abstractions;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Queries;
@@ -41,8 +42,6 @@ internal sealed class VoucherValueDetailQueryHandler : IHandler<VoucherValueDeta
     public async Task<Result<VoucherValueDetailDto>> HandleAsync(VoucherValueDetailQuery query, CancellationToken cancellation)
     {
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
-        if (authIdentityId is null)
-            return Error.NotAuthorized(_cultureInfoProvider.GetCultureInfo());
 
         var valueId = query.Id;
         

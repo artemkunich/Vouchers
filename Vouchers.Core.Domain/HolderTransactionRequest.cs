@@ -1,4 +1,5 @@
 ﻿using System;
+using Vouchers.Core.Domain.Exceptions;
 using Vouchers.Primitives;
 
 namespace Vouchers.Core.Domain;
@@ -31,22 +32,22 @@ public sealed class HolderTransactionRequest : AggregateRoot<Guid>
         bool mustBeExchangeable, string message)
     {
         if (quantity.Amount <= 0)
-            throw CoreException.AmountIsNotPositive;
+            throw new NotPositiveAmountException();
         
         if (quantity.UnitType.IssuerAccount.Equals(debtorAccount))
         {
             if (maxDurationBeforeValidityStart != TimeSpan.Zero)
-                throw CoreException.IssuerCannotSetMaxDurationBeforeValidityStart;
+                throw new IssuerCannotSetMaxDurationBeforeValidityStartException();
 
             if (minDurationBeforeValidityEnd != TimeSpan.Zero)
-                throw CoreException.IssuerCannotSetMinDurationBeforeValidityEnd;
+                throw new IssuerCannotSetMinDurationBeforeValidityEndException();
 
             if (mustBeExchangeable)
-                throw CoreException.IssuerCannotRequireExchangeability;
+                throw new IssuerCannotRequireExchangeabilityException();
         }
         
         if (creditorAccount is not null && debtorAccount.Equals(creditorAccount))
-            throw CoreException.CreditorAndDebtorAccountsAreTheSame;
+            throw new CreditorAndDebtorAccountsAreEqualException();
 
         return new()
         {
@@ -73,30 +74,30 @@ public sealed class HolderTransactionRequest : AggregateRoot<Guid>
     public void Perform(HolderTransaction transaction)
     {
         if(Transaction != null)
-            throw CoreException.TransactionRequestIsAlreadyPerformed;
+            throw new TransactionRequestIsAlreadyPerformedException();
 
         if (CreditorAccount != null && CreditorAccount.NotEquals(transaction.CreditorAccount))
-            throw CoreException.RequestCreditorIsNotSatisfiedByTransaction;
+            throw new RequestCreditorIsNotSatisfiedByTransactionException();
 
         if (DebtorAccount.NotEquals(transaction.DebtorAccount))
-            throw CoreException.RequestDebtorIsNotSatisfiedByTransaction;
+            throw new RequestDebtorIsNotSatisfiedByTransactionException();
 
         if (Quantity.UnitType.NotEquals(transaction.Quantity.UnitType))
-            throw CoreException.RequestUnitIsNotSatisfiedByTransaction;
+            throw new RequestUnitIsNotSatisfiedByTransactionException();
 
         if (Quantity.Amount != transaction.Quantity.Amount)
-            throw CoreException.RequestAmountIsNotSatisfiedByTransaction;
+            throw new RequestAmountIsNotSatisfiedByTransactionException();
 
         foreach (var item in transaction.TransactionItems)
         {
             if (MaxDurationBeforeValidityStart is not null && item.Unit.ValidFrom > DateTime.Now.Add(MaxDurationBeforeValidityStart.Value))
-                throw CoreException.RequestMaxValidFromIsNotSatisfiedByTransaction;
+                throw new RequestMaxValidFromIsNotSatisfiedByTransactionException();
 
             if (MinDurationBeforeValidityEnd is not null && item.Unit.ValidTo < DateTime.Now.Add(MinDurationBeforeValidityEnd.Value))
-                throw CoreException.RequestMinValidToIsNotSatisfiedByTransaction;
+                throw new RequestMinValidToIsNotSatisfiedByTransactionException();
 
             if (MustBeExchangeable && !item.Unit.CanBeExchanged)
-                throw CoreException.RequestMustBeExchangeableIsNotSatisfiedByTransaction;
+                throw new RequestMustBeExchangeableIsNotSatisfiedByTransactionException();
         }
 
         transaction.Perform();

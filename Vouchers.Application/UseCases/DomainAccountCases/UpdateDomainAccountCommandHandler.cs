@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Vouchers.Application.Abstractions;
 using Vouchers.Application.Commands.DomainAccountCommands;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Services;
@@ -11,7 +12,7 @@ using Vouchers.Domains.Domain;
 
 namespace Vouchers.Application.UseCases.DomainAccountCases;
 
-internal sealed class UpdateDomainAccountCommandHandler : IHandler<UpdateDomainAccountCommand>
+internal sealed class UpdateDomainAccountCommandHandler : IHandler<UpdateDomainAccountCommand, Unit>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IRepository<DomainAccount,Guid> _domainAccountRepository;
@@ -24,14 +25,12 @@ internal sealed class UpdateDomainAccountCommandHandler : IHandler<UpdateDomainA
         _authIdentityProvider = authIdentityProvider;
     }
 
-    public async Task<Result> HandleAsync(UpdateDomainAccountCommand command, CancellationToken cancellation)
+    public async Task<Result<Unit>> HandleAsync(UpdateDomainAccountCommand command, CancellationToken cancellation)
     {
         var cultureInfo = _cultureInfoProvider.GetCultureInfo();
         
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
-        if (authIdentityId is null)
-            return Error.NotRegistered(cultureInfo);
-        
+
         var domainAccount = await _domainAccountRepository.GetByIdAsync(command.DomainAccountId);
         if (domainAccount is null)
             return Error.DebtorAccountDoesNotExist(cultureInfo);
@@ -66,6 +65,6 @@ internal sealed class UpdateDomainAccountCommandHandler : IHandler<UpdateDomainA
 
         await _domainAccountRepository.UpdateAsync(domainAccount);
 
-        return Result.Create();
+        return Unit.Value;
     }
 }

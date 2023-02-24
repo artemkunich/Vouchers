@@ -4,12 +4,14 @@ using Vouchers.Application.Commands.VoucherValueCommands;
 using Vouchers.Application.Infrastructure;
 using System.Threading.Tasks;
 using System.Threading;
+using Vouchers.Application.Abstractions;
 using Vouchers.Values.Domain;
 using Vouchers.Application.Services;
+using Unit = Vouchers.Application.Abstractions.Unit;
 
 namespace Vouchers.Application.UseCases.VoucherValueCases;
 
-internal sealed class DeleteVoucherValueCommandHandler : IHandler<DeleteVoucherValueCommand>
+internal sealed class DeleteVoucherValueCommandHandler : IHandler<DeleteVoucherValueCommand,Unit>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IRepository<VoucherValue,Guid> _valueRepository;
@@ -25,13 +27,11 @@ internal sealed class DeleteVoucherValueCommandHandler : IHandler<DeleteVoucherV
         _cultureInfoProvider = cultureInfoProvider;
     }
 
-    public async Task<Result> HandleAsync(DeleteVoucherValueCommand command, CancellationToken cancellation)
+    public async Task<Result<Unit>> HandleAsync(DeleteVoucherValueCommand command, CancellationToken cancellation)
     {
         var cultureInfo = _cultureInfoProvider.GetCultureInfo();
         
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
-        if (authIdentityId is null)
-            return Error.NotRegistered(cultureInfo);
 
         var value = await _valueRepository.GetByIdAsync(command.VoucherValueId);
         if (value is null)
@@ -50,6 +50,6 @@ internal sealed class DeleteVoucherValueCommandHandler : IHandler<DeleteVoucherV
             await _valueRepository.RemoveAsync(value);
         }
         
-        return Result.Create();
+        return Unit.Value;
     }
 }

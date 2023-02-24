@@ -4,12 +4,14 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Vouchers.Application.Abstractions;
 using Vouchers.Core.Domain;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Domains.Domain;
 using Vouchers.Application.Commands.HolderTransactionCommands;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Services;
+using Unit = Vouchers.Core.Domain.Unit;
 
 namespace Vouchers.Application.UseCases.HolderTransactionCases;
 
@@ -50,9 +52,7 @@ internal sealed class CreateHolderTransactionCommandHandler : IHandler<CreateHol
         var cultureInfo = _cultureInfoProvider.GetCultureInfo();
         
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
-        if (authIdentityId is null)
-            return Error.NotRegistered(cultureInfo);
-        
+
         var creditorDomainAccount = await _domainAccountRepository.GetByIdAsync(command.CreditorAccountId);
         if (creditorDomainAccount?.IdentityId != authIdentityId)
             return Error.OperationIsNotAllowed(cultureInfo);

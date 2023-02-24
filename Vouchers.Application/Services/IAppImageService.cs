@@ -13,5 +13,5 @@ namespace Vouchers.Application.Services;
 internal interface IAppImageService
 {
     Task<CroppedImage> CreateCroppedImageAsync(Stream imageStream, CropParametersDto cropParametersDto);
-    Task<CroppedImage> CreateCroppedImageAsync(Guid croppedImageId, CropParametersDto cropParametersDto);
+    Task<CroppedImage> CreateCroppedImageAsync(CroppedImage croppedImage, CropParametersDto cropParametersDto);
 }

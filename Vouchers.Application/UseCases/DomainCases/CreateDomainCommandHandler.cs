@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Vouchers.Application.Abstractions;
 using Vouchers.Application.Commands.DomainCommands;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
@@ -44,9 +45,7 @@ internal sealed class CreateDomainCommandHandler : IHandler<CreateDomainCommand,
         var cultureInfo = _cultureInfoProvider.GetCultureInfo();
         
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
-        if (authIdentityId is null)
-            return Error.NotRegistered(cultureInfo);
-        
+
         var domainOffer = await _domainOfferRepository.GetByIdAsync(command.OfferId);
 
         DomainOffersPerIdentityCounter domainOffersPerIdentityCounter = null;
@@ -56,7 +55,7 @@ internal sealed class CreateDomainCommandHandler : IHandler<CreateDomainCommand,
             if (domainOffersPerIdentityCounter is null)
             {
                 var domainOffersPerIdentityCounterId = _identifierProvider.CreateNewId();
-                domainOffersPerIdentityCounter = DomainOffersPerIdentityCounter.Create(domainOffersPerIdentityCounterId, domainOffer, authIdentityId.Value, 0);
+                domainOffersPerIdentityCounter = DomainOffersPerIdentityCounter.Create(domainOffersPerIdentityCounterId, domainOffer, authIdentityId, 0);
                 domainOffersPerIdentityCounter.AddContract();
             }
             else if (domainOffersPerIdentityCounter.Counter > domainOffer.MaxContractsPerIdentity)
@@ -69,7 +68,7 @@ internal sealed class CreateDomainCommandHandler : IHandler<CreateDomainCommand,
             }
         }
 
-        var domainContract = DomainContract.Create(_identifierProvider.CreateNewId(), domainOffer, domainOffersPerIdentityCounter, authIdentityId.Value, command.DomainName, _dateTimeProvider.CurrentDateTime());
+        var domainContract = DomainContract.Create(_identifierProvider.CreateNewId(), domainOffer, domainOffersPerIdentityCounter, authIdentityId, command.DomainName, _dateTimeProvider.CurrentDateTime());
             
         if (domainOffer.Amount.Amount == 0)
         {
@@ -81,7 +80,7 @@ internal sealed class CreateDomainCommandHandler : IHandler<CreateDomainCommand,
             var domain = Domain.Create(domainId, domainContract, 0, 0, _dateTimeProvider.CurrentDateTime());
             domain.IncreaseMembersCount();
 
-            var domainAccount = DomainAccount.Create(account.Id, authIdentityId.Value, domain, _dateTimeProvider.CurrentDateTime());
+            var domainAccount = DomainAccount.Create(account.Id, authIdentityId, domain, _dateTimeProvider.CurrentDateTime());
             domainAccount.IsIssuer = true;
             domainAccount.IsConfirmed = true;
                 

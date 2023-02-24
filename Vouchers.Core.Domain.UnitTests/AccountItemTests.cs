@@ -1,5 +1,6 @@
 
 using FluentAssertions;
+using Vouchers.Core.Domain.Exceptions;
 
 namespace Vouchers.Core.Domain.UnitTests;
 
@@ -33,49 +34,44 @@ public class AccountItemTests
     }
 
     [Fact]
-    public void ProcessDebit_WithNotPositiveAmount_ThrowsCoreException()
+    public void ProcessDebit_WithNotPositiveAmount_ThrowsNotPositiveAmountException()
     {
         var processDebitWithZeroAmount = () => _accountItem.ProcessDebit(0);
         var processDebitWithNegativeAmount = () => _accountItem.ProcessDebit(-1);
-        
+
         processDebitWithZeroAmount
             .Should()
-            .Throw<CoreException>()
-            .WithMessage(CoreException.AmountIsNotPositive.Message);
-        
+            .Throw<NotPositiveAmountException>();
+
         processDebitWithNegativeAmount
             .Should()
-            .Throw<CoreException>()
-            .WithMessage(CoreException.AmountIsNotPositive.Message);
+            .Throw<NotPositiveAmountException>();
     }
 
     [Fact]
-    public void ProcessCredit_WithNotPositiveAmount_ThrowsCoreException()
+    public void ProcessCredit_WithNotPositiveAmount_ThrowsNotPositiveAmountExceptionn()
     {
         var processCreditWithZeroAmount = () => _accountItem.ProcessCredit(0);
         var processCreditWithNegativeAmount = () => _accountItem.ProcessCredit(-1);
-        
+
         processCreditWithZeroAmount
             .Should()
-            .Throw<CoreException>()
-            .WithMessage(CoreException.AmountIsNotPositive.Message);
-        
+            .Throw<NotPositiveAmountException>();
+
         processCreditWithNegativeAmount
             .Should()
-            .Throw<CoreException>()
-            .WithMessage(CoreException.AmountIsNotPositive.Message);
+            .Throw<NotPositiveAmountException>();
     }
     
     [Fact]
-    public void ProcessCredit_WithAmountGreaterThenBalance_ThrowsCoreException()
+    public void ProcessCredit_WithAmountGreaterThenBalance_ThrowsAmountIsGreaterThanBalanceException()
     {
         var amount = 1;
         _accountItem.ProcessDebit(amount);
         var processCredit = () => _accountItem.ProcessCredit(amount + 1);
         processCredit
             .Should()
-            .Throw<CoreException>()
-            .WithMessage(CoreException.AmountIsGreaterThanBalance.Message);
+            .Throw<AmountIsGreaterThanBalanceException>();
     }
     
     [Fact]

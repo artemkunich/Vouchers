@@ -8,6 +8,7 @@ using Vouchers.Application.Queries;
 using Vouchers.Application.UseCases;
 using System.Threading;
 using Vouchers.Application;
+using Vouchers.Application.Abstractions;
 
 namespace Vouchers.Persistence.QueryHandlers;
 

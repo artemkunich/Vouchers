@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Vouchers.Application;
+using Vouchers.Application.Abstractions;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Queries;
@@ -14,6 +15,7 @@ using Vouchers.Application.UseCases;
 using Vouchers.Core.Domain;
 using Vouchers.Domains.Domain;
 using Vouchers.Values.Domain;
+using Unit = Vouchers.Core.Domain.Unit;
 
 namespace Vouchers.Persistence.QueryHandlers;
 
@@ -33,8 +35,6 @@ internal sealed class IssuerVouchersQueryHandler : IHandler<IssuerVouchersQuery,
     public async Task<Result<IReadOnlyList<VoucherDto>>> HandleAsync(IssuerVouchersQuery query, CancellationToken cancellation)
     {
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
-        if (authIdentityId is null)
-            return Error.NotAuthorized(_cultureInfoProvider.GetCultureInfo());
 
         var issuerDomainAccount = await _dbContext.Set<UnitType>().Where(v => v.Id == query.ValueId)
             .Join(_dbContext.Set<DomainAccount>(), u => u.IssuerAccountId, a => a.Id, (u, a) => a).FirstOrDefaultAsync();

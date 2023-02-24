@@ -1,0 +1,8 @@
+using System;
+
+namespace Vouchers.Core.Domain.Exceptions;
+
+public sealed class ZeroAmountException : ArgumentOutOfRangeException
+{
+    public override string Message => "Amount is zero";
+}

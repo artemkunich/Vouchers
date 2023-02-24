@@ -1,4 +1,5 @@
 ﻿using System;
+using Vouchers.Core.Domain.Exceptions;
 
 namespace Vouchers.Core.Domain;
 
@@ -12,7 +13,7 @@ public sealed class UnitQuantity
     public static UnitQuantity Create(decimal amount, Unit unit)
     {
         if(amount <= 0)
-            throw CoreException.AmountIsNotPositive;
+            throw new NotPositiveAmountException();
         
         return new()
         {

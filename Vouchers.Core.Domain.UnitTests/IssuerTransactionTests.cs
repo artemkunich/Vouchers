@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Vouchers.Core.Domain.Exceptions;
 
 namespace Vouchers.Core.Domain.UnitTests;
 
@@ -31,7 +32,7 @@ public class IssuerTransactionTests
     }
 
     [Fact]
-    public void Create_WithZeroAmount_ThrowsCoreException()
+    public void Create_WithZeroAmount_ThrowsZeroAmountException()
     {
         var issuerTransactionId = Guid.NewGuid();
         var currentDateDime = _accountItem.Unit.ValidFrom;
@@ -39,12 +40,11 @@ public class IssuerTransactionTests
 
         createIssuerTransactionWithZeroAmount
             .Should()
-            .Throw<CoreException>()
-            .WithMessage(CoreException.AmountIsZero.Message);
+            .Throw<ZeroAmountException>();
     }
     
     [Fact]
-    public void Create_WithExpiredUnit_ThrowsCoreException()
+    public void Create_WithExpiredUnit_ThrowsUnitIsExpiredException()
     {
         var issuerTransactionId = Guid.NewGuid();
         var currentDateDime = _accountItem.Unit.ValidTo.AddDays(1);
@@ -52,12 +52,11 @@ public class IssuerTransactionTests
 
         createIssuerTransactionWithExpiredUnit
             .Should()
-            .Throw<CoreException>()
-            .WithMessage(CoreException.UnitIsExpired.Message);
+            .Throw<UnitIsExpiredException>();
     }
     
     [Fact]
-    public void Create_WithAccountItemWhereHolderAccountAndUnitTypeIssuerAccountAreDifferent_ThrowsCoreException()
+    public void Create_WithAccountItemWhereHolderAccountAndUnitTypeIssuerAccountAreDifferent_ThrowsAccountHolderAndUnitTypeIssuerAreDifferentException()
     {
         var accountItem = AccountItem.Create(Guid.NewGuid(), _holderAccount, _unit);
         
@@ -67,8 +66,7 @@ public class IssuerTransactionTests
 
         createIssuerTransactionWithAccountItemWhereHolderAccountAndUnitTypeIssuerAccountAreDifferent
             .Should()
-            .Throw<CoreException>()
-            .WithMessage(CoreException.AccountHolderAndUnitTypeIssuerAreDifferent.Message);
+            .Throw<AccountHolderAndUnitTypeIssuerAreDifferentException>();
     }
     
     [Fact]

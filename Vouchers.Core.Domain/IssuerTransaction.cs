@@ -1,4 +1,5 @@
 ﻿using System;
+using Vouchers.Core.Domain.Exceptions;
 using Vouchers.Primitives;
 
 namespace Vouchers.Core.Domain;
@@ -13,13 +14,13 @@ public sealed class IssuerTransaction : AggregateRoot<Guid>
     public static IssuerTransaction Create(Guid id, DateTime currentDateTime, AccountItem issuerAccountItem, decimal amount)
     {
         if (amount == 0)
-            throw CoreException.AmountIsZero;
+            throw new ZeroAmountException();
         
         if (issuerAccountItem.Unit.ValidTo < currentDateTime)
-            throw CoreException.UnitIsExpired;
+            throw new UnitIsExpiredException();
         
         if (issuerAccountItem.Unit.UnitType.IssuerAccount.NotEquals(issuerAccountItem.HolderAccount))
-            throw CoreException.AccountHolderAndUnitTypeIssuerAreDifferent;
+            throw new AccountHolderAndUnitTypeIssuerAreDifferentException();
         
         return new()
         {

@@ -3,34 +3,36 @@ using Vouchers.Application.Commands.VoucherValueCommands;
 using Vouchers.Application.Infrastructure;
 using System.Threading.Tasks;
 using System.Threading;
+using Vouchers.Application.Abstractions;
 using Vouchers.Values.Domain;
 using Vouchers.Application.Services;
+using Vouchers.Files.Domain;
 
 namespace Vouchers.Application.UseCases.VoucherValueCases;
 
-internal sealed class UpdateVoucherValueCommandHandler : IHandler<UpdateVoucherValueCommand>
+internal sealed class UpdateVoucherValueCommandHandler : IHandler<UpdateVoucherValueCommand,Unit>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IRepository<VoucherValue,Guid> _voucherValueRepository;
+    private readonly IRepository<CroppedImage, Guid> _croppedRepository;
     private readonly IAppImageService _appImageService;
     private readonly ICultureInfoProvider _cultureInfoProvider;
     
     public UpdateVoucherValueCommandHandler(IAuthIdentityProvider authIdentityProvider, IAppImageService appImageService,
-        IRepository<VoucherValue,Guid> voucherValueRepository, ICultureInfoProvider cultureInfoProvider)
+        IRepository<VoucherValue,Guid> voucherValueRepository, ICultureInfoProvider cultureInfoProvider, IRepository<CroppedImage, Guid> croppedRepository)
     {
         _authIdentityProvider = authIdentityProvider;
         _voucherValueRepository = voucherValueRepository;
         _cultureInfoProvider = cultureInfoProvider;
+        _croppedRepository = croppedRepository;
         _appImageService = appImageService;
     }
 
-    public async Task<Result> HandleAsync(UpdateVoucherValueCommand command, CancellationToken cancellation)
+    public async Task<Result<Unit>> HandleAsync(UpdateVoucherValueCommand command, CancellationToken cancellation)
     {
         var cultureInfo = _cultureInfoProvider.GetCultureInfo();
         
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
-        if (authIdentityId is null)
-            return Error.NotRegistered(cultureInfo);
 
         var value = await _voucherValueRepository.GetByIdAsync(command.Id);
         if (value is null)
@@ -44,15 +46,23 @@ internal sealed class UpdateVoucherValueCommandHandler : IHandler<UpdateVoucherV
         if (command.Image is not null && command.CropParameters is not null)
         {
             var imageStream = command.Image.OpenReadStream();
-            var image = await _appImageService.CreateCroppedImageAsync(imageStream, command.CropParameters);
-            value.ImageId = image.Id;
+            var croppedImage = await _appImageService.CreateCroppedImageAsync(imageStream, command.CropParameters);
+            await _croppedRepository.AddAsync(croppedImage);
+            
+            value.ImageId = croppedImage.Id;
             requireUpdate = true;
         }
                 
         if (command.Image is null && value.ImageId is not null && command.CropParameters is not null)
         {
-            var image = await _appImageService.CreateCroppedImageAsync(value.ImageId.Value, command.CropParameters);
-            value.ImageId = image.Id;
+            var croppedImage = await _croppedRepository.GetByIdAsync(value.ImageId.Value);
+            if (croppedImage is null)
+                return Error.ImageDoesNotExist();
+            
+            var newCroppedImage = await _appImageService.CreateCroppedImageAsync(croppedImage, command.CropParameters);
+            await _croppedRepository.AddAsync(newCroppedImage);
+            
+            value.ImageId = newCroppedImage.Id;
             requireUpdate = true;
         }
 
@@ -71,7 +81,7 @@ internal sealed class UpdateVoucherValueCommandHandler : IHandler<UpdateVoucherV
         if (requireUpdate)
             await _voucherValueRepository.UpdateAsync(value);
         
-        return Result.Create();
+        return Unit.Value;
     }
 
 }

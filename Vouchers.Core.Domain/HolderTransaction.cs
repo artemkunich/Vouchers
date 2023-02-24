@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Vouchers.Core.Domain.Exceptions;
 using Vouchers.Primitives;
 
 namespace Vouchers.Core.Domain;
@@ -22,7 +23,7 @@ public sealed class HolderTransaction : AggregateRoot<Guid>
     public static HolderTransaction Create(Guid id, DateTime currentDateTime, Account creditorAccount, Account debtorAccount, UnitType unitType, string message)
     {
         if (creditorAccount.Equals(debtorAccount))
-            throw CoreException.CreditorAndDebtorAccountsAreTheSame;
+            throw new CreditorAndDebtorAccountsAreEqualException();
 
         return new()
         {
@@ -41,13 +42,13 @@ public sealed class HolderTransaction : AggregateRoot<Guid>
     public void AddTransactionItem(HolderTransactionItem item)
     {
         if (item.HolderTransactionId != Id)
-            throw CoreException.ItemDoesNotBelongToTransaction;
+            throw new ItemDoesNotBelongToTransactionException();
         
         if (item.Unit.ValidTo < Timestamp)
-            throw CoreException.TransactionContainsExpiredUnits;
+            throw new TransactionContainsExpiredUnitsException();
 
         if(TransactionItems.Any(i => i.Id == item.Id))
-            throw CoreException.TransactionAlreadyContainsItem;
+            throw new TransactionAlreadyContainsItemException();
         
         var unitQuantity = UnitQuantity.Create(item.Amount, item.Unit);
         Quantity = Quantity.Add(unitQuantity);
@@ -57,10 +58,10 @@ public sealed class HolderTransaction : AggregateRoot<Guid>
     public void Perform() 
     {
         if (IsPerformed)
-            throw CoreException.TransactionIsAlreadyPerformed;;
+            throw new TransactionIsAlreadyPerformedException();
             
         if (Quantity.Amount == 0)
-            throw CoreException.AmountIsNotPositive;
+            throw new NotPositiveAmountException();
         
         foreach (var item in TransactionItems) 
         {
