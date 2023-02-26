@@ -20,7 +20,13 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Options;
 using System.Globalization;
+using Vouchers.Application.Abstractions;
+using Vouchers.Core.Domain;
+using Vouchers.Domains.Domain;
+using Vouchers.Files.Domain;
+using Vouchers.Identities.Domain;
 using Vouchers.Infrastructure;
+using Vouchers.Values.Domain;
 
 namespace Vouchers.API;
 
@@ -101,12 +107,21 @@ public class Startup
             .AddScoped<ILoginNameProvider, JWTLoginNameProvider>()
             .AddScoped<IImageService, ImageSharpService>()
             .AddScoped<ICultureInfoProvider, CultureInfoProvider>()
-            
+
             .AddHostedService<OutboxMessagesProcessingService>()
-                
-            .AddRepositories(Configuration)
-            .AddAppServices(Configuration)
-            .AddHandlers(Configuration);
+
+            .AddRepositoryForEntities(typeof(VouchersDbContext).Assembly) //Persistance
+            .AddRepositoryForEntities(typeof(Account).Assembly) //Core
+            .AddRepositoryForEntities(typeof(Domain).Assembly) //Domains
+            .AddRepositoryForEntities(typeof(CroppedImage).Assembly) //Files
+            .AddRepositoryForEntities(typeof(Identity).Assembly) //Identities
+            .AddRepositoryForEntities(typeof(VoucherValue).Assembly) //Values
+            .AddInfrastructureServices()
+            .AddApplicationServices(typeof(ApplicationServiceAttribute).Assembly)
+            .AddHandlers(typeof(IHandler<,>).Assembly)
+            .AddHandlers(typeof(VouchersDbContext).Assembly)
+            .AddPipelineBehaviors(typeof(IHandler<,>).Assembly)
+            .AddGenericPipeline();
         
         services
             .AddMvc(o => o.Conventions.Add(

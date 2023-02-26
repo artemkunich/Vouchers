@@ -23,13 +23,11 @@ internal sealed class HolderTransactionRequestQueryHandler : IHandler<Guid, Hold
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly VouchersDbContext _dbContext;
-    private readonly ICultureInfoProvider _cultureInfoProvider;
-    
-    public HolderTransactionRequestQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext, ICultureInfoProvider cultureInfoProvider)
+
+    public HolderTransactionRequestQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext)
     {
         _authIdentityProvider = authIdentityProvider;
         _dbContext = dbContext;
-        _cultureInfoProvider = cultureInfoProvider;
     }
 
     public async Task<Result<HolderTransactionRequestDto>> HandleAsync(Guid transactionRequestId, CancellationToken cancellation) 

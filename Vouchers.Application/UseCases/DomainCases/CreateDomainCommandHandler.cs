@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Vouchers.Application.Abstractions;
 using Vouchers.Application.Commands.DomainCommands;
 using Vouchers.Application.Dtos;
+using Vouchers.Application.Errors;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Services;
 using Vouchers.Core.Domain;
@@ -24,10 +25,10 @@ internal sealed class CreateDomainCommandHandler : IHandler<CreateDomainCommand,
     private readonly IRepository<Account,Guid> _accountRepository;
     private readonly IIdentifierProvider<Guid> _identifierProvider;
     private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly ICultureInfoProvider _cultureInfoProvider;
+    
     public CreateDomainCommandHandler(IAuthIdentityProvider authIdentityProvider, IReadOnlyRepository<DomainOffer,Guid> domainOfferRepository, 
         IReadOnlyRepository<DomainOffersPerIdentityCounter,Guid> domainOffersPerIdentityCounterRepository, IRepository<DomainContract,Guid> domainContractRepository, 
-        IRepository<DomainAccount,Guid> domainAccountRepository, IRepository<Account,Guid> accountRepository, IIdentifierProvider<Guid> identifierProvider, IDateTimeProvider dateTimeProvider, ICultureInfoProvider cultureInfoProvider)
+        IRepository<DomainAccount,Guid> domainAccountRepository, IRepository<Account,Guid> accountRepository, IIdentifierProvider<Guid> identifierProvider, IDateTimeProvider dateTimeProvider)
     {
         _authIdentityProvider = authIdentityProvider;
         _domainOfferRepository = domainOfferRepository;
@@ -37,13 +38,10 @@ internal sealed class CreateDomainCommandHandler : IHandler<CreateDomainCommand,
         _accountRepository = accountRepository;
         _identifierProvider = identifierProvider;
         _dateTimeProvider = dateTimeProvider;
-        _cultureInfoProvider = cultureInfoProvider;
     }
 
     public async Task<Result<IdDto<Guid>>> HandleAsync(CreateDomainCommand command, CancellationToken cancellation)
     {
-        var cultureInfo = _cultureInfoProvider.GetCultureInfo();
-        
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
 
         var domainOffer = await _domainOfferRepository.GetByIdAsync(command.OfferId);
@@ -60,7 +58,7 @@ internal sealed class CreateDomainCommandHandler : IHandler<CreateDomainCommand,
             }
             else if (domainOffersPerIdentityCounter.Counter > domainOffer.MaxContractsPerIdentity)
             {
-                return Error.MaxCountOfContractsExceeded(cultureInfo);
+                return new MaxCountOfContractsExceededError();
             }
             else
             {

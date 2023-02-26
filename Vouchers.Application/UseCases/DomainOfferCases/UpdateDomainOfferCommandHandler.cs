@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Vouchers.Application.Abstractions;
 using Vouchers.Application.Commands.DomainOfferCommands;
+using Vouchers.Application.Errors;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Services;
 using Vouchers.Domains.Domain;
@@ -15,20 +16,15 @@ namespace Vouchers.Application.UseCases.DomainOfferCases;
 
 internal sealed class UpdateDomainOfferCommandHandler : IHandler<UpdateDomainOfferCommand,Abstractions.Unit>
 {
-    private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IRepository<DomainOffer,Guid> _domainOfferRepository;
-    private readonly ICultureInfoProvider _cultureInfoProvider;
-    
-    public UpdateDomainOfferCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<DomainOffer,Guid> domainOfferRepository, ICultureInfoProvider cultureInfoProvider)
+
+    public UpdateDomainOfferCommandHandler(IRepository<DomainOffer,Guid> domainOfferRepository)
     {
-        _authIdentityProvider = authIdentityProvider;
         _domainOfferRepository = domainOfferRepository;
-        _cultureInfoProvider = cultureInfoProvider;
     }
 
     public async Task<Result<Abstractions.Unit>> HandleAsync(UpdateDomainOfferCommand command, CancellationToken cancellation)
     {
-        var cultureInfo = _cultureInfoProvider.GetCultureInfo();
         var domainOffer = await _domainOfferRepository.GetByIdAsync(command.Id);
 
         if (command.Terminate == true)
@@ -53,15 +49,15 @@ internal sealed class UpdateDomainOfferCommandHandler : IHandler<UpdateDomainOff
         
         if (command.ValidFrom is not null && command.ValidFrom != domainOffer.ValidFrom)
             result
-                .IfTrueAddError(domainOffer.ValidFrom <= DateTime.Now, Error.ValidFromCannotBeModifiedOnActiveOffers(cultureInfo))
-                .IfTrueAddError(command.ValidFrom < DateTime.Now, Error.ValidFromCannotBeSetToPast(cultureInfo))
+                .IfTrueAddError(domainOffer.ValidFrom <= DateTime.Now, new ValidFromCannotBeModifiedOnActiveOffersError())
+                .IfTrueAddError(command.ValidFrom < DateTime.Now, new ValidFromCannotBeSetToPastError())
                 .Process(() => domainOffer.ValidFrom = command.ValidFrom.Value)
                 .Process(() => requireUpdate = true);
 
         if (command.ValidTo is not null && command.ValidTo != domainOffer.ValidTo)
             result
-                .IfTrueAddError(command.ValidTo < domainOffer.ValidFrom, Error.ValidToCannotBeLessThanValidFrom(cultureInfo))
-                .IfTrueAddError(command.ValidTo < DateTime.Now, Error.ValidToCannotBeLessThanCurrentDatetime(cultureInfo))
+                .IfTrueAddError(command.ValidTo < domainOffer.ValidFrom, new ValidToCannotBeLessThanValidFromError())
+                .IfTrueAddError(command.ValidTo < DateTime.Now, new ValidToCannotBeLessThanCurrentDatetimeError())
                 .Process(() => domainOffer.ValidTo = command.ValidTo.Value)
                 .Process(() => requireUpdate = true);
 

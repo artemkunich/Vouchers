@@ -24,13 +24,11 @@ internal sealed class IdentityDomainAccountsQueryHandler : IHandler<IdentityDoma
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly VouchersDbContext _dbContext;
-    private readonly ICultureInfoProvider _cultureInfoProvider;
 
-    public IdentityDomainAccountsQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext, ICultureInfoProvider cultureInfoProvider)
+    public IdentityDomainAccountsQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext)
     {
         _authIdentityProvider = authIdentityProvider;
         _dbContext = dbContext;
-        _cultureInfoProvider = cultureInfoProvider;
     }
 
     public async Task<Result<IReadOnlyList<DomainAccountDto>>> HandleAsync(IdentityDomainAccountsQuery query, CancellationToken cancellation)

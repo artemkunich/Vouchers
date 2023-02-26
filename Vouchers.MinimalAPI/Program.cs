@@ -4,13 +4,19 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Vouchers.Application.Abstractions;
 using Vouchers.MinimalAPI.Endpoints;
 using Vouchers.Application.Infrastructure;
+using Vouchers.Core.Domain;
+using Vouchers.Domains.Domain;
+using Vouchers.Files.Domain;
+using Vouchers.Identities.Domain;
 using Vouchers.Persistence;
 using Vouchers.Infrastructure;
 using Vouchers.MinimalAPI.Binding;
 using Vouchers.MinimalAPI.Services;
 using Vouchers.MinimalAPI.Validation;
+using Vouchers.Values.Domain;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -80,9 +86,18 @@ builder.Services
     
     .AddHostedService<OutboxMessagesProcessingService>()
     
-    .AddRepositories(builder.Configuration)
-    .AddAppServices(builder.Configuration)
-    .AddHandlers(builder.Configuration)
+    .AddRepositoryForEntities(typeof(VouchersDbContext).Assembly) //Persistance
+    .AddRepositoryForEntities(typeof(Account).Assembly) //Core
+    .AddRepositoryForEntities(typeof(Domain).Assembly) //Domains
+    .AddRepositoryForEntities(typeof(CroppedImage).Assembly) //Files
+    .AddRepositoryForEntities(typeof(Identity).Assembly) //Identities
+    .AddRepositoryForEntities(typeof(VoucherValue).Assembly) //Values
+    .AddInfrastructureServices()
+    .AddApplicationServices(typeof(ApplicationServiceAttribute).Assembly)
+    .AddHandlers(typeof(IHandler<,>).Assembly)
+    .AddHandlers(typeof(VouchersDbContext).Assembly)
+    .AddPipelineBehaviors(typeof(IHandler<,>).Assembly)
+    .AddGenericPipeline()
     
     .AddFormValidators()
     .AddFormParameterProviders()

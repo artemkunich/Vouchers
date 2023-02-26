@@ -24,13 +24,11 @@ internal sealed class HolderValuesQueryHandler : IHandler<HolderValuesQuery,IRea
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly VouchersDbContext _dbContext;
-    private readonly ICultureInfoProvider _cultureInfoProvider;
 
-    public HolderValuesQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext, ICultureInfoProvider cultureInfoProvider)
+    public HolderValuesQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext)
     {
         _authIdentityProvider = authIdentityProvider;
         _dbContext = dbContext;
-        _cultureInfoProvider = cultureInfoProvider;
     }
 
     public async Task<Result<IReadOnlyList<VoucherValueDto>>>HandleAsync(HolderValuesQuery query, CancellationToken cancellation)

@@ -10,6 +10,7 @@ using Vouchers.Application.Infrastructure;
 using Vouchers.Domains.Domain;
 using Vouchers.Application.Commands.HolderTransactionCommands;
 using Vouchers.Application.Dtos;
+using Vouchers.Application.Errors;
 using Vouchers.Application.Services;
 using Unit = Vouchers.Core.Domain.Unit;
 
@@ -27,12 +28,11 @@ internal sealed class CreateHolderTransactionCommandHandler : IHandler<CreateHol
     private readonly IRepository<HolderTransactionRequest,Guid> _holderTransactionRequestRepository;
     private readonly IIdentifierProvider<Guid> _identifierProvider;
     private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly ICultureInfoProvider _cultureInfoProvider;
-    
+
     public CreateHolderTransactionCommandHandler(IAuthIdentityProvider authIdentityProvider, IReadOnlyRepository<DomainAccount,Guid> domainAccountRepository, 
         IReadOnlyRepository<Account,Guid> accountRepository, IReadOnlyRepository<Unit,Guid> unitRepository, 
         IReadOnlyRepository<UnitType,Guid> unitTypeRepository, IReadOnlyRepository<AccountItem,Guid> accountItemRepository, 
-        IRepository<HolderTransaction,Guid> holderTransactionRepository, IRepository<HolderTransactionRequest,Guid> holderTransactionRequestRepository, IIdentifierProvider<Guid> identifierProvider, IDateTimeProvider dateTimeProvider, ICultureInfoProvider cultureInfoProvider)
+        IRepository<HolderTransaction,Guid> holderTransactionRepository, IRepository<HolderTransactionRequest,Guid> holderTransactionRequestRepository, IIdentifierProvider<Guid> identifierProvider, IDateTimeProvider dateTimeProvider)
     {
         _authIdentityProvider = authIdentityProvider;
         _domainAccountRepository = domainAccountRepository;
@@ -44,46 +44,43 @@ internal sealed class CreateHolderTransactionCommandHandler : IHandler<CreateHol
         _holderTransactionRequestRepository = holderTransactionRequestRepository;
         _identifierProvider = identifierProvider;
         _dateTimeProvider = dateTimeProvider;
-        _cultureInfoProvider = cultureInfoProvider;
     }
 
     public async Task<Result<IdDto<Guid>>> HandleAsync(CreateHolderTransactionCommand command, CancellationToken cancellation)
     {
-        var cultureInfo = _cultureInfoProvider.GetCultureInfo();
-        
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
 
         var creditorDomainAccount = await _domainAccountRepository.GetByIdAsync(command.CreditorAccountId);
         if (creditorDomainAccount?.IdentityId != authIdentityId)
-            return Error.OperationIsNotAllowed(cultureInfo);
+            return new OperationIsNotAllowedError();
         if (!creditorDomainAccount.IsConfirmed)
-            return Error.CreditorAccountIsNotActivated(cultureInfo);
+            return new CreditorAccountIsNotActivatedError();
 
         HolderTransactionRequest holderTransactionRequest = null;
         if (command.HolderTransactionRequestId is not null)
         {
             holderTransactionRequest = await _holderTransactionRequestRepository.GetByIdAsync(command.HolderTransactionRequestId.Value);
             if(holderTransactionRequest is null)
-                return Error.TransactionRequestIsNotFound(cultureInfo);
+                return new TransactionRequestIsNotFoundError();
         }
 
         var debtorDomainAccount = await _domainAccountRepository.GetByIdAsync(command.DebtorAccountId);
         if(debtorDomainAccount is null)
-            return Error.DebtorAccountDoesNotExist(cultureInfo);
+            return new DebtorAccountDoesNotExistError();
         if (!debtorDomainAccount.IsConfirmed)
-            return Error.DebtorAccountIsNotActivated(cultureInfo);
+            return new DebtorAccountIsNotActivatedError();
 
         var unitType = await _unitTypeRepository.GetByIdAsync(command.UnitTypeId);
         if (unitType is null)
-            return Error.VoucherValueDoesNotExist(cultureInfo);
+            return new VoucherValueDoesNotExistError();
         
         var creditorAccount = await _accountRepository.GetByIdAsync(command.CreditorAccountId);
         if(creditorAccount is null)
-            return Error.CreditorAccountDoesNotExist(cultureInfo);
+            return new CreditorAccountDoesNotExistError();
             
         var debtorAccount = await _accountRepository.GetByIdAsync(command.DebtorAccountId);
         if (debtorAccount is null)
-            return Error.DebtorAccountDoesNotExist(cultureInfo);
+            return new DebtorAccountDoesNotExistError();
 
         var transactionId = _identifierProvider.CreateNewId();
         var currentDateTime = _dateTimeProvider.CurrentDateTime();
@@ -94,7 +91,7 @@ internal sealed class CreateHolderTransactionCommandHandler : IHandler<CreateHol
             var creditAccountItem = (await _accountItemRepository.GetByExpressionAsync(accItem => accItem.HolderAccountId == command.CreditorAccountId && accItem.Unit.Id == item.Item1)).FirstOrDefault();
             if (creditAccountItem is null)
             {
-                return Error.UserDoesNotHaveAccountForVoucher(command.CreditorAccountId, item.Item1, cultureInfo);
+                return new UserDoesNotHaveAccountForVoucherError();
             }
             var debitAccountItem = (await _accountItemRepository.GetByExpressionAsync(accItem => accItem.HolderAccountId == command.DebtorAccountId && accItem.Unit.Id == item.Item1)).FirstOrDefault();
             if (debitAccountItem is null)

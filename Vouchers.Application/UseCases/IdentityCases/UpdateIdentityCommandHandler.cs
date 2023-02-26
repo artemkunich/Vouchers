@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Vouchers.Application.Abstractions;
 using Vouchers.Application.Commands.IdentityCommands;
+using Vouchers.Application.Errors;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Services;
 using Vouchers.Files.Domain;
@@ -17,27 +18,23 @@ internal sealed class UpdateIdentityCommandHandler : IHandler<UpdateIdentityComm
     private readonly IRepository<Identity,Guid> _identityRepository;
     private readonly IRepository<CroppedImage, Guid> _croppedRepository;
     private readonly IAppImageService _appImageService;
-    private readonly ICultureInfoProvider _cultureInfoProvider;
-    
+
     public UpdateIdentityCommandHandler(IAuthIdentityProvider authIdentityProvider, 
-        IRepository<Identity,Guid> identityRepository, IAppImageService appImageService, ICultureInfoProvider cultureInfoProvider, IRepository<CroppedImage, Guid> croppedRepository)
+        IRepository<Identity,Guid> identityRepository, IAppImageService appImageService, IRepository<CroppedImage, Guid> croppedRepository)
     {
         _authIdentityProvider = authIdentityProvider;
         _identityRepository = identityRepository;
         _appImageService = appImageService;
-        _cultureInfoProvider = cultureInfoProvider;
         _croppedRepository = croppedRepository;
     }
 
     public async Task<Result<Unit>> HandleAsync(UpdateIdentityCommand command, CancellationToken cancellation)
     {
-        var cultureInfo = _cultureInfoProvider.GetCultureInfo();
-        
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
 
         var identity = await _identityRepository.GetByIdAsync(authIdentityId);
         if (identity is null)
-            return Error.IdentityDoesNotExist(cultureInfo);
+            return new IdentityDoesNotExistError();
 
         var isChanged = false;
         var identityUpdatedDomainEvent = new IdentityUpdatedDomainEvent();
@@ -57,7 +54,7 @@ internal sealed class UpdateIdentityCommandHandler : IHandler<UpdateIdentityComm
         {
             var croppedImage = await _croppedRepository.GetByIdAsync(identity.ImageId.Value);
             if (croppedImage is null)
-                return Error.ImageDoesNotExist();
+                return new ImageDoesNotExistError();
             
             var newCroppedImage = await _appImageService.CreateCroppedImageAsync(croppedImage, command.CropParameters);
             await _croppedRepository.AddAsync(newCroppedImage);

@@ -19,7 +19,6 @@ internal sealed class DomainDetailQueryHandler : IHandler<DomainDetailQuery, Dom
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly VouchersDbContext _dbContext;
-    private readonly ICultureInfoProvider _cultureInfoProvider;
 
     Func<CropParameters, CropParametersDto> _mapCropParameters = (CropParameters cp) => cp is null ? null : new CropParametersDto
     {
@@ -29,11 +28,10 @@ internal sealed class DomainDetailQueryHandler : IHandler<DomainDetailQuery, Dom
         Height = cp.Height,
     };
 
-    public DomainDetailQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext, ICultureInfoProvider cultureInfoProvider)
+    public DomainDetailQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext)
     {
         _authIdentityProvider = authIdentityProvider;
         _dbContext = dbContext;
-        _cultureInfoProvider = cultureInfoProvider;
     }
 
     public async Task<Result<DomainDetailDto>> HandleAsync(DomainDetailQuery query, CancellationToken cancellation)

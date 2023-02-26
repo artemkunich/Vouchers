@@ -22,13 +22,11 @@ internal sealed class IssuerValuesQueryHandler : IHandler<IssuerValuesQuery,IRea
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly VouchersDbContext _dbContext;
-    private readonly ICultureInfoProvider _cultureInfoProvider;
-    
-    public IssuerValuesQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext, ICultureInfoProvider cultureInfoProvider)
+
+    public IssuerValuesQueryHandler(IAuthIdentityProvider authIdentityProvider, VouchersDbContext dbContext)
     {
         _authIdentityProvider = authIdentityProvider;
         _dbContext = dbContext;
-        _cultureInfoProvider = cultureInfoProvider;
     }     
 
     public async Task<Result<IReadOnlyList<VoucherValueDto>>> HandleAsync(IssuerValuesQuery query, CancellationToken cancellation)

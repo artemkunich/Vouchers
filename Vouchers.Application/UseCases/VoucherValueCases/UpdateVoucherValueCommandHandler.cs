@@ -4,6 +4,7 @@ using Vouchers.Application.Infrastructure;
 using System.Threading.Tasks;
 using System.Threading;
 using Vouchers.Application.Abstractions;
+using Vouchers.Application.Errors;
 using Vouchers.Values.Domain;
 using Vouchers.Application.Services;
 using Vouchers.Files.Domain;
@@ -16,30 +17,26 @@ internal sealed class UpdateVoucherValueCommandHandler : IHandler<UpdateVoucherV
     private readonly IRepository<VoucherValue,Guid> _voucherValueRepository;
     private readonly IRepository<CroppedImage, Guid> _croppedRepository;
     private readonly IAppImageService _appImageService;
-    private readonly ICultureInfoProvider _cultureInfoProvider;
-    
+
     public UpdateVoucherValueCommandHandler(IAuthIdentityProvider authIdentityProvider, IAppImageService appImageService,
-        IRepository<VoucherValue,Guid> voucherValueRepository, ICultureInfoProvider cultureInfoProvider, IRepository<CroppedImage, Guid> croppedRepository)
+        IRepository<VoucherValue,Guid> voucherValueRepository, IRepository<CroppedImage, Guid> croppedRepository)
     {
         _authIdentityProvider = authIdentityProvider;
         _voucherValueRepository = voucherValueRepository;
-        _cultureInfoProvider = cultureInfoProvider;
         _croppedRepository = croppedRepository;
         _appImageService = appImageService;
     }
 
     public async Task<Result<Unit>> HandleAsync(UpdateVoucherValueCommand command, CancellationToken cancellation)
     {
-        var cultureInfo = _cultureInfoProvider.GetCultureInfo();
-        
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
 
         var value = await _voucherValueRepository.GetByIdAsync(command.Id);
         if (value is null)
-            return Error.VoucherValueDoesNotExist(cultureInfo);
+            return new VoucherValueDoesNotExistError();
 
         if (value.IssuerIdentityId != authIdentityId)
-            return Error.OperationIsNotAllowed(cultureInfo);
+            return new OperationIsNotAllowedError();
 
         var requireUpdate = false;
 
@@ -57,7 +54,7 @@ internal sealed class UpdateVoucherValueCommandHandler : IHandler<UpdateVoucherV
         {
             var croppedImage = await _croppedRepository.GetByIdAsync(value.ImageId.Value);
             if (croppedImage is null)
-                return Error.ImageDoesNotExist();
+                return new ImageDoesNotExistError();
             
             var newCroppedImage = await _appImageService.CreateCroppedImageAsync(croppedImage, command.CropParameters);
             await _croppedRepository.AddAsync(newCroppedImage);

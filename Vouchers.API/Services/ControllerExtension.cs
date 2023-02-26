@@ -2,6 +2,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Vouchers.Application;
 using Vouchers.Application.Abstractions;
+using Vouchers.Application.Errors;
 
 namespace Vouchers.API.Services;
 
@@ -11,7 +12,7 @@ public static class ControllerExtension
     {
         if (result.IsFailure)
         {
-            if (result.Errors.First() == Error.NotRegistered())
+            if (result.Errors.OfType<NotRegisteredError>().Any())
                 return controller.NotFound();
                 
             return controller.BadRequest(result.Errors);

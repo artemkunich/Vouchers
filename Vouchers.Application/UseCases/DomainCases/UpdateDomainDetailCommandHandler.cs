@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Vouchers.Application.Abstractions;
 using Vouchers.Application.Commands.DomainCommands;
+using Vouchers.Application.Errors;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Services;
 using Vouchers.Domains.Domain;
@@ -20,30 +21,26 @@ internal sealed class UpdateDomainDetailCommandHandler : IHandler<UpdateDomainDe
     private readonly IRepository<Domain, Guid> _domainRepository;
     private readonly IRepository<CroppedImage, Guid> _croppedRepository;
     private readonly IAppImageService _appImageService;
-    private readonly ICultureInfoProvider _cultureInfoProvider;
     public UpdateDomainDetailCommandHandler(IAuthIdentityProvider authIdentityProvider, IReadOnlyRepository<DomainAccount,Guid> domainAccountRepository, 
-        IRepository<Domain,Guid> domainRepository, IAppImageService appImageService, ICultureInfoProvider cultureInfoProvider, IRepository<CroppedImage, Guid> croppedRepository)
+        IRepository<Domain,Guid> domainRepository, IAppImageService appImageService, IRepository<CroppedImage, Guid> croppedRepository)
     {
         _authIdentityProvider = authIdentityProvider;
         _domainAccountRepository = domainAccountRepository;
         _domainRepository = domainRepository;
         _appImageService = appImageService;
-        _cultureInfoProvider = cultureInfoProvider;
         _croppedRepository = croppedRepository;
     }
 
     public async Task<Result<Unit>> HandleAsync(UpdateDomainDetailCommand command, CancellationToken cancellation)
     {
-        var cultureInfo = _cultureInfoProvider.GetCultureInfo();
-        
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
 
         var domainAccount = (await _domainAccountRepository.GetByExpressionAsync(account => account.DomainId == command.DomainId && account.IdentityId == authIdentityId)).FirstOrDefault();
         if (domainAccount is null)
-            return Error.DomainAccountDoesNotExist(cultureInfo);
+            return new DomainAccountDoesNotExistError();
 
         if (!domainAccount.IsAdmin && domainAccount.Domain.Contract.PartyId != authIdentityId)
-            return Error.OperationIsNotAllowed(cultureInfo);
+            return new OperationIsNotAllowedError();
 
         var requireUpdate = false;
         var domain = domainAccount.Domain;
@@ -62,7 +59,7 @@ internal sealed class UpdateDomainDetailCommandHandler : IHandler<UpdateDomainDe
         {
             var croppedImage = await _croppedRepository.GetByIdAsync(domain.ImageId.Value);
             if (croppedImage is null)
-                return Error.ImageDoesNotExist();
+                return new ImageDoesNotExistError();
             
             var newCroppedImage = await _appImageService.CreateCroppedImageAsync(croppedImage, command.CropParameters);
             await _croppedRepository.AddAsync(newCroppedImage);

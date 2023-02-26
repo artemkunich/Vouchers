@@ -7,6 +7,7 @@ using System.Threading;
 using Vouchers.Application.Abstractions;
 using Vouchers.Domains.Domain;
 using Vouchers.Application.Dtos;
+using Vouchers.Application.Errors;
 using Vouchers.Application.Services;
 
 namespace Vouchers.Application.UseCases.HolderTransactionRequestCases;
@@ -19,10 +20,9 @@ internal sealed class CreateHolderTransactionRequestCommandHandler : IHandler<Cr
     private readonly IReadOnlyRepository<UnitType,Guid> _unitTypeRepository;
     private readonly IRepository<HolderTransactionRequest,Guid> _holderTransactionRequestRepository;
     private readonly IIdentifierProvider<Guid> _identifierProvider;
-    private readonly ICultureInfoProvider _cultureInfoProvider;
     public CreateHolderTransactionRequestCommandHandler(IAuthIdentityProvider authIdentityProvider, 
         IReadOnlyRepository<DomainAccount,Guid> domainAccountRepository, IReadOnlyRepository<Account,Guid> accountRepository, 
-        IReadOnlyRepository<UnitType,Guid> unitTypeRepository, IRepository<HolderTransactionRequest,Guid> holderTransactionRequestRepository, IIdentifierProvider<Guid> identifierProvider, ICultureInfoProvider cultureInfoProvider)
+        IReadOnlyRepository<UnitType,Guid> unitTypeRepository, IRepository<HolderTransactionRequest,Guid> holderTransactionRequestRepository, IIdentifierProvider<Guid> identifierProvider)
     {
         _authIdentityProvider = authIdentityProvider;
         _domainAccountRepository = domainAccountRepository;
@@ -30,18 +30,15 @@ internal sealed class CreateHolderTransactionRequestCommandHandler : IHandler<Cr
         _unitTypeRepository = unitTypeRepository;
         _holderTransactionRequestRepository = holderTransactionRequestRepository;
         _identifierProvider = identifierProvider;
-        _cultureInfoProvider = cultureInfoProvider;
     }
 
     public async Task<Result<IdDto<Guid>>> HandleAsync(CreateHolderTransactionRequestCommand command, CancellationToken cancellation)
     {
-        var cultureInfo = _cultureInfoProvider.GetCultureInfo();
-        
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
         
         var debtorDomainAccount = await _domainAccountRepository.GetByIdAsync(command.DebtorAccountId);
         if (debtorDomainAccount?.IdentityId != authIdentityId)
-            return Error.OperationIsNotAllowed(cultureInfo);
+            return new OperationIsNotAllowedError();
 
         var debtorAccount = await _accountRepository.GetByIdAsync(command.DebtorAccountId);
 

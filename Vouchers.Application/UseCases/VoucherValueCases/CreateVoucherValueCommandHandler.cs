@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using Vouchers.Application.Abstractions;
 using Vouchers.Application.Dtos;
+using Vouchers.Application.Errors;
 using Vouchers.Files.Domain;
 using Vouchers.Domains.Domain;
 using Vouchers.Application.Services;
@@ -25,11 +26,10 @@ internal sealed class CreateVoucherValueCommandHandler : IHandler<CreateVoucherV
     private readonly IRepository<CroppedImage, Guid> _croppedRepository;
     private readonly IAppImageService _appImageService;
     private readonly IIdentifierProvider<Guid> _identifierProvider;
-    private readonly ICultureInfoProvider _cultureInfoProvider;
-    
+
     public CreateVoucherValueCommandHandler(IAuthIdentityProvider authIdentityProvider, IAppImageService appImageService,
         IReadOnlyRepository<DomainAccount,Guid> domainAccountRepository, IReadOnlyRepository<Account,Guid> accountRepository,
-        IRepository<VoucherValue,Guid> voucherValueRepository, IRepository<UnitType,Guid> unitTypeRepository, IIdentifierProvider<Guid> identifierProvider, ICultureInfoProvider cultureInfoProvider, IRepository<CroppedImage, Guid> croppedRepository)
+        IRepository<VoucherValue,Guid> voucherValueRepository, IRepository<UnitType,Guid> unitTypeRepository, IIdentifierProvider<Guid> identifierProvider, IRepository<CroppedImage, Guid> croppedRepository)
     {
         _authIdentityProvider = authIdentityProvider;
         _domainAccountRepository = domainAccountRepository;
@@ -37,24 +37,21 @@ internal sealed class CreateVoucherValueCommandHandler : IHandler<CreateVoucherV
         _voucherValueRepository = voucherValueRepository;
         _unitTypeRepository = unitTypeRepository;
         _identifierProvider = identifierProvider;
-        _cultureInfoProvider = cultureInfoProvider;
         _croppedRepository = croppedRepository;
         _appImageService = appImageService;
     }
 
     public async Task<Result<IdDto<Guid>>> HandleAsync(CreateVoucherValueCommand command, CancellationToken cancellation)
     {
-        var cultureInfo = _cultureInfoProvider.GetCultureInfo();
-        
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
 
         var issuerDomainAccount = await _domainAccountRepository.GetByIdAsync(command.IssuerAccountId);
         if (issuerDomainAccount?.IdentityId != authIdentityId)
-            return Error.OperationIsNotAllowed(cultureInfo);
+            return new OperationIsNotAllowedError();
         if (!issuerDomainAccount.IsConfirmed)
-            return Error.IssuerAccountIsNotActivated(cultureInfo);
+            return new IssuerAccountIsNotActivatedError();
         if (!issuerDomainAccount.IsIssuer)
-            return Error.IssuerOperationsAreNotAllowed(cultureInfo);
+            return new IssuerOperationsAreNotAllowedError();
 
         CroppedImage croppedImage = null;
         if (command.Image is not null && command.CropParameters is not null)

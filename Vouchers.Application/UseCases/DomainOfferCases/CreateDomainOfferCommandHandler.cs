@@ -16,16 +16,12 @@ namespace Vouchers.Application.UseCases.DomainOfferCases;
 
 internal sealed class CreateDomainOfferCommandHandler : IHandler<CreateDomainOfferCommand, IdDto<Guid>>
 {
-    private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IRepository<DomainOffer,Guid> _domainOfferRepository;
     private readonly IIdentifierProvider<Guid> _identifierProvider;
-    private readonly ICultureInfoProvider _cultureInfoProvider;
-    public CreateDomainOfferCommandHandler(IAuthIdentityProvider authIdentityProvider, IRepository<DomainOffer,Guid> domainOfferRepository, IIdentifierProvider<Guid> identifierProvider, ICultureInfoProvider cultureInfoProvider)
+    public CreateDomainOfferCommandHandler(IRepository<DomainOffer,Guid> domainOfferRepository, IIdentifierProvider<Guid> identifierProvider)
     {
-        _authIdentityProvider = authIdentityProvider;
         _domainOfferRepository = domainOfferRepository;
         _identifierProvider = identifierProvider;
-        _cultureInfoProvider = cultureInfoProvider;
     }
 
     public async Task<Result<IdDto<Guid>>> HandleAsync(CreateDomainOfferCommand command, CancellationToken cancellation)

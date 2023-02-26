@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Vouchers.Application.Abstractions;
 using Vouchers.Application.Commands.DomainAccountCommands;
 using Vouchers.Application.Dtos;
+using Vouchers.Application.Errors;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Services;
 using Vouchers.Core.Domain;
@@ -22,10 +23,9 @@ internal sealed class CreateDomainAccountCommandHandler : IHandler<CreateDomainA
     private readonly IRepository<Account,Guid> _accountRepository;
     private readonly IIdentifierProvider<Guid> _identifierProvider;
     private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly ICultureInfoProvider _cultureInfoProvider;
 
     public CreateDomainAccountCommandHandler(IAuthIdentityProvider authIdentityProvider, IReadOnlyRepository<Domain,Guid> domainRepository, 
-        IRepository<DomainAccount,Guid> domainAccountRepository, IRepository<Account,Guid> accountRepository, IIdentifierProvider<Guid> identifierProvider, IDateTimeProvider dateTimeProvider, ICultureInfoProvider cultureInfoProvider)
+        IRepository<DomainAccount,Guid> domainAccountRepository, IRepository<Account,Guid> accountRepository, IIdentifierProvider<Guid> identifierProvider, IDateTimeProvider dateTimeProvider)
     {
         _authIdentityProvider = authIdentityProvider;
         _domainRepository = domainRepository;
@@ -33,18 +33,15 @@ internal sealed class CreateDomainAccountCommandHandler : IHandler<CreateDomainA
         _accountRepository = accountRepository;
         _identifierProvider = identifierProvider;
         _dateTimeProvider = dateTimeProvider;
-        _cultureInfoProvider = cultureInfoProvider;
     }
 
     public async Task<Result<IdDto<Guid>>> HandleAsync(CreateDomainAccountCommand command, CancellationToken cancellation)
     {
-        var cultureInfo = _cultureInfoProvider.GetCultureInfo();
-        
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
 
         var domain = await _domainRepository.GetByIdAsync(command.DomainId);
         if (domain is null)
-            return Error.DomainDoesNotExist(cultureInfo);
+            return new DomainDoesNotExistError();
 
         var accountId = _identifierProvider.CreateNewId();
         var account = Account.Create(accountId, _dateTimeProvider.CurrentDateTime());

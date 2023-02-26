@@ -1,14 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Vouchers.Application.Abstractions;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Services;
 using Vouchers.Identities.Domain;
 
 namespace Vouchers.Application.ServiceProviders;
 
+[ApplicationService(typeof(IAuthIdentityProvider))]
 public class AuthIdentityProvider : IAuthIdentityProvider
 {
     private readonly ILoginNameProvider _loginNameProvider;

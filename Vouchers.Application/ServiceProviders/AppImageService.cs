@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Vouchers.Application.Abstractions;
 using Vouchers.Application.Dtos;
@@ -12,6 +9,7 @@ using Vouchers.Files.Domain;
 
 namespace Vouchers.Application.ServiceProviders;
 
+[ApplicationService(typeof(IAppImageService))]
 internal sealed class AppImageService : IAppImageService
 {
     private readonly IImageService _imageService;

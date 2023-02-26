@@ -32,18 +32,13 @@ public static class TypeExtensions
 }
 public static class ServiceCollectionExtension
 {
-    public static IServiceCollection AddRepositories(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddRepositoryForEntities(this IServiceCollection services, Assembly assembly)
     {
         services.AddScoped<IMessageDataSerializer, MessageDataSerializer>();
         
-        var assemblies = Assembly.GetExecutingAssembly().GetReferencedAssemblies().Select(Assembly.Load).Where(x => x.FullName != null && x.FullName.StartsWith("Vouchers")).ToList();
-        assemblies.Add(Assembly.GetExecutingAssembly());
-        
-        var entityTypes = assemblies.SelectMany(assembly => 
-            assembly.GetTypes().Where(t =>
-                t.IsClass && !t.IsAbstract &&
-                t.GetInterfaces().Any(type => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IEntity<>))
-            )
+        var entityTypes = assembly.GetTypes().Where(t =>
+            t.IsClass && !t.IsAbstract &&
+            t.GetInterfaces().Any(type => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IEntity<>))
         ).ToList();
 
         var executingAssembly = Assembly.GetExecutingAssembly();

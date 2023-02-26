@@ -8,6 +8,7 @@ using Vouchers.Application.Infrastructure;
 using Vouchers.Domains.Domain;
 using Vouchers.Application.Commands.IssuerTransactionCommands;
 using Vouchers.Application.Dtos;
+using Vouchers.Application.Errors;
 using Vouchers.Application.Services;
 using Unit = Vouchers.Core.Domain.Unit;
 
@@ -23,11 +24,10 @@ internal sealed class CreateIssuerTransactionCommandHandler : IHandler<CreateIss
     private readonly IRepository<IssuerTransaction,Guid> _issuerTransactionRepository;
     private readonly IIdentifierProvider<Guid> _identifierProvider;
     private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly ICultureInfoProvider _cultureInfoProvider;
     public CreateIssuerTransactionCommandHandler(IAuthIdentityProvider authIdentityProvider,
         IReadOnlyRepository<DomainAccount,Guid> domainAccountRepository, IReadOnlyRepository<Account,Guid> accountRepository, 
         IReadOnlyRepository<AccountItem,Guid> accountItemRepository, IReadOnlyRepository<Unit,Guid> unitRepository, 
-        IRepository<IssuerTransaction,Guid> issuerTransactionRepository, IIdentifierProvider<Guid> identifierProvider, IDateTimeProvider dateTimeProvider, ICultureInfoProvider cultureInfoProvider) 
+        IRepository<IssuerTransaction,Guid> issuerTransactionRepository, IIdentifierProvider<Guid> identifierProvider, IDateTimeProvider dateTimeProvider) 
     {
         _authIdentityProvider = authIdentityProvider;
         _domainAccountRepository = domainAccountRepository;
@@ -37,25 +37,22 @@ internal sealed class CreateIssuerTransactionCommandHandler : IHandler<CreateIss
         _issuerTransactionRepository = issuerTransactionRepository;
         _identifierProvider = identifierProvider;
         _dateTimeProvider = dateTimeProvider;
-        _cultureInfoProvider = cultureInfoProvider;
     }
 
     public async Task<Result<IdDto<Guid>>> HandleAsync(CreateIssuerTransactionCommand command, CancellationToken cancellation)
     {
-        var cultureInfo = _cultureInfoProvider.GetCultureInfo();
-        
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
 
         var issuerDomainAccount = await _domainAccountRepository.GetByIdAsync(command.IssuerAccountId);
         if (issuerDomainAccount?.IdentityId != authIdentityId)
-            return Error.OperationIsNotAllowed(cultureInfo);
+            return new OperationIsNotAllowedError();
         
         if (!issuerDomainAccount.IsConfirmed)
-            return Error.IssuerAccountIsNotActivated(cultureInfo);
+            return new IssuerAccountIsNotActivatedError();
 
         var issuerAccount = await _accountRepository.GetByIdAsync(command.IssuerAccountId);
         if (issuerAccount is null)
-            return Error.IssuerAccountDoesNotExist(cultureInfo);
+            return new IssuerAccountDoesNotExistError();
 
         var accountItem = (await _accountItemRepository.GetByExpressionAsync(accItem => accItem.HolderAccountId == issuerAccount.Id && accItem.Unit.Id == command.VoucherId)).FirstOrDefault();
         if (accountItem is null)
@@ -67,7 +64,7 @@ internal sealed class CreateIssuerTransactionCommandHandler : IHandler<CreateIss
                 accountItem = AccountItem.Create(accountItemId, issuerAccount, unit);
             }
             else
-                return Error.IssuerDoesNotHaveAccountItemForUnit(cultureInfo);
+                return new IssuerDoesNotHaveAccountItemForUnitError();
         }
 
         var transactionId = _identifierProvider.CreateNewId();
