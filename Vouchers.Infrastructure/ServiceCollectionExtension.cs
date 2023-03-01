@@ -5,6 +5,7 @@ using Vouchers.Application.Infrastructure;
 using Vouchers.Application.PipelineBehaviors;
 using Vouchers.Application.ServiceProviders;
 using Vouchers.Application.Services;
+using Vouchers.Infrastructure.EventPipelineBehaviors;
 using Vouchers.Infrastructure.InterCommunication;
 using Vouchers.Infrastructure.Pipeline;
 using Vouchers.Primitives;
@@ -19,14 +20,10 @@ public static class ServiceCollectionExtension
             .AddScoped<IIdentifierProvider<Guid>, GuidIdentifierProvider>()
             .AddScoped<IDateTimeProvider, DateTimeProvider>();
 
-    public static IServiceCollection AddApplicationServices(this IServiceCollection services)
-    {
+    public static IServiceCollection AddApplicationServices(this IServiceCollection services) =>
         services
             .AddScoped<IAppImageService, AppImageService>()
             .AddScoped<IAuthIdentityProvider, AuthIdentityProvider>();
-
-        return services;
-    }
 
     public static IServiceCollection AddHandlers(this IServiceCollection services, Assembly assembly)
     {
@@ -59,39 +56,14 @@ public static class ServiceCollectionExtension
         return services;
     }
     
-    public static IServiceCollection AddPipelineBehaviors(this IServiceCollection services, Assembly assembly)
-    {
-        var pipelineBehaviorGenericTypes = assembly.GetTypes().Where(t =>
-            !t.IsAbstract && !t.IsInterface && t.IsGenericType &&
-            t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IRequestPipelineBehavior<,>))
-        ).ToList().OrderBy(t => 
-            t.CustomAttributes.OfType<PipelineBehaviorPriorityAttribute>().Select(a => a.Priority).FirstOrDefault(uint.MinValue)
-        ).ToList();
+    public static IServiceCollection AddRequestPipelineBehaviors(this IServiceCollection services, Assembly assembly) =>
+        services
+            .AddScoped(typeof(IRequestPipelineBehavior<,>), typeof(ErrorsCultureInfo<,>))
+            .AddScoped(typeof(IRequestPipelineBehavior<,>), typeof(IdentityRegistrationBehavior<,>));
 
-        foreach (var pipelineBehaviorGenericType in pipelineBehaviorGenericTypes)
-        {
-            services.AddScoped(typeof(IRequestPipelineBehavior<,>), pipelineBehaviorGenericType);
-        }
-
-        return services;
-    }
-    
-    public static IServiceCollection AddEventPipelineBehaviors(this IServiceCollection services, Assembly assembly)
-    {
-        var pipelineBehaviorGenericTypes = assembly.GetTypes().Where(t =>
-            !t.IsAbstract && !t.IsInterface && t.IsGenericType &&
-            t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEventPipelineBehavior<>))
-        ).ToList().OrderBy(t => 
-            t.CustomAttributes.OfType<PipelineBehaviorPriorityAttribute>().Select(a => a.Priority).FirstOrDefault(uint.MinValue)
-        ).ToList();
-
-        foreach (var pipelineBehaviorGenericType in pipelineBehaviorGenericTypes)
-        {
-            services.AddScoped(typeof(IEventPipelineBehavior<>), pipelineBehaviorGenericType);
-        }
-
-        return services;
-    }
+    public static IServiceCollection AddEventPipelineBehaviors(this IServiceCollection services, Assembly assembly) =>
+        services
+            .AddScoped(typeof(IEventPipelineBehavior<>), typeof(TestEventPipelineBehavior<>));
     
     public static IServiceCollection AddGenericPipeline(this IServiceCollection services)
     {

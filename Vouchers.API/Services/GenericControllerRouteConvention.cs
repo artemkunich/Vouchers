@@ -67,9 +67,9 @@ public class GenericControllerRouteConvention : IControllerModelConvention
         }
             
         var authorizeAttribute = controller.Attributes.OfType<AuthorizeAttribute>().FirstOrDefault();
-        var appRoleAttribute = genericRequestType.GetCustomAttributes().OfType<ApplicationRolesAttribute>().FirstOrDefault();
-        if(authorizeAttribute is not null && appRoleAttribute is not null)
-            authorizeAttribute.Roles = string.Join(",", appRoleAttribute.Roles.Select(Enum.GetName));
+        var identityRoleAttribute = genericRequestType.GetCustomAttributes().OfType<IdentityRolesAttribute>().FirstOrDefault();
+        if(authorizeAttribute is not null && identityRoleAttribute is not null)
+            authorizeAttribute.Roles = string.Join(",", identityRoleAttribute.Roles.Select(Enum.GetName));
             
         var actionSelector = controller.Actions.First().Selectors.First();
         actionSelector.AttributeRouteModel = new AttributeRouteModel

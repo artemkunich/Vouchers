@@ -7,7 +7,7 @@ using Vouchers.Application.Dtos;
 
 namespace Vouchers.Application.Commands.DomainCommands;
 
-[ApplicationRoles(ApplicationRole.User)]
+[IdentityRoles(IdentityRole.User)]
 public sealed class CreateDomainCommand : IRequest<IdDto<Guid>>
 {
     [Required]

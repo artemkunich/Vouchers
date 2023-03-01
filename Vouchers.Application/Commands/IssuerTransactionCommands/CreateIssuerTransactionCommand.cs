@@ -7,7 +7,7 @@ using Vouchers.Application.Dtos;
 
 namespace Vouchers.Application.Commands.IssuerTransactionCommands;
 
-[ApplicationRoles(ApplicationRole.User)]
+[IdentityRoles(IdentityRole.User)]
 public sealed class CreateIssuerTransactionCommand : IRequest<IdDto<Guid>>
 {
     [Required]

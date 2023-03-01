@@ -121,7 +121,7 @@ public class Startup
             .AddApplicationServices()
             .AddHandlers(typeof(IRequestHandler<,>).Assembly)
             .AddHandlers(typeof(VouchersDbContext).Assembly)
-            .AddPipelineBehaviors(typeof(IRequestHandler<,>).Assembly)
+            .AddRequestPipelineBehaviors(typeof(IRequestHandler<,>).Assembly)
             .AddEventPipelineBehaviors(typeof(IMessageHandler<>).Assembly)
             .AddGenericPipeline();
         

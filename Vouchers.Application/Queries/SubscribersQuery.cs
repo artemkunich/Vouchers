@@ -6,7 +6,7 @@ using Vouchers.Application.Dtos;
 
 namespace Vouchers.Application.Queries;
 
-[ApplicationRoles(ApplicationRole.User)]
+[IdentityRoles(IdentityRole.User)]
 public sealed class SubscribersQuery : ListQuery, IRequest<IReadOnlyList<SubscriberDto>>
 {
     [Required]

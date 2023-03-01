@@ -4,7 +4,7 @@ using Vouchers.Application.Abstractions;
 
 namespace Vouchers.Application.Commands.HolderTransactionRequestCommands;
 
-[ApplicationRoles(ApplicationRole.User)]
+[IdentityRoles(IdentityRole.User)]
 public sealed class DeleteHolderTransactionRequestCommand : IRequest<Unit>
 {
     [Required]

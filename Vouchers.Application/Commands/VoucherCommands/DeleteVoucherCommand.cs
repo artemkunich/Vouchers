@@ -7,7 +7,7 @@ using Vouchers.Application.Dtos;
 
 namespace Vouchers.Application.Commands.VoucherCommands;
 
-[ApplicationRoles(ApplicationRole.User)]
+[IdentityRoles(IdentityRole.User)]
 public sealed class DeleteVoucherCommand : IRequest<Unit>
 {
     [Required]

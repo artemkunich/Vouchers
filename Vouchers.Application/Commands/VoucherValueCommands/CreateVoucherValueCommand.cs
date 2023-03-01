@@ -8,7 +8,7 @@ using Vouchers.Application.Dtos;
 
 namespace Vouchers.Application.Commands.VoucherValueCommands;
 
-[ApplicationRoles(ApplicationRole.User)]
+[IdentityRoles(IdentityRole.User)]
 public sealed class CreateVoucherValueCommand : IRequest<IdDto<Guid>>
 {
     [Required]

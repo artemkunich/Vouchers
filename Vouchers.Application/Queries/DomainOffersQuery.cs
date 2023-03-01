@@ -6,7 +6,7 @@ using Vouchers.Application.Dtos;
 
 namespace Vouchers.Application.Queries;
 
-[ApplicationRoles(ApplicationRole.Manager)]
+[IdentityRoles(IdentityRole.Manager)]
 public sealed class DomainOffersQuery : ListQuery, IRequest<IReadOnlyList<DomainOfferDto>>
 {
     public string Name { get; set; }

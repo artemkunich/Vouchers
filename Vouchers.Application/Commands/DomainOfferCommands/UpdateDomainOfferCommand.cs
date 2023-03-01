@@ -7,7 +7,7 @@ using Vouchers.Application.Dtos;
 
 namespace Vouchers.Application.Commands.DomainOfferCommands;
 
-[ApplicationRoles(ApplicationRole.Manager)]
+[IdentityRoles(IdentityRole.Manager)]
 public sealed class UpdateDomainOfferCommand : IRequest<Unit>
 {
     [Required]

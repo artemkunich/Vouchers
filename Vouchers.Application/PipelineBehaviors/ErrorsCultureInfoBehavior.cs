@@ -1,16 +1,11 @@
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Vouchers.Application.Abstractions;
-using Vouchers.Application.Commands.IdentityCommands;
-using Vouchers.Application.Errors;
 using Vouchers.Application.Infrastructure;
-using Vouchers.Application.Services;
 using Vouchers.Application.UseCases;
 
 namespace Vouchers.Application.PipelineBehaviors;
 
-[PipelineBehaviorPriority(9)]
 public class ErrorsCultureInfo<TRequest, TResponse> : IRequestPipelineBehavior<TRequest, TResponse>
 {
     private readonly ICultureInfoProvider _cultureInfoProvider;

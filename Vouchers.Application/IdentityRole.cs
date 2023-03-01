@@ -1,6 +1,6 @@
 namespace Vouchers.Application;
 
-public enum ApplicationRole
+public enum IdentityRole
 {
     Admin,
     User,

@@ -96,7 +96,7 @@ builder.Services
     .AddApplicationServices()
     .AddHandlers(typeof(IRequestHandler<,>).Assembly)
     .AddHandlers(typeof(VouchersDbContext).Assembly)
-    .AddPipelineBehaviors(typeof(IRequestHandler<,>).Assembly)
+    .AddRequestPipelineBehaviors(typeof(IRequestHandler<,>).Assembly)
     .AddGenericPipeline()
     
     .AddFormValidators()

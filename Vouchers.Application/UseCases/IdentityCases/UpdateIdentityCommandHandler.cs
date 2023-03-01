@@ -37,7 +37,7 @@ internal sealed class UpdateIdentityCommandHandler : IRequestHandler<UpdateIdent
             return new IdentityDoesNotExistError();
 
         var isChanged = false;
-        var identityUpdatedDomainEvent = new IdentityUpdatedEvent();
+        var identityUpdatedEvent = new IdentityUpdatedEvent();
             
         if (command.Image is not null && command.CropParameters is not null)
         {
@@ -45,7 +45,7 @@ internal sealed class UpdateIdentityCommandHandler : IRequestHandler<UpdateIdent
             var croppedImage = await _appImageService.CreateCroppedImageAsync(imageStream, command.CropParameters);
             await _croppedRepository.AddAsync(croppedImage);
             identity.ImageId = croppedImage.Id;
-            identityUpdatedDomainEvent.NewImageId = croppedImage.Id;
+            identityUpdatedEvent.NewImageId = croppedImage.Id;
 
             isChanged = true;
         }
@@ -61,7 +61,7 @@ internal sealed class UpdateIdentityCommandHandler : IRequestHandler<UpdateIdent
             
             identity.ImageId = newCroppedImage.Id;
 
-            identityUpdatedDomainEvent.NewImageId = newCroppedImage.Id;
+            identityUpdatedEvent.NewImageId = newCroppedImage.Id;
 
             isChanged = true;
         }
@@ -69,7 +69,7 @@ internal sealed class UpdateIdentityCommandHandler : IRequestHandler<UpdateIdent
         if (identity.FirstName != command.FirstName)
         {
             identity.FirstName = command.FirstName;
-            identityUpdatedDomainEvent.NewFirstName = identity.FirstName;
+            identityUpdatedEvent.NewFirstName = identity.FirstName;
                 
             isChanged = true;
         }
@@ -77,7 +77,7 @@ internal sealed class UpdateIdentityCommandHandler : IRequestHandler<UpdateIdent
         if (identity.LastName != command.LastName)
         {
             identity.LastName = command.LastName;
-            identityUpdatedDomainEvent.NewLastName = identity.LastName;
+            identityUpdatedEvent.NewLastName = identity.LastName;
                 
             isChanged = true;
         }
@@ -85,15 +85,15 @@ internal sealed class UpdateIdentityCommandHandler : IRequestHandler<UpdateIdent
         if (identity.Email != command.Email)
         {
             identity.Email = command.Email;
-            identityUpdatedDomainEvent.NewEmail = identity.Email;
+            identityUpdatedEvent.NewEmail = identity.Email;
                 
             isChanged = true;
         }
 
         if (isChanged)
         {
-            identityUpdatedDomainEvent.Id = Guid.NewGuid();
-            identity.RaiseEvent(identityUpdatedDomainEvent);
+            identityUpdatedEvent.Id = Guid.NewGuid();
+            identity.RaiseEvent(identityUpdatedEvent);
             await _identityRepository.UpdateAsync(identity);
         }
         

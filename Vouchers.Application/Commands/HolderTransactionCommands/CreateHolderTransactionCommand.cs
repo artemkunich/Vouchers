@@ -8,7 +8,7 @@ using Vouchers.Core.Domain;
 
 namespace Vouchers.Application.Commands.HolderTransactionCommands;
 
-[ApplicationRoles(ApplicationRole.User)]
+[IdentityRoles(IdentityRole.User)]
 public sealed class CreateHolderTransactionCommand : IRequest<IdDto<Guid>>
 {
     public Guid? HolderTransactionRequestId { get; set; }

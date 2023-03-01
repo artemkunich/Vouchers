@@ -7,7 +7,7 @@ using Vouchers.Application.Dtos;
 
 namespace Vouchers.Application.Queries;
 
-[ApplicationRoles(ApplicationRole.User)]
+[IdentityRoles(IdentityRole.User)]
 public sealed class DomainValuesQuery : ListQuery, IRequest<IReadOnlyList<VoucherValueDto>>
 {
     [Required]

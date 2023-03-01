@@ -4,12 +4,10 @@ using System.Threading.Tasks;
 using Vouchers.Application.Abstractions;
 using Vouchers.Application.Commands.IdentityCommands;
 using Vouchers.Application.Errors;
-using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Services;
 
 namespace Vouchers.Application.PipelineBehaviors;
 
-[PipelineBehaviorPriority(10)]
 public class IdentityRegistrationBehavior<TRequest, TResponse> : IRequestPipelineBehavior<TRequest, TResponse>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;

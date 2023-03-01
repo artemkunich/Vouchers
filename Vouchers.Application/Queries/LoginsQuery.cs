@@ -7,7 +7,7 @@ using Vouchers.Application.Dtos;
 
 namespace Vouchers.Application.Queries;
 
-[ApplicationRoles(ApplicationRole.Admin)]
+[IdentityRoles(IdentityRole.Admin)]
 public sealed class LoginsQuery : ListQuery, IRequest<IReadOnlyList<LoginDto>>
 {
     public string LoginName { get; set; }
