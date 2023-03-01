@@ -28,7 +28,7 @@ public class OutboxMessagesProcessingService : BackgroundService
             _domainEventTypes = assemblies.SelectMany(assembly =>
                 assembly.GetTypes().Where(type =>
                     !type.IsInterface && !type.IsAbstract &&
-                    typeof(IDomainEvent).IsAssignableFrom(type))
+                    typeof(IEvent).IsAssignableFrom(type))
                 ).ToArray();
 
             return _domainEventTypes;

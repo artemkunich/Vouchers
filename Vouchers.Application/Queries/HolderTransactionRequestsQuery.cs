@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Vouchers.Application.Abstractions;
+using Vouchers.Application.Dtos;
 
 namespace Vouchers.Application.Queries;
 
 [ApplicationRoles(ApplicationRole.User)]
-public sealed class HolderTransactionRequestsQuery : ListQuery
+public sealed class HolderTransactionRequestsQuery : ListQuery, IRequest<IReadOnlyList<HolderTransactionRequestDto>>
 {
     public string Ticker { get; set; }
     public string IssuerName { get; set; }

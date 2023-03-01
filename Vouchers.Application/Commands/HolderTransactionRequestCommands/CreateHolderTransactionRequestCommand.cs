@@ -1,10 +1,12 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using Vouchers.Application.Abstractions;
+using Vouchers.Application.Dtos;
 
 namespace Vouchers.Application.Commands.HolderTransactionRequestCommands;
 
 [ApplicationRoles(ApplicationRole.User)]
-public sealed class CreateHolderTransactionRequestCommand
+public sealed class CreateHolderTransactionRequestCommand : IRequest<IdDto<Guid>>
 {
     public Guid? CreditorAccountId { get; set; }
     [Required]

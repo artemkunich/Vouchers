@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using Vouchers.Application.Abstractions;
 using Vouchers.Application.Dtos;
 
 namespace Vouchers.Application.Commands.VoucherCommands;
 
 [ApplicationRoles(ApplicationRole.User)]
-public sealed class UpdateVoucherCommand
+public sealed class UpdateVoucherCommand  : IRequest<Unit>
 {
     [Required]
     public Guid Id { get; set; }

@@ -11,7 +11,7 @@ using Vouchers.Identities.Domain;
 
 namespace Vouchers.Application.UseCases.IdentityCases;
 
-internal sealed class CreateIdentityCommandHandler : IHandler<CreateIdentityCommand, IdDto<Guid>>
+internal sealed class CreateIdentityCommandHandler : IRequestHandler<CreateIdentityCommand, IdDto<Guid>>
 {
     private readonly ILoginNameProvider _loginNameProvider;
     private readonly IRepository<Login,Guid> _loginRepository;

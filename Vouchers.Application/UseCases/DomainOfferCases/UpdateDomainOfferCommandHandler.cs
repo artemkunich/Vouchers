@@ -14,7 +14,7 @@ using Unit = Vouchers.Core.Domain.Unit;
 
 namespace Vouchers.Application.UseCases.DomainOfferCases;
 
-internal sealed class UpdateDomainOfferCommandHandler : IHandler<UpdateDomainOfferCommand,Abstractions.Unit>
+internal sealed class UpdateDomainOfferCommandHandler : IRequestHandler<UpdateDomainOfferCommand,Abstractions.Unit>
 {
     private readonly IRepository<DomainOffer,Guid> _domainOfferRepository;
 

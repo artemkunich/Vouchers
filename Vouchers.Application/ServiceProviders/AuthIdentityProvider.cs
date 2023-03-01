@@ -8,7 +8,6 @@ using Vouchers.Identities.Domain;
 
 namespace Vouchers.Application.ServiceProviders;
 
-[ApplicationService(typeof(IAuthIdentityProvider))]
 public class AuthIdentityProvider : IAuthIdentityProvider
 {
     private readonly ILoginNameProvider _loginNameProvider;

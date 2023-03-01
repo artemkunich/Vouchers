@@ -3,6 +3,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Vouchers.Application.Abstractions;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.PipelineBehaviors;
+using Vouchers.Application.ServiceProviders;
+using Vouchers.Application.Services;
 using Vouchers.Infrastructure.InterCommunication;
 using Vouchers.Infrastructure.Pipeline;
 using Vouchers.Primitives;
@@ -17,17 +19,11 @@ public static class ServiceCollectionExtension
             .AddScoped<IIdentifierProvider<Guid>, GuidIdentifierProvider>()
             .AddScoped<IDateTimeProvider, DateTimeProvider>();
 
-    public static IServiceCollection AddApplicationServices(this IServiceCollection services, Assembly assembly)
+    public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
-        var applicationServiceTypes = assembly.GetTypes().Where(t => t.GetCustomAttributes(false).OfType<ApplicationServiceAttribute>().Any()).ToList();
-        foreach (var applicationServiceType in applicationServiceTypes)
-        {
-            var applicationServiceInterfaceTypes = applicationServiceType.GetCustomAttributes(false).OfType<ApplicationServiceAttribute>().Select(a => a.ServiceType);
-            foreach (var applicationServiceInterfaceType in applicationServiceInterfaceTypes)
-            {
-                services.AddScoped(applicationServiceInterfaceType, applicationServiceType);
-            }
-        }
+        services
+            .AddScoped<IAppImageService, AppImageService>()
+            .AddScoped<IAuthIdentityProvider, AuthIdentityProvider>();
 
         return services;
     }
@@ -36,13 +32,13 @@ public static class ServiceCollectionExtension
     {
         var handlerTypesTypes = assembly.GetTypes().Where(t =>
             !t.IsAbstract && !t.IsInterface && !t.IsGenericType &&
-            t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IHandler<,>))
+            t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IRequestHandler<,>))
         ).ToList();
 
         foreach (var handlerType in handlerTypesTypes)
         {
             var genericHandlerType = handlerType
-                .GetInterfaces().FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IHandler<,>));
+                .GetInterfaces().FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IRequestHandler<,>));
             if(genericHandlerType is null)
                 continue;
             
@@ -51,7 +47,7 @@ public static class ServiceCollectionExtension
             var firstGenericHandlerTypeArgument = genericHandlerType.GenericTypeArguments[0];
             var secondGenericHandlerTypeArgument = genericHandlerType.GenericTypeArguments[1];
             
-            if (typeof(IDomainEvent).IsAssignableFrom(firstGenericHandlerTypeArgument) && secondGenericHandlerTypeArgument == typeof(Unit))
+            if (typeof(IEvent).IsAssignableFrom(firstGenericHandlerTypeArgument) && secondGenericHandlerTypeArgument == typeof(Unit))
             {
                 var messageHandlerInterfaceType = typeof(IMessageHandler<>).MakeGenericType(firstGenericHandlerTypeArgument);
                 var messageHandlerType = typeof(MessageHandler<>).MakeGenericType(firstGenericHandlerTypeArgument);
@@ -67,14 +63,31 @@ public static class ServiceCollectionExtension
     {
         var pipelineBehaviorGenericTypes = assembly.GetTypes().Where(t =>
             !t.IsAbstract && !t.IsInterface && t.IsGenericType &&
-            t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IPipelineBehavior<,>))
+            t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IRequestPipelineBehavior<,>))
         ).ToList().OrderBy(t => 
             t.CustomAttributes.OfType<PipelineBehaviorPriorityAttribute>().Select(a => a.Priority).FirstOrDefault(uint.MinValue)
         ).ToList();
 
         foreach (var pipelineBehaviorGenericType in pipelineBehaviorGenericTypes)
         {
-            services.AddScoped(typeof(IPipelineBehavior<,>), pipelineBehaviorGenericType);
+            services.AddScoped(typeof(IRequestPipelineBehavior<,>), pipelineBehaviorGenericType);
+        }
+
+        return services;
+    }
+    
+    public static IServiceCollection AddEventPipelineBehaviors(this IServiceCollection services, Assembly assembly)
+    {
+        var pipelineBehaviorGenericTypes = assembly.GetTypes().Where(t =>
+            !t.IsAbstract && !t.IsInterface && t.IsGenericType &&
+            t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEventPipelineBehavior<>))
+        ).ToList().OrderBy(t => 
+            t.CustomAttributes.OfType<PipelineBehaviorPriorityAttribute>().Select(a => a.Priority).FirstOrDefault(uint.MinValue)
+        ).ToList();
+
+        foreach (var pipelineBehaviorGenericType in pipelineBehaviorGenericTypes)
+        {
+            services.AddScoped(typeof(IEventPipelineBehavior<>), pipelineBehaviorGenericType);
         }
 
         return services;

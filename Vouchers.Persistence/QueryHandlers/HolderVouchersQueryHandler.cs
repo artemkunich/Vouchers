@@ -19,7 +19,7 @@ using Unit = Vouchers.Core.Domain.Unit;
 
 namespace Vouchers.Persistence.QueryHandlers;
 
-internal sealed class HolderVouchersQueryHandler : IHandler<HolderVouchersQuery,IReadOnlyList<VoucherDto>>
+internal sealed class HolderVouchersQueryHandler : IRequestHandler<HolderVouchersQuery,IReadOnlyList<VoucherDto>>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly VouchersDbContext _dbContext;

@@ -12,7 +12,7 @@ using Vouchers.Identities.Domain.DomainEvents;
 
 namespace Vouchers.Application.UseCases.IdentityCases;
 
-internal sealed class UpdateIdentityCommandHandler : IHandler<UpdateIdentityCommand,Unit>
+internal sealed class UpdateIdentityCommandHandler : IRequestHandler<UpdateIdentityCommand,Unit>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IRepository<Identity,Guid> _identityRepository;
@@ -37,7 +37,7 @@ internal sealed class UpdateIdentityCommandHandler : IHandler<UpdateIdentityComm
             return new IdentityDoesNotExistError();
 
         var isChanged = false;
-        var identityUpdatedDomainEvent = new IdentityUpdatedDomainEvent();
+        var identityUpdatedDomainEvent = new IdentityUpdatedEvent();
             
         if (command.Image is not null && command.CropParameters is not null)
         {
@@ -93,7 +93,7 @@ internal sealed class UpdateIdentityCommandHandler : IHandler<UpdateIdentityComm
         if (isChanged)
         {
             identityUpdatedDomainEvent.Id = Guid.NewGuid();
-            identity.RaiseDomainEvent(identityUpdatedDomainEvent);
+            identity.RaiseEvent(identityUpdatedDomainEvent);
             await _identityRepository.UpdateAsync(identity);
         }
         

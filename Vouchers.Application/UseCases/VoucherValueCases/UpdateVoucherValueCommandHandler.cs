@@ -11,7 +11,7 @@ using Vouchers.Files.Domain;
 
 namespace Vouchers.Application.UseCases.VoucherValueCases;
 
-internal sealed class UpdateVoucherValueCommandHandler : IHandler<UpdateVoucherValueCommand,Unit>
+internal sealed class UpdateVoucherValueCommandHandler : IRequestHandler<UpdateVoucherValueCommand,Unit>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IRepository<VoucherValue,Guid> _voucherValueRepository;

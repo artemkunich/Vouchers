@@ -16,7 +16,7 @@ using Unit = Vouchers.Core.Domain.Unit;
 
 namespace Vouchers.Application.UseCases.HolderTransactionCases;
 
-internal sealed class CreateHolderTransactionCommandHandler : IHandler<CreateHolderTransactionCommand, IdDto<Guid>>
+internal sealed class CreateHolderTransactionCommandHandler : IRequestHandler<CreateHolderTransactionCommand, IdDto<Guid>>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IReadOnlyRepository<DomainAccount,Guid> _domainAccountRepository;

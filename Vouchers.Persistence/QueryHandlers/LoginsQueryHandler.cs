@@ -12,7 +12,7 @@ using Vouchers.Application.Abstractions;
 
 namespace Vouchers.Persistence.QueryHandlers;
 
-internal sealed class LoginsQueryHandler : IHandler<LoginsQuery, IReadOnlyList<LoginDto>>
+internal sealed class LoginsQueryHandler : IRequestHandler<LoginsQuery, IReadOnlyList<LoginDto>>
 {
     VouchersDbContext _dbContext;
 

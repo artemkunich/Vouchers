@@ -11,6 +11,7 @@ using System.Threading;
 using Vouchers.Application;
 using Vouchers.Application.Abstractions;
 using Vouchers.Application.Infrastructure;
+using Vouchers.Application.Queries;
 using Vouchers.Application.Services;
 using Vouchers.Core.Domain;
 using Vouchers.Domains.Domain;
@@ -19,7 +20,7 @@ using Vouchers.Values.Domain;
 
 namespace Vouchers.Persistence.QueryHandlers;
 
-internal sealed class HolderTransactionRequestQueryHandler : IHandler<Guid, HolderTransactionRequestDto>
+internal sealed class HolderTransactionRequestQueryHandler : IRequestHandler<HolderTransactionRequestQuery, HolderTransactionRequestDto>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly VouchersDbContext _dbContext;
@@ -30,11 +31,11 @@ internal sealed class HolderTransactionRequestQueryHandler : IHandler<Guid, Hold
         _dbContext = dbContext;
     }
 
-    public async Task<Result<HolderTransactionRequestDto>> HandleAsync(Guid transactionRequestId, CancellationToken cancellation) 
+    public async Task<Result<HolderTransactionRequestDto>> HandleAsync(HolderTransactionRequestQuery query, CancellationToken cancellation) 
     {
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
 
-        return await GetQuery(transactionRequestId, authIdentityId).FirstOrDefaultAsync(cancellation);
+        return await GetQuery(query.Id, authIdentityId).FirstOrDefaultAsync(cancellation);
     }
 
     private IQueryable<HolderTransactionRequestDto> GetQuery(Guid transactionRequestId, Guid authIdentityId) 

@@ -12,7 +12,7 @@ using Vouchers.Application.Services;
 
 namespace Vouchers.Application.UseCases.HolderTransactionRequestCases;
 
-internal sealed class CreateHolderTransactionRequestCommandHandler : IHandler<CreateHolderTransactionRequestCommand, IdDto<Guid>>
+internal sealed class CreateHolderTransactionRequestCommandHandler : IRequestHandler<CreateHolderTransactionRequestCommand, IdDto<Guid>>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IReadOnlyRepository<DomainAccount,Guid> _domainAccountRepository;

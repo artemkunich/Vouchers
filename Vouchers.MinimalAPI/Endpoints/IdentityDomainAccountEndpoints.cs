@@ -16,7 +16,7 @@ internal static class IdentityDomainAccountEndpoints
         app.MapGet("identityDomainAccounts", GetDomainAccounts).RequireAuthorization("ApiScope", "RoleUser");
     }
     
-    private static async Task<IResult> GetDomainAccounts(IHandler<IdentityDomainAccountsQuery,IEnumerable<DomainAccountDto>> handler,
+    private static async Task<IResult> GetDomainAccounts(IRequestHandler<IdentityDomainAccountsQuery,IEnumerable<DomainAccountDto>> requestHandler,
         [FromQuery] string? domainName,
         CancellationToken token)
     {
@@ -25,7 +25,7 @@ internal static class IdentityDomainAccountEndpoints
         {
             DomainName = domainName
         };
-        var result = await handler.HandleAsync(query, token);
+        var result = await requestHandler.HandleAsync(query, token);
         return Results.Ok(result);
     }
 }

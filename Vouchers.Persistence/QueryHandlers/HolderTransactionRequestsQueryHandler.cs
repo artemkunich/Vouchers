@@ -18,7 +18,7 @@ using Vouchers.Values.Domain;
 
 namespace Vouchers.Persistence.QueryHandlers;
 
-internal sealed class HolderTransactionRequestsQueryHandler : IHandler<HolderTransactionRequestsQuery,IReadOnlyList<HolderTransactionRequestDto>>
+internal sealed class HolderTransactionRequestsQueryHandler : IRequestHandler<HolderTransactionRequestsQuery,IReadOnlyList<HolderTransactionRequestDto>>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly VouchersDbContext _dbContext;

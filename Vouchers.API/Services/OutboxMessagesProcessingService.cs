@@ -10,43 +10,46 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using Vouchers.Core.Domain;
+using Vouchers.Domains.Domain;
+using Vouchers.Files.Domain;
+using Vouchers.Identities.Domain;
 using Vouchers.InterCommunication;
 using Vouchers.Infrastructure.InterCommunication;
 using Vouchers.Persistence;
 using Vouchers.Persistence.InterCommunication;
 using Vouchers.Primitives;
+using Vouchers.Values.Domain;
 
 namespace Vouchers.API.Services;
 
 public class OutboxMessagesProcessingService : BackgroundService
 {
     private readonly IServiceProvider _serviceProvider;
-
-    private Type[] _domainEventTypes;
-    private IEnumerable<Type> DomainEventTypes
-    {
-        get
-        {
-            if (_domainEventTypes != null)
-                return _domainEventTypes;
-            
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(x => x.FullName != null && x.FullName.StartsWith("Vouchers"));
-
-            _domainEventTypes = assemblies.SelectMany(assembly =>
-                assembly.GetTypes().Where(type =>
-                    !type.IsInterface && !type.IsAbstract &&
-                    typeof(IDomainEvent).IsAssignableFrom(type))
-                ).ToArray();
-
-            return _domainEventTypes;
-        }
-    }
-
+    private readonly Dictionary<string,Type> _domainEventTypes;
     public OutboxMessagesProcessingService(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
+        _domainEventTypes = new Dictionary<string, Type>();
+        
+        AddEventTypesFromAssembly(typeof(Account).Assembly); //Core
+        AddEventTypesFromAssembly(typeof(Domain).Assembly); //Domains
+        AddEventTypesFromAssembly(typeof(CroppedImage).Assembly); //Files
+        AddEventTypesFromAssembly(typeof(Identity).Assembly); //Identities
+        AddEventTypesFromAssembly(typeof(VoucherValue).Assembly); //Values
     }
-    
+
+    public void AddEventTypesFromAssembly(Assembly assembly)
+    {
+        var types = assembly.GetTypes()
+            .Where(type => !type.IsInterface && !type.IsAbstract && typeof(IEvent).IsAssignableFrom(type)).ToList();
+            
+        types.ForEach(type =>
+        {
+            if (type.FullName != null) _domainEventTypes[type.FullName] = type;
+        });
+    }
+
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         while (!stoppingToken.IsCancellationRequested)
@@ -78,10 +81,11 @@ public class OutboxMessagesProcessingService : BackgroundService
         {
             try
             {
-                Type eventType = DomainEventTypes.FirstOrDefault(type => type.FullName == outboxMessage.Type);
-                if (eventType is null)
+                if (!_domainEventTypes.ContainsKey(outboxMessage.Type))
                     break;
                 
+                var eventType = _domainEventTypes[outboxMessage.Type];
+
                 var messageHandlerType = typeof(IMessageHandler<>).MakeGenericType(eventType);
 
                 var messageHandler = serviceProvider.GetService(messageHandlerType);

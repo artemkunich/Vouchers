@@ -16,7 +16,7 @@ using Vouchers.Domains.Domain;
 
 namespace Vouchers.Persistence.QueryHandlers;
 
-internal sealed class DomainAccountsQueryHandler : IHandler<DomainAccountsQuery, IReadOnlyList<DomainAccountDto>>
+internal sealed class DomainAccountsQueryHandler : IRequestHandler<DomainAccountsQuery, IReadOnlyList<DomainAccountDto>>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly VouchersDbContext _dbContext;

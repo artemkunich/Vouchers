@@ -66,8 +66,8 @@ internal abstract class Repository<TAggregateRoot, TKey> : ReadOnlyRepository<TA
             .Select(x => x.Entity)
             .SelectMany(aggregateRoot =>
             {
-                var domainEvents = aggregateRoot.DomainEvents;
-                aggregateRoot.ClearDomainEvents();
+                var domainEvents = aggregateRoot.Events;
+                aggregateRoot.ClearEvents();
                 return domainEvents;
             }).ToList();
 

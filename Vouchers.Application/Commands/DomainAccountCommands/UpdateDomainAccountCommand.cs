@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using Vouchers.Application.Abstractions;
 using Vouchers.Application.Dtos;
 
 namespace Vouchers.Application.Commands.DomainAccountCommands;
 
 [ApplicationRoles(ApplicationRole.User)]
-public sealed class UpdateDomainAccountCommand
+public sealed class UpdateDomainAccountCommand : IRequest<Unit>
 {      
     [Required]
     public Guid DomainAccountId { get; set; }

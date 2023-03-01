@@ -15,7 +15,7 @@ using Vouchers.Domains.Domain;
 
 namespace Vouchers.Application.UseCases.DomainCases;
 
-internal sealed class CreateDomainCommandHandler : IHandler<CreateDomainCommand, IdDto<Guid>>
+internal sealed class CreateDomainCommandHandler : IRequestHandler<CreateDomainCommand, IdDto<Guid>>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IReadOnlyRepository<DomainOffer,Guid> _domainOfferRepository;

@@ -3,11 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using Vouchers.Application.Abstractions;
 using Vouchers.Application.Dtos;
 
 namespace Vouchers.Application.Commands.IdentityCommands;
 
-public sealed class UpdateIdentityCommand
+public sealed class UpdateIdentityCommand : IRequest<Unit>
 {
     public string LoginName { get; set; }
 

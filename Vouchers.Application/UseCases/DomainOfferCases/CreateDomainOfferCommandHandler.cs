@@ -14,7 +14,7 @@ using Vouchers.Domains.Domain;
 
 namespace Vouchers.Application.UseCases.DomainOfferCases;
 
-internal sealed class CreateDomainOfferCommandHandler : IHandler<CreateDomainOfferCommand, IdDto<Guid>>
+internal sealed class CreateDomainOfferCommandHandler : IRequestHandler<CreateDomainOfferCommand, IdDto<Guid>>
 {
     private readonly IRepository<DomainOffer,Guid> _domainOfferRepository;
     private readonly IIdentifierProvider<Guid> _identifierProvider;

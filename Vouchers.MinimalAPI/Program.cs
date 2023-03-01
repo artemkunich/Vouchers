@@ -93,10 +93,10 @@ builder.Services
     .AddRepositoryForEntities(typeof(Identity).Assembly) //Identities
     .AddRepositoryForEntities(typeof(VoucherValue).Assembly) //Values
     .AddInfrastructureServices()
-    .AddApplicationServices(typeof(ApplicationServiceAttribute).Assembly)
-    .AddHandlers(typeof(IHandler<,>).Assembly)
+    .AddApplicationServices()
+    .AddHandlers(typeof(IRequestHandler<,>).Assembly)
     .AddHandlers(typeof(VouchersDbContext).Assembly)
-    .AddPipelineBehaviors(typeof(IHandler<,>).Assembly)
+    .AddPipelineBehaviors(typeof(IRequestHandler<,>).Assembly)
     .AddGenericPipeline()
     
     .AddFormValidators()

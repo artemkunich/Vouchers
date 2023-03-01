@@ -10,7 +10,7 @@ using Vouchers.Application.Services;
 namespace Vouchers.Application.PipelineBehaviors;
 
 [PipelineBehaviorPriority(10)]
-public class IdentityRegistrationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+public class IdentityRegistrationBehavior<TRequest, TResponse> : IRequestPipelineBehavior<TRequest, TResponse>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
 

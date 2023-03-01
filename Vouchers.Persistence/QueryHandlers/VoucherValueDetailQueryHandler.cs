@@ -18,7 +18,7 @@ using Vouchers.Values.Domain;
 
 namespace Vouchers.Persistence.QueryHandlers;
 
-internal sealed class VoucherValueDetailQueryHandler : IHandler<VoucherValueDetailQuery,VoucherValueDetailDto>
+internal sealed class VoucherValueDetailQueryHandler : IRequestHandler<VoucherValueDetailQuery,VoucherValueDetailDto>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly VouchersDbContext _dbContext;

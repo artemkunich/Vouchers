@@ -3,7 +3,7 @@ using Vouchers.Primitives;
 
 namespace Vouchers.Identities.Domain.DomainEvents;
 
-public class IdentityUpdatedDomainEvent : DomainEvent
+public class IdentityUpdatedEvent : Event
 {
     public string NewFirstName { get; set; }
 

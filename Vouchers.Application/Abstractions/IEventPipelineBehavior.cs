@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Vouchers.Application.Abstractions;
 
-public interface IHandler<in TRequest, TResponse>
+public interface IEventPipelineBehavior<in TRequest>
 {
-    Task<Result<TResponse>> HandleAsync(TRequest request, CancellationToken cancellation);
+    Task<Result<Unit>> HandleAsync(TRequest request, CancellationToken cancellation, HandlerDelegate<Unit> next);
 }

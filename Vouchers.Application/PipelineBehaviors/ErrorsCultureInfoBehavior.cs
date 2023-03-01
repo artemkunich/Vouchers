@@ -11,7 +11,7 @@ using Vouchers.Application.UseCases;
 namespace Vouchers.Application.PipelineBehaviors;
 
 [PipelineBehaviorPriority(9)]
-public class ErrorsCultureInfo<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+public class ErrorsCultureInfo<TRequest, TResponse> : IRequestPipelineBehavior<TRequest, TResponse>
 {
     private readonly ICultureInfoProvider _cultureInfoProvider;
 

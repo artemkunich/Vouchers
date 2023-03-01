@@ -3,12 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using Vouchers.Application.Abstractions;
 using Vouchers.Application.Dtos;
 
 namespace Vouchers.Application.Commands.VoucherValueCommands;
 
 [ApplicationRoles(ApplicationRole.User)]
-public sealed class CreateVoucherValueCommand
+public sealed class CreateVoucherValueCommand : IRequest<IdDto<Guid>>
 {
     [Required]
     public Guid IssuerAccountId { get; set; }

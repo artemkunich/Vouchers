@@ -16,9 +16,9 @@ public sealed class Dispatcher : IDispatcher
 
     public Dispatcher(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
 
-    public async Task<Result<TResult>> DispatchAsync<TRequest, TResult>(TRequest request, CancellationToken cancellation = default(CancellationToken))
+    public async Task<Result<TResult>> DispatchAsync<TRequest, TResult>(TRequest request, CancellationToken cancellation = default(CancellationToken)) where TRequest: IRequest<TResult>
     {
-        var handler = _serviceProvider.GetRequiredService<IHandler<TRequest, TResult>>();
+        var handler = _serviceProvider.GetRequiredService<IRequestHandler<TRequest, TResult>>();
         return await handler.HandleAsync(request, cancellation);
     }
 }

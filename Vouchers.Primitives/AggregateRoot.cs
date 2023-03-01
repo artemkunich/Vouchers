@@ -2,11 +2,11 @@ namespace Vouchers.Primitives;
 
 public class AggregateRoot<TKey> : Entity<TKey>
 {
-    private readonly List<IDomainEvent> _domainEvents = new List<IDomainEvent>();
+    private readonly List<IEvent> _events = new();
 
-    public void RaiseDomainEvent(IDomainEvent @event) => _domainEvents.Add(@event);
+    public void RaiseEvent(IEvent @event) => _events.Add(@event);
 
-    public IEnumerable<IDomainEvent> DomainEvents => _domainEvents.ToList();
+    public IEnumerable<IEvent> Events => _events.ToList();
 
-    public void ClearDomainEvents() => _domainEvents.Clear();
+    public void ClearEvents() => _events.Clear();
 }

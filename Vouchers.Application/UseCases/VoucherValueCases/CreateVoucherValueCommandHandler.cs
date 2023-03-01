@@ -16,7 +16,7 @@ using Vouchers.Application.Services;
 
 namespace Vouchers.Application.UseCases.VoucherValueCases;
 
-internal sealed class CreateVoucherValueCommandHandler : IHandler<CreateVoucherValueCommand, IdDto<Guid>>
+internal sealed class CreateVoucherValueCommandHandler : IRequestHandler<CreateVoucherValueCommand, IdDto<Guid>>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IReadOnlyRepository<DomainAccount,Guid> _domainAccountRepository;

@@ -10,7 +10,7 @@ using Vouchers.Files.Domain;
 
 namespace Vouchers.Application.Services;
 
-internal interface IAppImageService
+public interface IAppImageService
 {
     Task<CroppedImage> CreateCroppedImageAsync(Stream imageStream, CropParametersDto cropParametersDto);
     Task<CroppedImage> CreateCroppedImageAsync(CroppedImage croppedImage, CropParametersDto cropParametersDto);

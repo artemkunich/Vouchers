@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using Vouchers.Application.Abstractions;
+using Vouchers.Application.Dtos;
 
 namespace Vouchers.Application.Commands.IssuerTransactionCommands;
 
 [ApplicationRoles(ApplicationRole.User)]
-public sealed class CreateIssuerTransactionCommand
+public sealed class CreateIssuerTransactionCommand : IRequest<IdDto<Guid>>
 {
     [Required]
     public Guid IssuerAccountId { get; set; }

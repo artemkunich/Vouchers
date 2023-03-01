@@ -12,7 +12,7 @@ using Unit = Vouchers.Application.Abstractions.Unit;
 
 namespace Vouchers.Application.UseCases.VoucherValueCases;
 
-internal sealed class DeleteVoucherValueCommandHandler : IHandler<DeleteVoucherValueCommand,Unit>
+internal sealed class DeleteVoucherValueCommandHandler : IRequestHandler<DeleteVoucherValueCommand,Unit>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IRepository<VoucherValue,Guid> _valueRepository;

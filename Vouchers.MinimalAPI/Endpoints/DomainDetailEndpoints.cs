@@ -18,16 +18,16 @@ internal static class DomainDetailEndpoints
         app.MapPut("domainDetail", PutDomainDetail).RequireAuthorization("ApiScope", "RoleUser").AddEndpointFilter<FormValidatorFilter<UpdateDomainDetailCommand>>();
     }
 
-    private static async Task<IResult> GetDomainDetail(IHandler<Guid,DomainDetailDto> handler, Guid domainId, CancellationToken token)
+    private static async Task<IResult> GetDomainDetail(IRequestHandler<DomainDetailQuery,DomainDetailDto> requestHandler, Guid domainId, CancellationToken token)
     {
-        var result = await handler.HandleAsync(domainId, token);
+        var result = await requestHandler.HandleAsync(new DomainDetailQuery{Id = domainId}, token);
         return Results.Ok(result);
     }
     
-    private static async Task<IResult> PutDomainDetail(IFormParameterProvider<UpdateDomainDetailCommand> formParameterProvider, IHandler<UpdateDomainDetailCommand,Unit> handler, HttpContext ctx, CancellationToken token)
+    private static async Task<IResult> PutDomainDetail(IFormParameterProvider<UpdateDomainDetailCommand> formParameterProvider, IRequestHandler<UpdateDomainDetailCommand,Unit> requestHandler, HttpContext ctx, CancellationToken token)
     {
         var command = formParameterProvider.GetParameter();
-        await handler.HandleAsync(command, token);
+        await requestHandler.HandleAsync(command, token);
         return Results.NoContent();
     }
 }

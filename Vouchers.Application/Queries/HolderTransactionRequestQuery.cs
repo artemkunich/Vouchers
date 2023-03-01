@@ -5,7 +5,8 @@ using Vouchers.Application.Dtos;
 
 namespace Vouchers.Application.Queries;
 
-public sealed class IdentityDetailQuery : IRequest<IdentityDetailDto>
+public class HolderTransactionRequestQuery : IRequest<HolderTransactionRequestDto>
 {
-    public Guid? AccountId { get; init; }
+    [Required]
+    public Guid Id { get; init; }
 }

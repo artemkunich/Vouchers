@@ -20,7 +20,7 @@ using Vouchers.Values.Domain;
 
 namespace Vouchers.Persistence.QueryHandlers;
 
-internal sealed class DomainValuesQueryHandler : IHandler<DomainValuesQuery,IReadOnlyList<VoucherValueDto>>
+internal sealed class DomainValuesQueryHandler : IRequestHandler<DomainValuesQuery,IReadOnlyList<VoucherValueDto>>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly VouchersDbContext _dbContext;

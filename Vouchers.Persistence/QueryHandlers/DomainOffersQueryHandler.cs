@@ -13,7 +13,7 @@ using Vouchers.Application.Abstractions;
 
 namespace Vouchers.Persistence.QueryHandlers;
 
-internal sealed class DomainOffersQueryHandler : IHandler<DomainOffersQuery, IReadOnlyList<DomainOfferDto>>
+internal sealed class DomainOffersQueryHandler : IRequestHandler<DomainOffersQuery, IReadOnlyList<DomainOfferDto>>
 {
     private readonly VouchersDbContext _dbContext;
 

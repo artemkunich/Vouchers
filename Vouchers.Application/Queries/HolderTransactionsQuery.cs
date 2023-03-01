@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using Vouchers.Application.Abstractions;
+using Vouchers.Application.Dtos;
 
 namespace Vouchers.Application.Queries;
 
 [ApplicationRoles(ApplicationRole.User)]
-public sealed class HolderTransactionsQuery : ListQuery
+public sealed class HolderTransactionsQuery : ListQuery, IRequest<IReadOnlyList<HolderTransactionDto>>
 {
     [Required]
     public Guid AccountId { get; set; } 

@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using Vouchers.Application.Abstractions;
 using Vouchers.Application.Dtos;
 
 namespace Vouchers.Application.Commands.DomainOfferCommands;
 
 [ApplicationRoles(ApplicationRole.Manager)]
-public sealed class CreateDomainOfferCommand
+public sealed class CreateDomainOfferCommand : IRequest<IdDto<Guid>>
 {
     [Required]
     public string Name { get; set; }

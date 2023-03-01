@@ -1,6 +1,6 @@
 namespace Vouchers.Primitives;
 
-public abstract class DomainEvent : IDomainEvent
+public abstract class Event : IEvent
 {
     public Guid Id { get; set; }
 }

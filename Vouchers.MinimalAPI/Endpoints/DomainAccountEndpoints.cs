@@ -16,7 +16,7 @@ internal static class DomainAccountEndpoints
         app.MapGet("domainAccounts", GetDomainAccounts).RequireAuthorization("ApiScope", "RoleUser");
     }
     
-    private static async Task<IResult> GetDomainAccounts(IHandler<DomainAccountsQuery,IEnumerable<DomainAccountDto>> handler, 
+    private static async Task<IResult> GetDomainAccounts(IRequestHandler<DomainAccountsQuery,IEnumerable<DomainAccountDto>> requestHandler, 
         [FromQuery] Guid domainId,
         [FromQuery] string? email,
         [FromQuery] string? name,
@@ -37,7 +37,7 @@ internal static class DomainAccountEndpoints
             PageIndex = pageIndex ?? 0,
             PageSize = pageSize ?? 10,
         };
-        var result = await handler.HandleAsync(query, token);
+        var result = await requestHandler.HandleAsync(query, token);
         return Results.Ok(result);
     }
 }

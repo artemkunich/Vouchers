@@ -9,8 +9,7 @@ using Vouchers.Files.Domain;
 
 namespace Vouchers.Application.ServiceProviders;
 
-[ApplicationService(typeof(IAppImageService))]
-internal sealed class AppImageService : IAppImageService
+public sealed class AppImageService : IAppImageService
 {
     private readonly IImageService _imageService;
 

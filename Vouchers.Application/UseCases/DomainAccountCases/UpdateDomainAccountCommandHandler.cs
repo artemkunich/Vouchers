@@ -13,7 +13,7 @@ using Vouchers.Domains.Domain;
 
 namespace Vouchers.Application.UseCases.DomainAccountCases;
 
-internal sealed class UpdateDomainAccountCommandHandler : IHandler<UpdateDomainAccountCommand, Unit>
+internal sealed class UpdateDomainAccountCommandHandler : IRequestHandler<UpdateDomainAccountCommand, Unit>
 {
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IRepository<DomainAccount,Guid> _domainAccountRepository;

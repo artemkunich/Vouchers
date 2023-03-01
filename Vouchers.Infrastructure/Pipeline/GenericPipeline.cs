@@ -2,15 +2,15 @@ using Vouchers.Application.Abstractions;
 
 namespace Vouchers.Infrastructure.Pipeline;
 
-public sealed class GenericPipeline<TRequest, TResponse> : IPipeline<TRequest, TResponse>
+public sealed class GenericPipeline<TRequest, TResponse> : IPipeline<TRequest, TResponse> where TRequest : IRequest<TResponse>
 {
     private readonly Func<TRequest, CancellationToken, Task<Result<TResponse>>> _next;
     
-    public GenericPipeline(IEnumerable<IPipelineBehavior<TRequest, TResponse>> behaviors, IHandler<TRequest, TResponse> handler)
+    public GenericPipeline(IEnumerable<IRequestPipelineBehavior<TRequest, TResponse>> behaviors, IRequestHandler<TRequest, TResponse> requestHandler)
     {
         var reversedBehaviors = behaviors.Reverse();
 
-        _next = handler.HandleAsync;
+        _next = requestHandler.HandleAsync;
         foreach (var behavior in reversedBehaviors)
         {
             var next = _next;
@@ -18,6 +18,6 @@ public sealed class GenericPipeline<TRequest, TResponse> : IPipeline<TRequest, T
         }
     }
     
-    public async Task<Result<TResponse>> HandleAsync(TRequest request, CancellationToken token) => 
-        await _next(request, token);
+    public async Task<Result<TResponse>> HandleAsync(TRequest request, CancellationToken cancellation) => 
+        await _next(request, cancellation);
 }

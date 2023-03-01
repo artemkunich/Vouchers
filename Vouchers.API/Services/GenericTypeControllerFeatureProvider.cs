@@ -17,16 +17,16 @@ public class GenericTypeControllerFeatureProvider : IApplicationFeatureProvider<
 {
     public void PopulateFeature(IEnumerable<ApplicationPart> parts, ControllerFeature feature)
     {
-        var applicationAssembly = typeof(IHandler<,>).Assembly;
+        var applicationAssembly = typeof(IRequestHandler<,>).Assembly;
         var persistenceAssembly = typeof(VouchersDbContext).Assembly;
         
         var candidates = applicationAssembly.GetTypes().Union(persistenceAssembly.GetTypes()).Where(t =>
             !t.IsAbstract && !t.IsInterface && !t.IsGenericType &&
-            t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IHandler<,>))).ToArray();
+            t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IRequestHandler<,>))).ToArray();
         
         foreach (var candidate in candidates)
         {
-            var candidateInterface = candidate.GetInterfaces().First(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IHandler<,>));
+            var candidateInterface = candidate.GetInterfaces().First(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IRequestHandler<,>));
             var genericArguments = candidateInterface.GetGenericArguments().ToArray();
             
             var genericRequestType = genericArguments[0];
