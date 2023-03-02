@@ -8,7 +8,6 @@ using Vouchers.Application.Dtos;
 
 namespace Vouchers.Application.Commands.VoucherValueCommands;
 
-[IdentityRoles(IdentityRole.User)]
 public sealed class UpdateVoucherValueCommand : IRequest<Unit>
 {
     [Required]

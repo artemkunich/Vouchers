@@ -6,6 +6,7 @@ using Vouchers.Application.Dtos;
 
 namespace Vouchers.Application.Commands.IdentityCommands;
 
+[Permission]
 public sealed class DeleteIdentityCommand : IRequest<Unit>
 {
 }

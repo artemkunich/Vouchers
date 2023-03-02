@@ -8,10 +8,9 @@ using Vouchers.Application.Dtos;
 
 namespace Vouchers.Application.Commands.IdentityCommands;
 
+[Permission]
 public sealed class UpdateIdentityCommand : IRequest<Unit>
 {
-    public string LoginName { get; set; }
-
     public string FirstName { get; set; }
 
     public string LastName { get; set; }

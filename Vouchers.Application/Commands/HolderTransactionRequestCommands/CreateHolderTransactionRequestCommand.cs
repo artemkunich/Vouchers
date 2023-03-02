@@ -5,7 +5,6 @@ using Vouchers.Application.Dtos;
 
 namespace Vouchers.Application.Commands.HolderTransactionRequestCommands;
 
-[IdentityRoles(IdentityRole.User)]
 public sealed class CreateHolderTransactionRequestCommand : IRequest<IdDto<Guid>>
 {
     public Guid? CreditorAccountId { get; set; }

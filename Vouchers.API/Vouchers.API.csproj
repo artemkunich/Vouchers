@@ -27,6 +27,7 @@
     <ProjectReference Include="..\Vouchers.Core.Domain\Vouchers.Core.Domain.csproj" />
     <ProjectReference Include="..\Vouchers.Persistence\Vouchers.Persistence.csproj" />
     <ProjectReference Include="..\Vouchers.Infrastructure\Vouchers.Infrastructure.csproj" />
+    <ProjectReference Include="..\Vouchers.Resources\Vouchers.Resources.csproj" />
   </ItemGroup>
 
 </Project>

@@ -9,6 +9,7 @@
     <ItemGroup>
       <ProjectReference Include="..\Vouchers.Application\Vouchers.Application.csproj" />
       <ProjectReference Include="..\Vouchers.Persistence\Vouchers.Persistence.csproj" />
+      <ProjectReference Include="..\Vouchers.Resources\Vouchers.Resources.csproj" />
     </ItemGroup>
 
     <ItemGroup>

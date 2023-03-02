@@ -1,13 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using System.Globalization;
-using Vouchers.Application.Infrastructure;
+using Vouchers.Resources;
 
 namespace Vouchers.API.Services;
 
 public class CultureInfoProvider : ICultureInfoProvider
 {
-    IHttpContextAccessor _httpContextAccessor;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
     public CultureInfoProvider(IHttpContextAccessor httpContextAccessor)
     {
@@ -15,7 +15,7 @@ public class CultureInfoProvider : ICultureInfoProvider
     }
 
     public CultureInfo GetCultureInfo() {
-        var rqf = _httpContextAccessor.HttpContext.Features.Get<IRequestCultureFeature>();
-        return rqf.RequestCulture.UICulture;
+        var rqf = _httpContextAccessor.HttpContext?.Features.Get<IRequestCultureFeature>();
+        return rqf?.RequestCulture.UICulture;
     }
 }

@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using Vouchers.Identities.Domain;
 
 namespace Vouchers.Application.Queries;
 
-[IdentityRoles(IdentityRole.Admin)]
+[Permission(IdentityRole.Admin)]
 public sealed class IdentitiesQuery : ListQuery
 {
     public string Name { get; set; }

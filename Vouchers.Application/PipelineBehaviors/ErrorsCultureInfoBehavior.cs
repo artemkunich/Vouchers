@@ -2,17 +2,16 @@ using System.Threading;
 using System.Threading.Tasks;
 using Vouchers.Application.Abstractions;
 using Vouchers.Application.Infrastructure;
-using Vouchers.Application.UseCases;
 
 namespace Vouchers.Application.PipelineBehaviors;
 
 public class ErrorsCultureInfo<TRequest, TResponse> : IRequestPipelineBehavior<TRequest, TResponse>
 {
-    private readonly ICultureInfoProvider _cultureInfoProvider;
+    private readonly IResourceProvider _resourceProvider;
 
-    public ErrorsCultureInfo(ICultureInfoProvider cultureInfoProvider)
+    public ErrorsCultureInfo(IResourceProvider resourceProvider)
     {
-        _cultureInfoProvider = cultureInfoProvider;
+        _resourceProvider = resourceProvider;
     }
 
     public async Task<Result<TResponse>> HandleAsync(TRequest request, CancellationToken cancellation, HandlerDelegate<TResponse> next)
@@ -22,13 +21,9 @@ public class ErrorsCultureInfo<TRequest, TResponse> : IRequestPipelineBehavior<T
         if (result.IsSuccess)
             return result;
 
-        var cultureInfo = _cultureInfoProvider.GetCultureInfo();
-        if (cultureInfo is null)
-            return result;
-        
         foreach (var error in result.Errors)
         {
-            error.Message = ApplicationResources.GetString(error.Code, cultureInfo);
+            error.Message = _resourceProvider.GetString(error.Code);
         }
 
         return result;

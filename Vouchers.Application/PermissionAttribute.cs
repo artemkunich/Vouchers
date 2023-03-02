@@ -1,15 +1,18 @@
 using System;
 using System.Collections.Generic;
+using Vouchers.Identities.Domain;
 
 namespace Vouchers.Application;
 
 [AttributeUsage(AttributeTargets.Class)]
-public class IdentityRolesAttribute : Attribute
+public class PermissionAttribute : Attribute
 {
+    public static IEnumerable<IdentityRole> DefaultRoles = new IdentityRole[] {IdentityRole.User};
+    
     private readonly HashSet<IdentityRole> _roles;
-    public IReadOnlySet<IdentityRole> Roles => _roles;
+    public IEnumerable<IdentityRole> Roles => _roles;
 
-    public IdentityRolesAttribute(params IdentityRole[] roles)
+    public PermissionAttribute(params IdentityRole[] roles)
     {
         _roles = new HashSet<IdentityRole>();
 

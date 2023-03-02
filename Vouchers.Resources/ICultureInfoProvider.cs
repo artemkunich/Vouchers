@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Vouchers.Application.Infrastructure;
+namespace Vouchers.Resources;
 
 public interface ICultureInfoProvider
 {

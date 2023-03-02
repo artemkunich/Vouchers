@@ -7,7 +7,6 @@ using Vouchers.Application.Dtos;
 
 namespace Vouchers.Application.Queries;
 
-[IdentityRoles(IdentityRole.User)]
 public sealed class HolderValuesQuery : ListQuery, IRequest<IReadOnlyList<VoucherValueDto>>
 {
     [Required]

@@ -9,16 +9,18 @@ using Vouchers.Infrastructure.EventPipelineBehaviors;
 using Vouchers.Infrastructure.InterCommunication;
 using Vouchers.Infrastructure.Pipeline;
 using Vouchers.Primitives;
+using Vouchers.Resources;
 
 namespace Vouchers.Infrastructure;
     
 public static class ServiceCollectionExtension
 {
-    public static IServiceCollection AddInfrastructureServices(this IServiceCollection services) => 
+    public static IServiceCollection AddInfrastructureServices(this IServiceCollection services) =>
         services
             .AddScoped<IMessageHelper, MessageHelper>()
             .AddScoped<IIdentifierProvider<Guid>, GuidIdentifierProvider>()
-            .AddScoped<IDateTimeProvider, DateTimeProvider>();
+            .AddScoped<IDateTimeProvider, DateTimeProvider>()
+            .AddScoped<IResourceProvider, ResourceProvider>();
 
     public static IServiceCollection AddApplicationServices(this IServiceCollection services) =>
         services

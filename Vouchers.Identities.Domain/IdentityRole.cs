@@ -1,4 +1,4 @@
-namespace Vouchers.Application;
+namespace Vouchers.Identities.Domain;
 
 public enum IdentityRole
 {

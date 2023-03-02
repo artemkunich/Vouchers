@@ -5,7 +5,6 @@ using Vouchers.Application.Dtos;
 
 namespace Vouchers.Application.Queries;
 
-[IdentityRoles(IdentityRole.User)]
 public sealed class VoucherValueDetailQuery : IRequest<VoucherValueDetailDto>
 {
     [Required]

@@ -57,6 +57,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Domain", "Domain", "{C31E43
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vouchers.Core.Domain.UnitTests", "Vouchers.Core.Domain.UnitTests\Vouchers.Core.Domain.UnitTests.csproj", "{678E09A6-12B9-4BE4-B1DA-E859A7314A5C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vouchers.Resources", "Vouchers.Resources\Vouchers.Resources.csproj", "{AB5395CC-FBCE-4E2C-8F95-9E78936130F2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -131,6 +133,10 @@ Global
 		{678E09A6-12B9-4BE4-B1DA-E859A7314A5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{678E09A6-12B9-4BE4-B1DA-E859A7314A5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{678E09A6-12B9-4BE4-B1DA-E859A7314A5C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB5395CC-FBCE-4E2C-8F95-9E78936130F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB5395CC-FBCE-4E2C-8F95-9E78936130F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB5395CC-FBCE-4E2C-8F95-9E78936130F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB5395CC-FBCE-4E2C-8F95-9E78936130F2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -163,5 +169,6 @@ Global
 		{CAB3894E-FC4B-4B47-9423-2F8C5B951D69} = {89151487-C55D-465D-98C4-9FB6A16491B2}
 		{C31E4348-C010-4A47-912B-80D8911997A3} = {CAB3894E-FC4B-4B47-9423-2F8C5B951D69}
 		{678E09A6-12B9-4BE4-B1DA-E859A7314A5C} = {C31E4348-C010-4A47-912B-80D8911997A3}
+		{AB5395CC-FBCE-4E2C-8F95-9E78936130F2} = {E39D4AAC-A645-473D-98B5-F63DA2D8E074}
 	EndGlobalSection
 EndGlobal

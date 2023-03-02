@@ -4,10 +4,11 @@ using System.ComponentModel.DataAnnotations;
 using System.Text;
 using Vouchers.Application.Abstractions;
 using Vouchers.Application.Dtos;
+using Vouchers.Identities.Domain;
 
 namespace Vouchers.Application.Queries;
 
-[IdentityRoles(IdentityRole.Admin)]
+[Permission(IdentityRole.Admin)]
 public sealed class LoginsQuery : ListQuery, IRequest<IReadOnlyList<LoginDto>>
 {
     public string LoginName { get; set; }

@@ -25,10 +25,4 @@ public sealed class Identity : AggregateRoot<Guid>
         LastName = lastName
     };
 
-    public bool Equals(Identity identity) =>
-        Id == identity.Id;
-
-    public bool NotEquals(Identity identity) =>
-        Id != identity.Id;
-
 }

@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 using Vouchers.Application.Abstractions;
 using Vouchers.Application.Dtos;
-using Vouchers.Core.Domain;
 
 namespace Vouchers.Application.Commands.HolderTransactionCommands;
 
-[IdentityRoles(IdentityRole.User)]
 public sealed class CreateHolderTransactionCommand : IRequest<IdDto<Guid>>
 {
     public Guid? HolderTransactionRequestId { get; set; }

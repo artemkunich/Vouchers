@@ -16,6 +16,7 @@ using Vouchers.Infrastructure;
 using Vouchers.MinimalAPI.Binding;
 using Vouchers.MinimalAPI.Services;
 using Vouchers.MinimalAPI.Validation;
+using Vouchers.Resources;
 using Vouchers.Values.Domain;
 
 var builder = WebApplication.CreateBuilder(args);

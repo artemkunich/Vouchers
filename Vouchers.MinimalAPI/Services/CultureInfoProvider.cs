@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Localization;
 using System.Globalization;
 using Vouchers.Application.Infrastructure;
+using Vouchers.Resources;
 
 namespace Vouchers.MinimalAPI.Services;
 

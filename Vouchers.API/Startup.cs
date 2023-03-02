@@ -27,6 +27,7 @@ using Vouchers.Files.Domain;
 using Vouchers.Identities.Domain;
 using Vouchers.Infrastructure;
 using Vouchers.Infrastructure.InterCommunication;
+using Vouchers.Resources;
 using Vouchers.Values.Domain;
 
 namespace Vouchers.API;

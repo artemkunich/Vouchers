@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
 using Vouchers.Application.Abstractions;
 using Vouchers.Application.Dtos;
 
 namespace Vouchers.Application.Queries;
 
-[IdentityRoles(IdentityRole.User)]
 public sealed class DomainsQuery : ListQuery, IRequest<IReadOnlyList<DomainDto>>
 {
     public string Name { get; set; }

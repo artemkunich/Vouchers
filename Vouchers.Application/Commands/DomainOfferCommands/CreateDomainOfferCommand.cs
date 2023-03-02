@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 using Vouchers.Application.Abstractions;
 using Vouchers.Application.Dtos;
+using Vouchers.Identities.Domain;
 
 namespace Vouchers.Application.Commands.DomainOfferCommands;
 
-[IdentityRoles(IdentityRole.Manager)]
+[Permission(IdentityRole.Manager)]
 public sealed class CreateDomainOfferCommand : IRequest<IdDto<Guid>>
 {
     [Required]
