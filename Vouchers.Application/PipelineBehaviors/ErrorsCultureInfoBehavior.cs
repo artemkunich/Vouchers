@@ -14,9 +14,9 @@ public class ErrorsCultureInfo<TRequest, TResponse> : IRequestPipelineBehavior<T
         _resourceProvider = resourceProvider;
     }
 
-    public async Task<Result<TResponse>> HandleAsync(TRequest request, CancellationToken cancellation, HandlerDelegate<TResponse> next)
+    public async Task<Result<TResponse>> HandleAsync(TRequest request, CancellationToken cancellation, HandlerDelegate<TResponse> nextAsync)
     {
-        var result = await next();
+        var result = await nextAsync();
 
         if (result.IsSuccess)
             return result;

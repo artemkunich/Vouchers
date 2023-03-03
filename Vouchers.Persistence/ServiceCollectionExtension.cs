@@ -67,6 +67,8 @@ public static class ServiceCollectionExtension
             
             services.AddScoped(genericRepositoryType, repositoryType);
         }
+        
+        MessagesProcessor.AddEventTypesFromAssembly(assembly);
 
         return services;
     }

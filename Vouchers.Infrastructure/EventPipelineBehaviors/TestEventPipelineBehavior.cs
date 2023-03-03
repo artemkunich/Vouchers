@@ -4,8 +4,8 @@ namespace Vouchers.Infrastructure.EventPipelineBehaviors;
 
 public class TestEventPipelineBehavior<TMessage> : IEventPipelineBehavior<TMessage>
 {
-    public Task<Result<Unit>> HandleAsync(TMessage request, CancellationToken cancellation, HandlerDelegate<Unit> next)
+    public Task<Result<Unit>> HandleAsync(TMessage request, CancellationToken cancellation, HandlerDelegate<Unit> nextAsync)
     {
-        return next();
+        return nextAsync();
     }
 }

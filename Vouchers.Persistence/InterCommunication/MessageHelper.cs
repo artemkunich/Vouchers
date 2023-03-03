@@ -1,12 +1,12 @@
+using System;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Vouchers.Persistence;
-using Vouchers.Persistence.InterCommunication;
 
-namespace Vouchers.Infrastructure.InterCommunication;
+namespace Vouchers.Persistence.InterCommunication;
 
 public class MessageHelper : IMessageHelper
 {
-    private VouchersDbContext _dbContext;
+    private readonly VouchersDbContext _dbContext;
 
     public MessageHelper(VouchersDbContext dbContext)
     {
@@ -16,10 +16,7 @@ public class MessageHelper : IMessageHelper
     public Guid? GetMessageId(object message)
     {
         var idPropertyInfo = message.GetType().GetProperty("Id", typeof(Guid));
-        if (idPropertyInfo is null)
-            return null;
-
-        return idPropertyInfo.GetValue(message) as Guid?;
+        return idPropertyInfo?.GetValue(message) as Guid?;
     }
 
     public async Task<bool> CheckIfMessageWasConsumedAsync(Guid messageId, string consumer)
@@ -27,10 +24,6 @@ public class MessageHelper : IMessageHelper
         var consumedMessage = await _dbContext.Set<ConsumedMessage>()
             .FirstOrDefaultAsync(m => m.MessageId == messageId && m.Consumer == consumer);
 
-        if (consumedMessage is null)
-            return false;
-
-        return true;
-
+        return consumedMessage is not null;
     }
 }

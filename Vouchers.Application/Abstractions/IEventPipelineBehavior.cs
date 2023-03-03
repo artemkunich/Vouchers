@@ -8,5 +8,5 @@ namespace Vouchers.Application.Abstractions;
 
 public interface IEventPipelineBehavior<in TRequest>
 {
-    Task<Result<Unit>> HandleAsync(TRequest request, CancellationToken cancellation, HandlerDelegate<Unit> next);
+    Task<Result<Unit>> HandleAsync(TRequest request, CancellationToken cancellation, HandlerDelegate<Unit> nextAsync);
 }

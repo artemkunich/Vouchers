@@ -1,4 +1,7 @@
-namespace Vouchers.Infrastructure.InterCommunication;
+using System;
+using System.Threading.Tasks;
+
+namespace Vouchers.Persistence.InterCommunication;
 
 public interface IMessageHelper
 {

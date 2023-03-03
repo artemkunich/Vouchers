@@ -1,6 +1,6 @@
 using Vouchers.Application.Infrastructure;
 
-namespace Vouchers.Infrastructure.InterCommunication;
+namespace Vouchers.Infrastructure;
 
 public class GuidIdentifierProvider : IIdentifierProvider<Guid>
 {

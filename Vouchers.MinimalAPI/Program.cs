@@ -95,8 +95,9 @@ builder.Services
     .AddRepositoryForEntities(typeof(VoucherValue).Assembly) //Values
     .AddInfrastructureServices()
     .AddApplicationServices()
-    .AddHandlers(typeof(IRequestHandler<,>).Assembly)
-    .AddHandlers(typeof(VouchersDbContext).Assembly)
+    .AddRequestHandlers(typeof(IRequestHandler<,>).Assembly)
+    .AddRequestHandlers(typeof(VouchersDbContext).Assembly)
+    .AddEventHandlers(typeof(IEventHandler<>).Assembly)
     .AddRequestPipelineBehaviors(typeof(IRequestHandler<,>).Assembly)
     .AddGenericPipeline()
     

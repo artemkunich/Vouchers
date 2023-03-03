@@ -26,7 +26,7 @@ using Vouchers.Domains.Domain;
 using Vouchers.Files.Domain;
 using Vouchers.Identities.Domain;
 using Vouchers.Infrastructure;
-using Vouchers.Infrastructure.InterCommunication;
+using Vouchers.Persistence.InterCommunication;
 using Vouchers.Resources;
 using Vouchers.Values.Domain;
 
@@ -120,10 +120,11 @@ public class Startup
             .AddRepositoryForEntities(typeof(VoucherValue).Assembly) //Values
             .AddInfrastructureServices()
             .AddApplicationServices()
-            .AddHandlers(typeof(IRequestHandler<,>).Assembly)
-            .AddHandlers(typeof(VouchersDbContext).Assembly)
+            .AddRequestHandlers(typeof(IRequestHandler<,>).Assembly)
+            .AddRequestHandlers(typeof(VouchersDbContext).Assembly)
+            .AddEventHandlers(typeof(IEventHandler<>).Assembly)
             .AddRequestPipelineBehaviors(typeof(IRequestHandler<,>).Assembly)
-            .AddEventPipelineBehaviors(typeof(IMessageHandler<>).Assembly)
+            .AddEventPipelineBehaviors(typeof(IMessagePipeline<>).Assembly)
             .AddGenericPipeline();
         
         services

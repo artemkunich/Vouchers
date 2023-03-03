@@ -17,17 +17,17 @@ public class IdentityRegistrationBehavior<TRequest, TResponse> : IRequestPipelin
         _authIdentityProvider = authIdentityProvider;
     }
 
-    public async Task<Result<TResponse>> HandleAsync(TRequest request, CancellationToken cancellation, HandlerDelegate<TResponse> next)
+    public async Task<Result<TResponse>> HandleAsync(TRequest request, CancellationToken cancellation, HandlerDelegate<TResponse> nextAsync)
     {
         if (typeof(TRequest) == typeof(CreateIdentityCommand))
         {
-            return await next();
+            return await nextAsync();
         }
 
         var authIdentityId = await _authIdentityProvider.GetAuthIdentityIdAsync();
         if (authIdentityId == Guid.Empty)
             return new NotRegisteredError();
         
-        return await next();
+        return await nextAsync();
     }
 }

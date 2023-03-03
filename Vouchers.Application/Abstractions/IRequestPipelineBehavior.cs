@@ -10,5 +10,5 @@ public delegate Task<Result<TResponse>> HandlerDelegate<TResponse>();
 
 public interface IRequestPipelineBehavior<in TRequest, TResponse>
 {
-    Task<Result<TResponse>> HandleAsync(TRequest request, CancellationToken cancellation, HandlerDelegate<TResponse> next);
+    Task<Result<TResponse>> HandleAsync(TRequest request, CancellationToken cancellation, HandlerDelegate<TResponse> nextAsync);
 }
