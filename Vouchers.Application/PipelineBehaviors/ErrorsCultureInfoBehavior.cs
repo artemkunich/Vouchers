@@ -5,7 +5,7 @@ using Vouchers.Application.Infrastructure;
 
 namespace Vouchers.Application.PipelineBehaviors;
 
-public class ErrorsCultureInfo<TRequest, TResponse> : IRequestPipelineBehavior<TRequest, TResponse>
+public class ErrorsCultureInfo<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
 {
     private readonly IResourceProvider _resourceProvider;
 

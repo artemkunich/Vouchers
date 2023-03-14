@@ -1,9 +1,10 @@
 using System;
+using Vouchers.Application.Abstractions;
 using Vouchers.Primitives;
 
-namespace Vouchers.Identities.Domain.DomainEvents;
+namespace Vouchers.Application.DomainEvents;
 
-public class IdentityUpdatedEvent : Event
+public class IdentityUpdatedIntegrationEvent : IntegrationEvent
 {
     public string NewFirstName { get; set; }
 

@@ -1,9 +1,9 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Vouchers.Primitives;
+namespace Vouchers.Application.Abstractions;
 
-public interface IEvent
+public interface IIntegrationEvent
 {
     public Guid Id { get; set; }
 }

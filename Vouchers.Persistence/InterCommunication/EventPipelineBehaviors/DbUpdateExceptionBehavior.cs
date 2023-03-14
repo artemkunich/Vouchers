@@ -7,9 +7,9 @@ using Vouchers.Persistence.InterCommunication.Errors;
 
 namespace Vouchers.Persistence.InterCommunication.EventPipelineBehaviors;
 
-public class DbUpdateExceptionBehavior<TEvent> : IEventPipelineBehavior<TEvent>
+public class DbUpdateExceptionBehavior<TEvent> : IIntegrationEventPipelineBehavior<TEvent>
 {
-    public async Task<Result<Unit>> HandleAsync(TEvent request, CancellationToken cancellation, HandlerDelegate<Unit> nextAsync)
+    public async Task<Result<Unit>> HandleAsync(TEvent @event, CancellationToken cancellation, HandlerDelegate<Unit> nextAsync)
     {
         try
         {

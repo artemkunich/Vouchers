@@ -6,7 +6,7 @@ public sealed class GenericPipeline<TRequest, TResponse> : IPipeline<TRequest, T
 {
     private readonly Func<TRequest, CancellationToken, Task<Result<TResponse>>> _next;
     
-    public GenericPipeline(IEnumerable<IRequestPipelineBehavior<TRequest, TResponse>> behaviors, IRequestHandler<TRequest, TResponse> requestHandler)
+    public GenericPipeline(IEnumerable<IPipelineBehavior<TRequest, TResponse>> behaviors, IRequestHandler<TRequest, TResponse> requestHandler)
     {
         var reversedBehaviors = behaviors.Reverse();
 

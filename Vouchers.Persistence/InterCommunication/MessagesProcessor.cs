@@ -18,8 +18,8 @@ public class MessagesProcessor : IMessagesProcessor
 {
     private readonly VouchersDbContext _dbContext;
     private readonly IServiceProvider _serviceProvider;
-    private static readonly Dictionary<string,Type> DomainEventTypes = new ();
-
+    private static readonly Dictionary<string,Type> IntegrationEventTypes = new();
+    private static readonly Dictionary<string,Type> MessagePipelineTypes = new();
     public MessagesProcessor(VouchersDbContext dbContext, IServiceProvider serviceProvider)
     {
         _dbContext = dbContext;
@@ -29,17 +29,24 @@ public class MessagesProcessor : IMessagesProcessor
     public static void AddEventTypesFromAssembly(Assembly assembly)
     {
         var types = assembly.GetTypes()
-            .Where(type => !type.IsInterface && !type.IsAbstract && typeof(IEvent).IsAssignableFrom(type)).ToList();
+            .Where(type => !type.IsInterface && !type.IsAbstract && typeof(IIntegrationEvent).IsAssignableFrom(type)).ToList();
             
         types.ForEach(type =>
         {
-            if (type.FullName != null) DomainEventTypes[type.FullName] = type;
+            if (type.FullName == null) 
+                return;
+            
+            IntegrationEventTypes[type.FullName] = type;
+            MessagePipelineTypes[type.FullName] = typeof(IIntegrationEventPipeline<>).MakeGenericType(type);
         });
     }
     
     public async Task<int> ProcessMessagesAsync(CancellationToken cancellation)
     {
-        var outboxMessages = await _dbContext.Set<OutboxMessage>().Where(x => x.State == OutboxMessageState.Ready).Take(100).ToListAsync(cancellation);
+        var outboxMessages = await _dbContext.Set<OutboxMessage>()
+            .Where(x => x.State == OutboxMessageState.Ready)
+            .Take(100)
+            .ToListAsync(cancellation);
 
         var processedMessagesCount = 0;
         
@@ -49,12 +56,11 @@ public class MessagesProcessor : IMessagesProcessor
         
         foreach (var outboxMessage in outboxMessages)
         {
-            if (!DomainEventTypes.ContainsKey(outboxMessage.Type))
+            if (!IntegrationEventTypes.ContainsKey(outboxMessage.Type))
                 break;
             
-            var eventType = DomainEventTypes[outboxMessage.Type];
-
-            var messagePipelineType = typeof(IMessagePipeline<>).MakeGenericType(eventType);
+            var eventType = IntegrationEventTypes[outboxMessage.Type];
+            var messagePipelineType = MessagePipelineTypes[outboxMessage.Type];
 
             var messagePipeline = _serviceProvider.GetService(messagePipelineType);
             if (messagePipeline is null)
@@ -64,7 +70,7 @@ public class MessagesProcessor : IMessagesProcessor
             if (@event is null)
                 break;
 
-            var handleMethod = messagePipelineType.GetMethod(nameof(IMessagePipeline<object>.HandleAsync));
+            var handleMethod = messagePipelineType.GetMethod(nameof(IIntegrationEventPipeline<object>.HandleAsync));
             if(handleMethod is null)
                 break;
             

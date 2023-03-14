@@ -104,8 +104,6 @@ public class Startup
 
         services
             .AddHttpContextAccessor()
-
-            .AddScoped<IDispatcher, Dispatcher>()
             .AddScoped<ILoginNameProvider, JWTLoginNameProvider>()
             .AddScoped<IImageService, ImageSharpService>()
             .AddScoped<ICultureInfoProvider, CultureInfoProvider>()
@@ -122,9 +120,10 @@ public class Startup
             .AddApplicationServices()
             .AddRequestHandlers(typeof(IRequestHandler<,>).Assembly)
             .AddRequestHandlers(typeof(VouchersDbContext).Assembly)
-            .AddEventHandlers(typeof(IEventHandler<>).Assembly)
+            .AddDomainEventHandlers(typeof(IDomainEventHandler<>).Assembly)
+            .AddIntegrationEventHandlers(typeof(IDomainEventHandler<>).Assembly)
             .AddRequestPipelineBehaviors(typeof(IRequestHandler<,>).Assembly)
-            .AddEventPipelineBehaviors(typeof(IMessagePipeline<>).Assembly)
+            .AddEventPipelineBehaviors(typeof(IIntegrationEventPipeline<>).Assembly)
             .AddGenericPipeline();
         
         services

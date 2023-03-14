@@ -12,7 +12,7 @@ namespace Vouchers.Persistence.Repositories;
 
 internal sealed class UnitRepository : Repository<Unit, Guid>
 {
-    public UnitRepository(VouchersDbContext dbContext, IMessageDataSerializer messageDataSerializer, IIdentifierProvider<Guid> identifierProvider) : base(dbContext, messageDataSerializer, identifierProvider)
+    public UnitRepository(VouchersDbContext dbContext) : base(dbContext)
     {
     }
 

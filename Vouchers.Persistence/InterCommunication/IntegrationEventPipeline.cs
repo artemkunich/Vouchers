@@ -6,20 +6,19 @@ using System.Threading.Tasks;
 using Vouchers.Application.Abstractions;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Persistence.InterCommunication.Errors;
-using Vouchers.Primitives;
 
 namespace Vouchers.Persistence.InterCommunication;
 
-public class MessagePipeline<TEvent> : IMessagePipeline<TEvent> where TEvent : IEvent
+public class IntegrationEventPipeline<TEvent> : IIntegrationEventPipeline<TEvent> where TEvent : IIntegrationEvent
 {
     private readonly IMessageHelper _messageHelper;
     private readonly VouchersDbContext _dbContext;
-    private readonly IEnumerable<IEventPipelineBehavior<TEvent>> _pipelineBehaviors;
-    private readonly IEnumerable<IEventHandler<TEvent>> _handlers;
+    private readonly IEnumerable<IIntegrationEventPipelineBehavior<TEvent>> _pipelineBehaviors;
+    private readonly IEnumerable<IIntegrationEventHandler<TEvent>> _handlers;
     private readonly IIdentifierProvider<Guid> _identifierProvider;
     private readonly IDateTimeProvider _dateTimeProvider;
     
-    public MessagePipeline(IMessageHelper messageHelper, VouchersDbContext dbContext, IEnumerable<IEventPipelineBehavior<TEvent>> pipelineBehaviors, IEnumerable<IEventHandler<TEvent>> handlers, IIdentifierProvider<Guid> identifierProvider, IDateTimeProvider dateTimeProvider)
+    public IntegrationEventPipeline(IMessageHelper messageHelper, VouchersDbContext dbContext, IEnumerable<IIntegrationEventPipelineBehavior<TEvent>> pipelineBehaviors, IEnumerable<IIntegrationEventHandler<TEvent>> handlers, IIdentifierProvider<Guid> identifierProvider, IDateTimeProvider dateTimeProvider)
     {
         _messageHelper = messageHelper;
         _dbContext = dbContext;
@@ -29,17 +28,15 @@ public class MessagePipeline<TEvent> : IMessagePipeline<TEvent> where TEvent : I
         _dateTimeProvider = dateTimeProvider;
     }
     
-    public async Task<Result<Unit>> HandleAsync(TEvent message, CancellationToken cancellation)
+    public async Task<Result<Unit>> HandleAsync(TEvent @event, CancellationToken cancellation)
     {
-        var messageId = _messageHelper.GetMessageId(message);
-        if (messageId is null)
-            return new MessageWithoutIdError();
+        var messageId = @event.Id;
 
         foreach (var handler in _handlers)
         {
             var consumer = handler.GetType().FullName;
 
-            var isMessageConsumed = await _messageHelper.CheckIfMessageWasConsumedAsync(messageId.Value, consumer);
+            var isMessageConsumed = await _messageHelper.CheckIfMessageWasConsumedAsync(messageId, consumer);
             if (isMessageConsumed)
             {
                 return Unit.Value;
@@ -48,10 +45,10 @@ public class MessagePipeline<TEvent> : IMessagePipeline<TEvent> where TEvent : I
             var nextFunc = CreateNextFunc(handler); 
             
             var consumedMessageId = _identifierProvider.CreateNewId();
-            var consumedMessage = ConsumedMessage.Create(consumedMessageId, messageId.Value, consumer, _dateTimeProvider.CurrentDateTime());
+            var consumedMessage = ConsumedMessage.Create(consumedMessageId, messageId, consumer, _dateTimeProvider.CurrentDateTime());
             _dbContext.Set<ConsumedMessage>().Add(consumedMessage);
 
-            var result = await nextFunc(message, cancellation);
+            var result = await nextFunc(@event, cancellation);
 
             if (result.IsFailure)
                 return result;
@@ -64,7 +61,7 @@ public class MessagePipeline<TEvent> : IMessagePipeline<TEvent> where TEvent : I
         return Unit.Value;
     }
 
-    private Func<TEvent, CancellationToken, Task<Result<Unit>>> CreateNextFunc(IEventHandler<TEvent> handler)
+    private Func<TEvent, CancellationToken, Task<Result<Unit>>> CreateNextFunc(IIntegrationEventHandler<TEvent> handler)
     {
         var nextFunc = handler.HandleAsync;
         foreach (var behavior in _pipelineBehaviors)

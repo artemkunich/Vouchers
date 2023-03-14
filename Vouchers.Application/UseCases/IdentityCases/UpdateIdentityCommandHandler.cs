@@ -3,12 +3,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Vouchers.Application.Abstractions;
 using Vouchers.Application.Commands.IdentityCommands;
+using Vouchers.Application.DomainEvents;
 using Vouchers.Application.Errors;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Application.Services;
 using Vouchers.Files.Domain;
 using Vouchers.Identities.Domain;
-using Vouchers.Identities.Domain.DomainEvents;
 
 namespace Vouchers.Application.UseCases.IdentityCases;
 
@@ -18,14 +18,16 @@ internal sealed class UpdateIdentityCommandHandler : IRequestHandler<UpdateIdent
     private readonly IRepository<Identity,Guid> _identityRepository;
     private readonly IRepository<CroppedImage, Guid> _croppedRepository;
     private readonly IAppImageService _appImageService;
-
+    private readonly IEventDispatcher _eventDispatcher;
+    
     public UpdateIdentityCommandHandler(IAuthIdentityProvider authIdentityProvider, 
-        IRepository<Identity,Guid> identityRepository, IAppImageService appImageService, IRepository<CroppedImage, Guid> croppedRepository)
+        IRepository<Identity,Guid> identityRepository, IAppImageService appImageService, IRepository<CroppedImage, Guid> croppedRepository, IEventDispatcher eventDispatcher)
     {
         _authIdentityProvider = authIdentityProvider;
         _identityRepository = identityRepository;
         _appImageService = appImageService;
         _croppedRepository = croppedRepository;
+        _eventDispatcher = eventDispatcher;
     }
 
     public async Task<Result<Unit>> HandleAsync(UpdateIdentityCommand command, CancellationToken cancellation)
@@ -37,7 +39,7 @@ internal sealed class UpdateIdentityCommandHandler : IRequestHandler<UpdateIdent
             return new IdentityDoesNotExistError();
 
         var isChanged = false;
-        var identityUpdatedEvent = new IdentityUpdatedEvent();
+        var identityUpdatedEvent = new IdentityUpdatedDomainEvent();
             
         if (command.Image is not null && command.CropParameters is not null)
         {
@@ -92,9 +94,10 @@ internal sealed class UpdateIdentityCommandHandler : IRequestHandler<UpdateIdent
 
         if (isChanged)
         {
-            identityUpdatedEvent.Id = Guid.NewGuid();
-            identity.RaiseEvent(identityUpdatedEvent);
             await _identityRepository.UpdateAsync(identity);
+            var result = await _eventDispatcher.DispatchAsync(identityUpdatedEvent, cancellation);
+            if (result.IsFailure)
+                return result;
         }
         
         return Unit.Value;

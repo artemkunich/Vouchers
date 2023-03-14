@@ -13,7 +13,7 @@ namespace Vouchers.Persistence.Repositories;
 
 internal sealed class GenericRepository<TAggregateRoot, TKey> : Repository<TAggregateRoot, TKey> where TAggregateRoot : AggregateRoot<TKey>
 {
-    public GenericRepository(VouchersDbContext dbContext, IMessageDataSerializer messageDataSerializer, IIdentifierProvider<Guid> identifierProvider) : base(dbContext, messageDataSerializer, identifierProvider)
+    public GenericRepository(VouchersDbContext dbContext) : base(dbContext)
     {
     }
 }

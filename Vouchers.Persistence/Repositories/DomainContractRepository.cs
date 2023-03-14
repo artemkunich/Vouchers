@@ -14,7 +14,7 @@ namespace Vouchers.Persistence.Repositories;
 
 internal sealed class DomainContractRepository : Repository<DomainContract, Guid>
 {
-    public DomainContractRepository(VouchersDbContext dbContext, IMessageDataSerializer messageDataSerializer, IIdentifierProvider<Guid> identifierProvider) : base(dbContext, messageDataSerializer, identifierProvider)
+    public DomainContractRepository(VouchersDbContext dbContext) : base(dbContext)
     {
     }
 

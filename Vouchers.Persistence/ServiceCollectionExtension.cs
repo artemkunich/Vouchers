@@ -1,12 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Microsoft.Extensions.Configuration;
 using Vouchers.Application.Infrastructure;
 using Vouchers.Persistence.InterCommunication;
-using Vouchers.Application.UseCases;
 using Vouchers.Primitives;
 using Vouchers.Persistence.Repositories;
 
@@ -67,8 +64,6 @@ public static class ServiceCollectionExtension
             
             services.AddScoped(genericRepositoryType, repositoryType);
         }
-        
-        MessagesProcessor.AddEventTypesFromAssembly(assembly);
 
         return services;
     }

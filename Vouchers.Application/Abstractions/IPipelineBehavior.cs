@@ -8,7 +8,7 @@ namespace Vouchers.Application.Abstractions;
 
 public delegate Task<Result<TResponse>> HandlerDelegate<TResponse>();
 
-public interface IRequestPipelineBehavior<in TRequest, TResponse>
+public interface IPipelineBehavior<in TRequest, TResponse>
 {
     Task<Result<TResponse>> HandleAsync(TRequest request, CancellationToken cancellation, HandlerDelegate<TResponse> nextAsync);
 }

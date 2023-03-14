@@ -16,6 +16,7 @@ using Vouchers.Infrastructure;
 using Vouchers.MinimalAPI.Binding;
 using Vouchers.MinimalAPI.Services;
 using Vouchers.MinimalAPI.Validation;
+using Vouchers.Persistence.InterCommunication;
 using Vouchers.Resources;
 using Vouchers.Values.Domain;
 
@@ -80,7 +81,6 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services
     .AddHttpContextAccessor()
-    .AddScoped<IDispatcher, Dispatcher>()
     .AddScoped<ILoginNameProvider, JWTLoginNameProvider>()
     .AddScoped<IImageService, ImageSharpService>()
     .AddScoped<ICultureInfoProvider, CultureInfoProvider>()
@@ -97,8 +97,10 @@ builder.Services
     .AddApplicationServices()
     .AddRequestHandlers(typeof(IRequestHandler<,>).Assembly)
     .AddRequestHandlers(typeof(VouchersDbContext).Assembly)
-    .AddEventHandlers(typeof(IEventHandler<>).Assembly)
+    .AddDomainEventHandlers(typeof(IDomainEventHandler<>).Assembly)
+    .AddIntegrationEventHandlers(typeof(IDomainEventHandler<>).Assembly)
     .AddRequestPipelineBehaviors(typeof(IRequestHandler<,>).Assembly)
+    .AddEventPipelineBehaviors(typeof(IIntegrationEventPipeline<>).Assembly)
     .AddGenericPipeline()
     
     .AddFormValidators()

@@ -14,7 +14,7 @@ namespace Vouchers.Persistence.Repositories;
 
 internal sealed class LoginRepository : Repository<Login, Guid>
 {
-    public LoginRepository(VouchersDbContext dbContext, IMessageDataSerializer messageDataSerializer, IIdentifierProvider<Guid> identifierProvider) : base(dbContext, messageDataSerializer, identifierProvider)
+    public LoginRepository(VouchersDbContext dbContext) : base(dbContext)
     {
     }
 
