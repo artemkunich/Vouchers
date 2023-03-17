@@ -4,5 +4,5 @@ namespace Vouchers.Application.Abstractions;
 
 public class IntegrationEvent : IIntegrationEvent
 {
-    public Guid Id { get; set; }
+    public Guid Id { get; init; }
 }

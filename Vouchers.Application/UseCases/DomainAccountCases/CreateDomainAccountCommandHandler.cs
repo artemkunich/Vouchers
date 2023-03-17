@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Vouchers.Application.Abstractions;
 using Vouchers.Application.Commands.DomainAccountCommands;
+using Vouchers.Application.DomainEvents;
 using Vouchers.Application.Dtos;
 using Vouchers.Application.Errors;
 using Vouchers.Application.Infrastructure;
@@ -20,19 +21,24 @@ internal sealed class CreateDomainAccountCommandHandler : IRequestHandler<Create
     private readonly IAuthIdentityProvider _authIdentityProvider;
     private readonly IReadOnlyRepository<Domain,Guid> _domainRepository;
     private readonly IRepository<DomainAccount,Guid> _domainAccountRepository;
-    private readonly IRepository<Account,Guid> _accountRepository;
     private readonly IIdentifierProvider<Guid> _identifierProvider;
     private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly IEventDispatcher _eventDispatcher;
 
-    public CreateDomainAccountCommandHandler(IAuthIdentityProvider authIdentityProvider, IReadOnlyRepository<Domain,Guid> domainRepository, 
-        IRepository<DomainAccount,Guid> domainAccountRepository, IRepository<Account,Guid> accountRepository, IIdentifierProvider<Guid> identifierProvider, IDateTimeProvider dateTimeProvider)
+    public CreateDomainAccountCommandHandler(
+        IAuthIdentityProvider authIdentityProvider, 
+        IReadOnlyRepository<Domain,Guid> domainRepository, 
+        IRepository<DomainAccount,Guid> domainAccountRepository, 
+        IIdentifierProvider<Guid> identifierProvider, 
+        IDateTimeProvider dateTimeProvider, 
+        IEventDispatcher eventDispatcher)
     {
         _authIdentityProvider = authIdentityProvider;
         _domainRepository = domainRepository;
         _domainAccountRepository = domainAccountRepository;
-        _accountRepository = accountRepository;
         _identifierProvider = identifierProvider;
         _dateTimeProvider = dateTimeProvider;
+        _eventDispatcher = eventDispatcher;
     }
 
     public async Task<Result<IdDto<Guid>>> HandleAsync(CreateDomainAccountCommand command, CancellationToken cancellation)
@@ -43,11 +49,9 @@ internal sealed class CreateDomainAccountCommandHandler : IRequestHandler<Create
         if (domain is null)
             return new DomainDoesNotExistError();
 
-        var accountId = _identifierProvider.CreateNewId();
-        var account = Account.Create(accountId, _dateTimeProvider.CurrentDateTime());
-        await _accountRepository.AddAsync(account);
-
-        var domainAccount = DomainAccount.Create(account.Id, authIdentityId, domain, _dateTimeProvider.CurrentDateTime());
+        var domainAccountId = _identifierProvider.CreateNewId();
+        var domainAccountCreatedDatetime = _dateTimeProvider.CurrentDateTime();
+        var domainAccount = DomainAccount.Create(domainAccountId, authIdentityId, domain, domainAccountCreatedDatetime);
             
         if (domain.IsPublic)
         {
@@ -56,6 +60,21 @@ internal sealed class CreateDomainAccountCommandHandler : IRequestHandler<Create
         }
 
         await _domainAccountRepository.AddAsync(domainAccount);
+
+        var result = await _eventDispatcher.DispatchAsync(new DomainAccountCreatedEvent(
+            domainAccountId,
+            authIdentityId,
+            domain.Id,
+            domainAccountCreatedDatetime,
+            domainAccount.IsIssuer,
+            domainAccount.IsAdmin,
+            domainAccount.IsOwner,
+            domainAccount.IsConfirmed
+        ), cancellation);
+
+        if (result.IsFailure)
+            return result.Errors;
+            
         return new IdDto<Guid>(domainAccount.Id);
     }
 }

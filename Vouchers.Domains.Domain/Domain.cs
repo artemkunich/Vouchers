@@ -36,7 +36,7 @@ public sealed class Domain : AggregateRoot<Guid>
 
     public void IncreaseMembersCount()
     {
-        if (Contract.Offer.MaxMembersCount > MembersCount + 1)
+        if (MembersCount + 1 > Contract.Offer.MaxMembersCount)
             throw new DomainsException("Domain max members count exceeded");
 
         MembersCount++;

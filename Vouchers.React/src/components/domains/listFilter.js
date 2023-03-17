@@ -19,7 +19,7 @@ export const DomainsListFilter = ({handleSearch, handleCancel}) => {
         </div>
         <div className="col-4 align-middle"/>
         <div className="col-2 align-middle" >
-            <button className="btn mt-2" style={{backgroundColor: '#59a8fc', color: 'white', marginLeft: -15, width: 125}} onClick={handleSearch}>Search</button>
+            <button className="btn mt-2" style={{backgroundColor: '#59a8fc', color: 'white', marginLeft: -15, width: 125}} onClick={() => handleSearch(filter)}>Search</button>
             {
                 handleCancel && <button className="btn mt-2" style={{backgroundColor: '#59a8fc', color: 'white', marginLeft: -15, width: 125}} onClick={()=>handleCancel()}>Cancel</button>
             }

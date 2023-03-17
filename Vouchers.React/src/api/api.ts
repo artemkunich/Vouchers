@@ -11,13 +11,13 @@ export const api = {
     putIdentityDetail: (token: User, form: FormData) => putForm("Identity", form, token.access_token),
 
     getDomainOffers: (token: User, query: any) => getByQuery("DomainOffers", serializeToQuery(query), token.access_token),
-    postDomainOffer: (token: User, offer: any) => postJson("DomainOffers", offer, token.access_token),
-    putDomainOffer: (token: User, offer: any) => putJson("DomainOffers", offer, token.access_token),
+    postDomainOffer: (token: User, offer: any) => postJson("DomainOffer", offer, token.access_token),
+    putDomainOffer: (token: User, offer: any) => putJson("DomainOffer", offer, token.access_token),
     
     getIdentityDomainOffers: (token: User, query: any) => getByQuery("IdentityDomainOffers", serializeToQuery(query), token.access_token),
     
     getDomains: (token: User, query: any) => getByQuery("Domains", serializeToQuery(query), token.access_token),
-    postDomain: (token: User, domain: any) => postJson("Domains", domain, token.access_token),
+    postDomain: (token: User, domain: any) => postJson("Domain", domain, token.access_token),
       
     getDomainDetail: (token: User, id: string): Promise<DomainDetailDto | undefined> => getById("DomainDetail", id, token.access_token) as Promise<DomainDetailDto | undefined>,
     putDomainDetail: (token: User, command: UpdateDomainDetailCommand) => putForm("DomainDetail", converUpdateDomainDetailCommandToForm(command), token.access_token),
@@ -25,8 +25,8 @@ export const api = {
     getIdentityDomainAccounts: (token: User, query: any) => getByQuery("IdentityDomainAccounts", serializeToQuery(query), token.access_token),
 
     getDomainAccounts: (token: User, query: DomainAccountsQuery): Promise<DomainAccountDto[]> => getByQuery("DomainAccounts", serializeToQuery(query), token.access_token) as Promise<DomainAccountDto[]>,
-    postDomainAccount: (token: User, domainAccount: any) => postJson("DomainAccounts", domainAccount, token.access_token),
-    putDomainAccount: (token: User, command: UpdateDomainAccountCommand): Promise<boolean | undefined> => putJson("DomainAccounts", command, token.access_token),
+    postDomainAccount: (token: User, domainAccount: any) => postJson("DomainAccount", domainAccount, token.access_token),
+    putDomainAccount: (token: User, command: UpdateDomainAccountCommand): Promise<boolean | undefined> => putJson("DomainAccount", command, token.access_token),
 
     getValues: (token: User, query: any) => getByQuery("IssuerValues", serializeToQuery(query), token.access_token),
     postValue: (token: User, form: FormData) => postForm("VoucherValue", form, token.access_token),

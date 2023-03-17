@@ -10,10 +10,12 @@ import { api } from '../../api/api.ts'
 export const OutgoingTransactionRequestsList = ({selectTransactionRequest}) => {
     
     const token = useSelector(state => state.user.token)
+    const currentAccount = useSelector(state => state.domainAccount.currentAccount)
 
     const [transactionRequestsFilter, setTransactionRequestsFilter] = useState({
         pageIndex: 0,
         pageSize: 10,
+        accountId: currentAccount.id,
         includeIncoming: false,
         includeOutgoing: true,
         includePerformed: false,

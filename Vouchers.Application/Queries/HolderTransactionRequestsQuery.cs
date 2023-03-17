@@ -8,6 +8,7 @@ namespace Vouchers.Application.Queries;
 
 public sealed class HolderTransactionRequestsQuery : ListQuery, IRequest<IReadOnlyList<HolderTransactionRequestDto>>
 {
+    public Guid AccountId { get; set; }
     public string Ticker { get; set; }
     public string IssuerName { get; set; }
     public string CounterpartyName { get; set; }

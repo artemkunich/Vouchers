@@ -156,6 +156,16 @@ internal sealed class HolderTransactionRequestsQueryHandler : IRequestHandler<Ho
         if (query.IssuerName is not null)
             holderTransactionRequestsWithDomainAccountsAndUnitAndUnitImageQuery = holderTransactionRequestsWithDomainAccountsAndUnitAndUnitImageQuery.Where(o => (o.UnitIssuer.FirstName + o.UnitIssuer.LastName).Contains(query.IssuerName));
 
+        holderTransactionRequestsWithDomainAccountsAndUnitAndUnitImageQuery = holderTransactionRequestsWithDomainAccountsAndUnitAndUnitImageQuery
+            .Where(o => 
+                o.DebtorDomainAccount.IdentityId == authIdentityId && o.DebtorDomainAccount.Id == query.AccountId || 
+                o.CreditorDomainAccount.IdentityId == authIdentityId && o.CreditorDomainAccount.Id == query.AccountId ||
+                o.TransactionRequest.Transaction != null && (
+                    o.TransactionRequest.Transaction.DebtorAccountId == query.AccountId ||
+                    o.TransactionRequest.Transaction.CreditorAccountId == query.AccountId
+                ));     
+
+        
         var resultQuery = holderTransactionRequestsWithDomainAccountsAndUnitAndUnitImageQuery.Select(req =>
             new HolderTransactionRequestDto
             {
