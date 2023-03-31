@@ -4,8 +4,10 @@ using SixLabors.ImageSharp.Processing;
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using Vouchers.Application.Dtos;
-using Vouchers.Application.Infrastructure;
+using Vouchers.Domains.Application.Dtos;
+using Vouchers.Domains.Application.Infrastructure;
+using Vouchers.Common.Application.Dtos;
+using Vouchers.Common.Application.Infrastructure;
 
 namespace Vouchers.Infrastructure;
 

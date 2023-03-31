@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using System.Globalization;
-using Vouchers.Application.Infrastructure;
+using Vouchers.Common.Application.Infrastructure;
 using Vouchers.Resources;
 
 namespace Vouchers.MinimalAPI.Services;

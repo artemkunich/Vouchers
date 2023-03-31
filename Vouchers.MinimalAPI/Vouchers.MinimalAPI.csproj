@@ -23,7 +23,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Vouchers.Application\Vouchers.Application.csproj" />
+      <ProjectReference Include="..\Vouchers.Domains.Application\Vouchers.Domains.Application.csproj" />
       <ProjectReference Include="..\Vouchers.Auth\Vouchers.Auth.csproj" />
       <ProjectReference Include="..\Vouchers.Persistence\Vouchers.Persistence.csproj" />
       <ProjectReference Include="..\Vouchers.Infrastructure\Vouchers.Infrastructure.csproj" />

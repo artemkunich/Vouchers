@@ -430,7 +430,7 @@ namespace Vouchers.Persistence.Migrations
                     b.ToTable("DomainOffersPerIdentityCounter", (string)null);
                 });
 
-            modelBuilder.Entity("Vouchers.Primitives.OutboxEvent", b =>
+            modelBuilder.Entity("Vouchers.Common.Primitives.OutboxEvent", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");

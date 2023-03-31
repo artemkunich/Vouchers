@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Vouchers.Application.Infrastructure;
+using Vouchers.Common.Application.Infrastructure;
 using Vouchers.Primitives;
 using Vouchers.Persistence.InterCommunication;
 

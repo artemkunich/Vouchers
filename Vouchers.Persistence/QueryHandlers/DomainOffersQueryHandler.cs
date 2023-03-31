@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Vouchers.Application.Dtos;
+using Vouchers.Common.Application.Dtos;
 using Vouchers.Domains.Domain;
-using Vouchers.Application.Queries;
-using Vouchers.Application.UseCases;
+using Vouchers.Common.Application.Queries;
+using Vouchers.Common.Application.UseCases;
 using System.Threading;
-using Vouchers.Application;
-using Vouchers.Application.Abstractions;
+using Vouchers.Common.Application.Abstractions;
 
 namespace Vouchers.Persistence.QueryHandlers;
 

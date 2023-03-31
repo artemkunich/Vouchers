@@ -1,10 +1,10 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
-using Vouchers.Application.Abstractions;
-using Vouchers.Application.Infrastructure;
-using Vouchers.Application.PipelineBehaviors;
-using Vouchers.Application.ServiceProviders;
-using Vouchers.Application.Services;
+using Vouchers.Domains.Application.PipelineBehaviors;
+using Vouchers.Domains.Application.ServiceProviders;
+using Vouchers.Domains.Application.Services;
+using Vouchers.Common.Application.Abstractions;
+using Vouchers.Common.Application.Infrastructure;
 using Vouchers.Infrastructure.EventPipelineBehaviors;
 using Vouchers.Infrastructure.Pipeline;
 using Vouchers.Persistence.InterCommunication;
@@ -23,12 +23,12 @@ public static class ServiceCollectionExtension
             .AddScoped<IIdentifierProvider<Guid>, GuidIdentifierProvider>()
             .AddScoped<IDateTimeProvider, DateTimeProvider>()
             .AddScoped<IResourceProvider, ResourceProvider>()
-            .AddScoped<IEventDispatcher, EventDispatcher>();
+            .AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
 
     public static IServiceCollection AddApplicationServices(this IServiceCollection services) =>
         services
             .AddScoped<IAppImageService, AppImageService>()
-            .AddScoped<IAuthIdentityProvider, AuthIdentityProvider>();
+            .AddScoped<IIdentityIdProvider, AuthIdentityProvider>();
 
     public static IServiceCollection AddRequestHandlers(this IServiceCollection services, Assembly assembly)
     {

@@ -1,6 +1,4 @@
-using Vouchers.Application.Commands.DomainCommands;
-using Vouchers.Application.Commands.IdentityCommands;
-using Vouchers.Application.Dtos;
+using Vouchers.Domains.Application.Dtos;
 
 namespace Vouchers.MinimalAPI.Binding;
 

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Vouchers.Application.Queries;
+using Vouchers.Common.Application.Queries;
 
 namespace Vouchers.Persistence.QueryHandlers;
 

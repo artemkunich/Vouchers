@@ -1,13 +1,7 @@
-using Microsoft.AspNetCore.Mvc;
-using Vouchers.MinimalAPI.Filters;
-using Vouchers.Application;
-using Vouchers.Application.Abstractions;
-using Vouchers.Application.Commands.DomainAccountCommands;
-using Vouchers.Application.Commands.IdentityCommands;
-using Vouchers.Application.Dtos;
-using Vouchers.Application.Infrastructure;
-using Vouchers.Application.Queries;
-using Vouchers.Application.UseCases;
+using Vouchers.Domains.Application.Dtos;
+using Vouchers.Domains.Application.Queries;
+using Vouchers.Common.Application.Abstractions;
+using Vouchers.Domains.Application.UseCases.IdentityCases;
 using Vouchers.MinimalAPI.Binding;
 
 namespace Vouchers.MinimalAPI.Endpoints;
@@ -30,7 +24,7 @@ internal static class IdentityDetailEndpoints
             return Results.Ok(detail);
     }
     
-    private static async Task<IResult> PostIdentityDetail(IFormParameterProvider<CreateIdentityCommand> formParameterProvider, IRequestHandler<CreateIdentityCommand, IdDto<Guid>> requestHandler, CancellationToken token)
+    private static async Task<IResult> PostIdentityDetail(IFormParameterProvider<CreateIdentityCommand> formParameterProvider, IRequestHandler<CreateIdentityCommand, Common.Application.Dtos.IdDto<Guid>> requestHandler, CancellationToken token)
     {
         var command = formParameterProvider.GetParameter();
             

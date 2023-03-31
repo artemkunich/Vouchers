@@ -1,10 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Vouchers.Application;
-using Vouchers.Application.Abstractions;
-using Vouchers.Application.UseCases;
+﻿using Vouchers.Common.Application.Abstractions;
 
 namespace Vouchers.Infrastructure;
 

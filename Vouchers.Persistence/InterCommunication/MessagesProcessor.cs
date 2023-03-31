@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Vouchers.Application.Abstractions;
+using Vouchers.Common.Application.Abstractions;
 using Vouchers.InterCommunication;
 using Vouchers.Primitives;
 

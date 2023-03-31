@@ -1,6 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Vouchers.Application.Abstractions;
+using Vouchers.Common.Application.Abstractions;
 
 namespace Vouchers.Persistence.InterCommunication;
 

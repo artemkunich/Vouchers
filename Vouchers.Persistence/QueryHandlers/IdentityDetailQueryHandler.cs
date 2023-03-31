@@ -5,17 +5,15 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Vouchers.Application;
-using Vouchers.Application.Abstractions;
-using Vouchers.Application.Dtos;
-using Vouchers.Application.Infrastructure;
-using Vouchers.Application.Queries;
-using Vouchers.Application.Services;
-using Vouchers.Application.UseCases;
+using Vouchers.Common.Application.Abstractions;
+using Vouchers.Common.Application.Dtos;
+using Vouchers.Common.Application.Infrastructure;
+using Vouchers.Common.Application.Queries;
+using Vouchers.Common.Application.Services;
+using Vouchers.Common.Application.UseCases;
 using Vouchers.Core.Domain;
 using Vouchers.Domains.Domain;
 using Vouchers.Files.Domain;
-using Vouchers.Identities.Domain;
 
 namespace Vouchers.Persistence.QueryHandlers;
 

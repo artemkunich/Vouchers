@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 using System.Resources;
-using Vouchers.Application.Infrastructure;
+using Vouchers.Common.Application.Infrastructure;
 
 namespace Vouchers.Resources;
 

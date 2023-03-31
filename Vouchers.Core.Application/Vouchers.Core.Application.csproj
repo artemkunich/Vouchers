@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>disable</Nullable>
+        <RootNamespace>Vouchers.Core.Application</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Vouchers.Common.Application\Vouchers.Common.Application.csproj" />
+      <ProjectReference Include="..\Vouchers.Common.Primitives\Vouchers.Common.Primitives.csproj" />
+      <ProjectReference Include="..\Vouchers.Core.Domain\Vouchers.Core.Domain.csproj" />
+    </ItemGroup>
+
+</Project>

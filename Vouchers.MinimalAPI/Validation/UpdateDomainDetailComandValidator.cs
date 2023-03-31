@@ -1,5 +1,5 @@
 using FluentValidation.Results;
-using Vouchers.Application.Commands.DomainCommands;
+using Vouchers.Domains.Application.UseCases.DomainCases;
 
 namespace Vouchers.MinimalAPI.Validation;
 

@@ -1,4 +1,4 @@
-using Vouchers.Application.Abstractions;
+using Vouchers.Common.Application.Abstractions;
 using Vouchers.Persistence.InterCommunication;
 
 namespace Vouchers.Infrastructure.EventPipelineBehaviors;

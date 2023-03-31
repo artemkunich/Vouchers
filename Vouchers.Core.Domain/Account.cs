@@ -6,12 +6,16 @@ namespace Vouchers.Core.Domain;
 
 public sealed class Account : AggregateRoot<Guid>
 {
+    public Guid IdentityId { get; init; }
     public DateTime CreatedDateTime { get; init; }
     public decimal Supply { get; private set; }
 
-    public static Account Create(Guid id, DateTime createdDateTime) => new ()
+    public bool IsActive { get; set; }
+    
+    public static Account Create(Guid id, Guid identityId, DateTime createdDateTime) => new ()
     {
         Id = id,
+        IdentityId = identityId,
         CreatedDateTime = createdDateTime
     };
 

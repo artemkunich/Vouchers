@@ -3,18 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
-using Vouchers.Application.Dtos;
-using Vouchers.Application.Queries;
-using Vouchers.Application.UseCases;
-using Vouchers.Application.Services;
+using Vouchers.Common.Application.Dtos;
+using Vouchers.Common.Application.Queries;
+using Vouchers.Common.Application.UseCases;
+using Vouchers.Common.Application.Services;
 using System.Threading;
-using Vouchers.Application;
-using Vouchers.Application.Abstractions;
-using Vouchers.Application.Infrastructure;
+using Vouchers.Common.Application.Abstractions;
+using Vouchers.Common.Application.Infrastructure;
 using Vouchers.Core.Domain;
 using Vouchers.Domains.Domain;
-using Vouchers.Identities.Domain;
-using Vouchers.Values.Domain;
 
 namespace Vouchers.Persistence.QueryHandlers;
 

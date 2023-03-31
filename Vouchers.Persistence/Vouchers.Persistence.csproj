@@ -16,12 +16,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Vouchers.Application\Vouchers.Application.csproj" />
+    <ProjectReference Include="..\Vouchers.Domains.Application\Vouchers.Domains.Application.csproj" />
     <ProjectReference Include="..\Vouchers.Auth\Vouchers.Auth.csproj" />
     <ProjectReference Include="..\Vouchers.Core.Domain\Vouchers.Core.Domain.csproj" />
     <ProjectReference Include="..\Vouchers.Domains.Domain\Vouchers.Domains.Domain.csproj" />
     <ProjectReference Include="..\Vouchers.Files.Domain\Vouchers.Files.Domain.csproj" />
-    <ProjectReference Include="..\Vouchers.Values.Domain\Vouchers.Values.Domain.csproj" />
   </ItemGroup>
 
 </Project>

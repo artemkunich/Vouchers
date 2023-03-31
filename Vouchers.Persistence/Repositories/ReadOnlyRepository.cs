@@ -7,7 +7,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Vouchers.Application.Infrastructure;
+using Vouchers.Common.Application.Infrastructure;
 using Vouchers.Primitives;
 using Vouchers.Persistence.InterCommunication;
 

@@ -3,8 +3,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Vouchers.API.Services;
-using Vouchers.Application.PipelineBehaviors;
-using Vouchers.Application.UseCases;
 using Vouchers.Infrastructure.Pipeline;
 
 namespace Vouchers.API.Controllers;

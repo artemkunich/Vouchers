@@ -5,8 +5,8 @@ using System.Reflection;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Vouchers.Application;
-using Vouchers.Application.Queries;
+using Vouchers.Domains.Application;
+using Vouchers.Domains.Application.Queries;
 
 
 namespace Vouchers.API.Services;

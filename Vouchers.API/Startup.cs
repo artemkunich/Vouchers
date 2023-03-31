@@ -14,21 +14,20 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Vouchers.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Vouchers.Application.Infrastructure;
+using Vouchers.Common.Application.Infrastructure;
 using Vouchers.API.Services;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Options;
 using System.Globalization;
-using Vouchers.Application.Abstractions;
+using Vouchers.Domains.Application.Infrastructure;
+using Vouchers.Common.Application.Abstractions;
 using Vouchers.Core.Domain;
 using Vouchers.Domains.Domain;
 using Vouchers.Files.Domain;
-using Vouchers.Identities.Domain;
 using Vouchers.Infrastructure;
 using Vouchers.Persistence.InterCommunication;
 using Vouchers.Resources;
-using Vouchers.Values.Domain;
 
 namespace Vouchers.API;
 

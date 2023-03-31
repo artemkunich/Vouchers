@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Vouchers.Application.Abstractions;
-using Vouchers.Application.Infrastructure;
+using Vouchers.Common.Application.Abstractions;
+using Vouchers.Common.Application.Infrastructure;
 using Vouchers.Persistence.InterCommunication.Errors;
 
 namespace Vouchers.Persistence.InterCommunication;

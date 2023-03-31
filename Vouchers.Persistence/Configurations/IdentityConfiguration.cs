@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Text;
 
 using Vouchers.Core.Domain;
-using Vouchers.Identities.Domain;
 
 namespace Vouchers.Persistence.Configurations;
 

@@ -4,13 +4,13 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Vouchers.Application.Abstractions;
+using Vouchers.Domains.Application.Infrastructure;
+using Vouchers.Common.Application.Abstractions;
 using Vouchers.MinimalAPI.Endpoints;
-using Vouchers.Application.Infrastructure;
+using Vouchers.Common.Application.Infrastructure;
 using Vouchers.Core.Domain;
 using Vouchers.Domains.Domain;
 using Vouchers.Files.Domain;
-using Vouchers.Identities.Domain;
 using Vouchers.Persistence;
 using Vouchers.Infrastructure;
 using Vouchers.MinimalAPI.Binding;
@@ -18,7 +18,6 @@ using Vouchers.MinimalAPI.Services;
 using Vouchers.MinimalAPI.Validation;
 using Vouchers.Persistence.InterCommunication;
 using Vouchers.Resources;
-using Vouchers.Values.Domain;
 
 var builder = WebApplication.CreateBuilder(args);
 

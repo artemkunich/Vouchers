@@ -1,4 +1,4 @@
-using Vouchers.Application.Abstractions;
+using Vouchers.Common.Application.Abstractions;
 
 namespace Vouchers.Infrastructure.Pipeline;
 

@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Vouchers.Primitives\Vouchers.Primitives.csproj" />
+    <ProjectReference Include="..\Vouchers.Common.Primitives\Vouchers.Common.Primitives.csproj" />
   </ItemGroup>
 
   <ItemGroup>

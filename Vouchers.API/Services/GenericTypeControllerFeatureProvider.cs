@@ -6,9 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Vouchers.API.Controllers;
-using Vouchers.Application.Abstractions;
-using Vouchers.Application.Queries;
-using Vouchers.Application.UseCases;
+using Vouchers.Domains.Application.Queries;
+using Vouchers.Common.Application.Abstractions;
 using Vouchers.Persistence;
 
 namespace Vouchers.API.Services;

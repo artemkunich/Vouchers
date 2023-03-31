@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System.Linq;
-using Vouchers.Application.Infrastructure;
+using Vouchers.Common.Application.Infrastructure;
 
 namespace Vouchers.MinimalAPI.Services;
 

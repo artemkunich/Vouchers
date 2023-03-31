@@ -1,8 +1,8 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Vouchers.Application.Abstractions;
-using Vouchers.Application.Infrastructure;
+using Vouchers.Common.Application.Abstractions;
+using Vouchers.Common.Application.Infrastructure;
 
 namespace Vouchers.Persistence.InterCommunication.DomainEventHandlers;
 

@@ -2,7 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Vouchers.Application.Abstractions;
+using Vouchers.Common.Application.Abstractions;
 using Vouchers.Persistence.InterCommunication.Errors;
 
 namespace Vouchers.Persistence.InterCommunication.EventPipelineBehaviors;

@@ -2,7 +2,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
-using Vouchers.Application.Infrastructure;
+using Vouchers.Common.Application.Infrastructure;
 using Vouchers.Persistence.InterCommunication;
 using Vouchers.Primitives;
 using Vouchers.Persistence.Repositories;

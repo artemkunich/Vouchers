@@ -1,4 +1,4 @@
-using Vouchers.Application.Infrastructure;
+using Vouchers.Common.Application.Infrastructure;
 
 namespace Vouchers.Infrastructure;
 

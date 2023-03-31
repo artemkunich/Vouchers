@@ -3,8 +3,6 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Collections.Generic;
 using System.Text;
-
-using Vouchers.Values.Domain;
 using Vouchers.Core.Domain;
 
 namespace Vouchers.Persistence.Configurations;

@@ -1,8 +1,8 @@
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using Vouchers.Application;
-using Vouchers.Application.Abstractions;
-using Vouchers.Application.Errors;
+using Vouchers.Domains.Application.Errors;
+using Vouchers.Common.Application.Abstractions;
+using Vouchers.Common.Application.Errors;
 
 namespace Vouchers.API.Services;
 

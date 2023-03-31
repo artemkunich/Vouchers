@@ -60,6 +60,8 @@ public class CurrencyAmount
     {
         return new CurrencyAmount(currency, amount);
     }
+
+    public bool IsZero => Amount == 0;
 }
 
 public enum Currency

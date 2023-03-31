@@ -1,11 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using Vouchers.Application.Abstractions;
-using Vouchers.MinimalAPI.Filters;
-using Vouchers.Application.Commands.DomainAccountCommands;
-using Vouchers.Application.Dtos;
-using Vouchers.Application.Infrastructure;
-using Vouchers.Application.Queries;
-using Vouchers.Application.UseCases;
+using Vouchers.Domains.Application.Dtos;
+using Vouchers.Domains.Application.Queries;
+using Vouchers.Common.Application.Abstractions;
 
 namespace Vouchers.MinimalAPI.Endpoints;
 

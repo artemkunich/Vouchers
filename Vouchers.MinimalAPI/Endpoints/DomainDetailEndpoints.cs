@@ -1,10 +1,7 @@
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
-using Vouchers.Application.Abstractions;
-using Vouchers.Application.Commands.DomainCommands;
-using Vouchers.Application.Dtos;
-using Vouchers.Application.Queries;
-using Vouchers.Application.UseCases;
+using Vouchers.Domains.Application.Dtos;
+using Vouchers.Domains.Application.Queries;
+using Vouchers.Common.Application.Abstractions;
+using Vouchers.Domains.Application.UseCases.DomainCases;
 using Vouchers.MinimalAPI.Binding;
 using Vouchers.MinimalAPI.Filters;
 
