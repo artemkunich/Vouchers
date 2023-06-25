@@ -15,7 +15,7 @@ public class ErrorsCultureInfo<TRequest, TResponse> : IPipelineBehavior<TRequest
         _resourceProvider = resourceProvider;
     }
 
-    public async Task<Result<TResponse>> HandleAsync(TRequest request, CancellationToken cancellation, Func<Task<Result<TResponse>>> nextAsync)
+    public async Task<Result<TResponse>> HandleAsync(TRequest request, CancellationToken cancellation, ShortNextDelegate<TResponse> nextAsync)
     {
         var result = await nextAsync();
 

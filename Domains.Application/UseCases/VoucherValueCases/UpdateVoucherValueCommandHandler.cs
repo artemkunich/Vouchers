@@ -13,25 +13,19 @@ internal sealed class UpdateVoucherValueCommandHandler : IRequestHandler<UpdateV
 {
     private readonly IIdentityIdProvider<Guid> _identityIdProvider;
     private readonly IRepository<VoucherValue,Guid> _voucherValueRepository;
-    private readonly IRepository<CroppedImage, Guid> _croppedRepository;
-    private readonly IAppImageService _appImageService;
 
     public UpdateVoucherValueCommandHandler(
         IIdentityIdProvider<Guid> identityIdProvider,
-        IAppImageService appImageService,
-        IRepository<VoucherValue,Guid> voucherValueRepository, 
-        IRepository<CroppedImage, Guid> croppedRepository)
+        IRepository<VoucherValue,Guid> voucherValueRepository)
     {
         _identityIdProvider = identityIdProvider;
         _voucherValueRepository = voucherValueRepository;
-        _croppedRepository = croppedRepository;
-        _appImageService = appImageService;
     }
 
     public async Task<Result<Unit>> HandleAsync(
         UpdateVoucherValueCommand command, CancellationToken cancellation)
     {
-        var authIdentityId = _identityIdProvider.CurrentIdentityId;
+        var authIdentityId = _identityIdProvider.GetIdentityId();
 
         var value = await _voucherValueRepository.GetByIdAsync(command.Id, cancellation);
         if (value is null)
@@ -41,29 +35,6 @@ internal sealed class UpdateVoucherValueCommandHandler : IRequestHandler<UpdateV
             return new OperationIsNotAllowedError();
 
         var requireUpdate = false;
-
-        if (command.Image is not null && command.CropParameters is not null)
-        {
-            var imageStream = command.Image.OpenReadStream();
-            var croppedImage = await _appImageService.CreateCroppedImageAsync(imageStream, command.CropParameters);
-            await _croppedRepository.AddAsync(croppedImage, cancellation);
-            
-            value.ImageId = croppedImage.Id;
-            requireUpdate = true;
-        }
-                
-        if (command.Image is null && value.ImageId is not null && command.CropParameters is not null)
-        {
-            var croppedImage = await _croppedRepository.GetByIdAsync(value.ImageId.Value, cancellation);
-            if (croppedImage is null)
-                return new ImageDoesNotExistError();
-            
-            var newCroppedImage = await _appImageService.CreateCroppedImageAsync(croppedImage, command.CropParameters);
-            await _croppedRepository.AddAsync(newCroppedImage, cancellation);
-            
-            value.ImageId = newCroppedImage.Id;
-            requireUpdate = true;
-        }
 
         if (command.Ticker is not null && value.Ticker != command.Ticker)
         {

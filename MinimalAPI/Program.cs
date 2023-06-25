@@ -93,7 +93,7 @@ builder.Services
     .AddRepositoryForEntities(typeof(Identity).Assembly) //Identities
     .AddRepositoryForEntities(typeof(VoucherValue).Assembly) //Values
     .AddInfrastructureServices()
-    .AddApplicationServices()
+    .AddModules()
     .AddRequestHandlers(typeof(IRequestHandler<,>).Assembly)
     .AddRequestHandlers(typeof(VouchersDbContext).Assembly)
     .AddDomainEventHandlers(typeof(INotificationHandler<>).Assembly)

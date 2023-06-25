@@ -13,8 +13,4 @@ public sealed class UpdateIdentityCommand : IRequest<Unit>
 
     public string Email { get; set; }
 
-    public IFormFile Image { get; set; }
-
-    public CropParametersDto CropParameters { get; set; }
-
 }

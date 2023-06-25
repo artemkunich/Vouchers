@@ -15,20 +15,15 @@ internal sealed class UpdateDomainDetailCommandHandler : IRequestHandler<UpdateD
     private readonly IIdentityIdProvider<Guid> _identityIdProvider;
     private readonly IReadOnlyRepository<DomainAccount,Guid> _domainAccountRepository;
     private readonly IRepository<Domain.Domain, Guid> _domainRepository;
-    private readonly IRepository<CroppedImage, Guid> _croppedRepository;
-    private readonly IAppImageService _appImageService;
+    
     public UpdateDomainDetailCommandHandler(
         IIdentityIdProvider<Guid> identityIdProvider, 
         IReadOnlyRepository<DomainAccount,Guid> domainAccountRepository, 
-        IRepository<Domain.Domain,Guid> domainRepository, 
-        IAppImageService appImageService, 
-        IRepository<CroppedImage, Guid> croppedRepository)
+        IRepository<Domain.Domain,Guid> domainRepository)
     {
         _identityIdProvider = identityIdProvider;
         _domainAccountRepository = domainAccountRepository;
         _domainRepository = domainRepository;
-        _appImageService = appImageService;
-        _croppedRepository = croppedRepository;
     }
 
     public async Task<Result<Unit>> HandleAsync(UpdateDomainDetailCommand command, CancellationToken cancellation)
@@ -44,29 +39,6 @@ internal sealed class UpdateDomainDetailCommandHandler : IRequestHandler<UpdateD
 
         var requireUpdate = false;
         var domain = domainAccount.Domain;
-
-        if (command.Image is not null && command.CropParameters is not null)
-        {
-            var imageStream = command.Image.OpenReadStream();
-            var newCroppedImage = await _appImageService.CreateCroppedImageAsync(imageStream, command.CropParameters);
-            await _croppedRepository.AddAsync(newCroppedImage, cancellation);
-            
-            domain.ImageId = newCroppedImage.Id;
-            requireUpdate = true;
-        }
-
-        if (command.Image is null && domain.ImageId is not null && command.CropParameters is not null)
-        {
-            var croppedImage = await _croppedRepository.GetByIdAsync(domain.ImageId.Value, cancellation);
-            if (croppedImage is null)
-                return new ImageDoesNotExistError();
-            
-            var newCroppedImage = await _appImageService.CreateCroppedImageAsync(croppedImage, command.CropParameters);
-            await _croppedRepository.AddAsync(newCroppedImage, cancellation);
-            
-            domain.ImageId = newCroppedImage.Id;
-            requireUpdate = true;
-        }
 
         if (command.Description is not null && domain.Description != command.Description)
         {

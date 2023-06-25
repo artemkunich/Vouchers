@@ -8,7 +8,11 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Core.Infrastructure\Core.Infrastructure.csproj" />
+      <ProjectReference Include="..\Domains.Infrastructure\Domains.Infrastructure.csproj" />
+      <ProjectReference Include="..\Files.Infrastructure\Files.Infrastructure.csproj" />
       <ProjectReference Include="..\Persistence\Persistence.csproj" />
+      <ProjectReference Include="..\Queries.Infrastructure\Queries.Infrastructure.csproj" />
     </ItemGroup>
 
     <ItemGroup>

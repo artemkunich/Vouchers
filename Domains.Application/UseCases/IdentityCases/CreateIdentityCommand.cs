@@ -17,8 +17,4 @@ public sealed class CreateIdentityCommand : IRequest<Dtos.IdDto<Guid>>
 
     [Required]
     public string Email { get; set; }
-
-    public IFormFile Image { get; set; }
-
-    public CropParametersDto CropParameters { get; set; }
 }

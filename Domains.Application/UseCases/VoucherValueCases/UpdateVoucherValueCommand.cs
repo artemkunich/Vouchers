@@ -14,8 +14,5 @@ public sealed class UpdateVoucherValueCommand : IRequest<Unit>
     public string Ticker { get; set; }
 
     public string Description { get; set; }
-
-    public IFormFile Image { get; set; }
-
-    public CropParametersDto CropParameters { get; set; }
+    
 }

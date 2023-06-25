@@ -14,8 +14,5 @@ public sealed class UpdateDomainDetailCommand : IRequest<Unit>
     public string Description { get; set; }
 
     public bool? IsPublic { get; set; }
-
-    public CropParametersDto CropParameters { get; set; }
-
-    public IFormFile Image { get; set; }
+    
 }

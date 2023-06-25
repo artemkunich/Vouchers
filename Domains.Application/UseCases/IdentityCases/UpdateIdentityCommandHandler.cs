@@ -14,21 +14,15 @@ internal sealed class UpdateIdentityCommandHandler : IRequestHandler<UpdateIdent
 {
     private readonly IIdentityIdProvider<Guid> _identityIdProvider;
     private readonly IRepository<Identity,Guid> _identityRepository;
-    private readonly IRepository<CroppedImage, Guid> _croppedRepository;
-    private readonly IAppImageService _appImageService;
     private readonly INotificationDispatcher _notificationDispatcher;
     
     public UpdateIdentityCommandHandler(
         IIdentityIdProvider<Guid> identityIdProvider, 
-        IRepository<Identity,Guid> identityRepository, 
-        IAppImageService appImageService, 
-        IRepository<CroppedImage, Guid> croppedRepository, 
+        IRepository<Identity,Guid> identityRepository,
         INotificationDispatcher notificationDispatcher)
     {
         _identityIdProvider = identityIdProvider;
         _identityRepository = identityRepository;
-        _appImageService = appImageService;
-        _croppedRepository = croppedRepository;
         _notificationDispatcher = notificationDispatcher;
     }
 
@@ -42,33 +36,6 @@ internal sealed class UpdateIdentityCommandHandler : IRequestHandler<UpdateIdent
 
         var isChanged = false;
         var identityUpdatedEvent = new IdentityUpdatedNotification();
-            
-        if (command.Image is not null && command.CropParameters is not null)
-        {
-            var imageStream = command.Image.OpenReadStream();
-            var croppedImage = await _appImageService.CreateCroppedImageAsync(imageStream, command.CropParameters);
-            await _croppedRepository.AddAsync(croppedImage, cancellation);
-            identity.ImageId = croppedImage.Id;
-            identityUpdatedEvent.NewImageId = croppedImage.Id;
-
-            isChanged = true;
-        }
-
-        if (command.Image is null && identity.ImageId is not null && command.CropParameters is not null)
-        {
-            var croppedImage = await _croppedRepository.GetByIdAsync(identity.ImageId.Value, cancellation);
-            if (croppedImage is null)
-                return new ImageDoesNotExistError();
-            
-            var newCroppedImage = await _appImageService.CreateCroppedImageAsync(croppedImage, command.CropParameters);
-            await _croppedRepository.AddAsync(newCroppedImage, cancellation);
-            
-            identity.ImageId = newCroppedImage.Id;
-
-            identityUpdatedEvent.NewImageId = newCroppedImage.Id;
-
-            isChanged = true;
-        }
 
         if (identity.FirstName != command.FirstName)
         {

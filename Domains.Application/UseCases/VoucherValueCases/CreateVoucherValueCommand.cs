@@ -16,8 +16,4 @@ public sealed class CreateVoucherValueCommand : IRequest<Dtos.IdDto<Guid>>
 
     public string Description { get; set; }
 
-    public IFormFile Image { get; set; }
-
-    public CropParametersDto CropParameters { get; set; }
-    
 }

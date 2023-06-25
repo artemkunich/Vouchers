@@ -1,15 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Processing;
-using System;
-using System.IO;
-using System.Threading.Tasks;
-using Vouchers.Domains.Application.Dtos;
-using Vouchers.Domains.Application.Infrastructure;
-using Vouchers.Common.Application.Dtos;
-using Vouchers.Common.Application.Infrastructure;
+﻿using Vouchers.Files.Application.Dtos;
+using Vouchers.Files.Application.Infrastructure;
 
-namespace Vouchers.Infrastructure;
+namespace Vouchers.Files.Infrastructure;
 
 public sealed class ImageSharpService : IImageService
 {

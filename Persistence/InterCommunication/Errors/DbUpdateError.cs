@@ -1,4 +1,4 @@
-using Vouchers.Common.Application.Abstractions;
+using Akunich.Application.Abstractions;
 
 namespace Vouchers.Persistence.InterCommunication.Errors;
 

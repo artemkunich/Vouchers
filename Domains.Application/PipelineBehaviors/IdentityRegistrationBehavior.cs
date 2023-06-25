@@ -17,7 +17,7 @@ public class IdentityRegistrationBehavior<TRequest, TResponse> : IPipelineBehavi
         _identityIdProvider = identityIdProvider;
     }
 
-    public async Task<Result<TResponse>> HandleAsync(TRequest request, CancellationToken cancellation, Func<Task<Result<TResponse>>> nextAsync)
+    public async Task<Result<TResponse>> HandleAsync(TRequest request, CancellationToken cancellation, ShortNextDelegate<TResponse> nextAsync)
     {
         if (typeof(TRequest) == typeof(CreateIdentityCommand))
         {

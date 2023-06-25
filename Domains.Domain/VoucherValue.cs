@@ -10,7 +10,6 @@ public sealed class VoucherValue : AggregateRoot<Guid>
     public Guid IssuerIdentityId { get; init; }
     public string Ticker { get; set; }
     public string Description { get; set; }
-    public Guid? ImageId { get; set; }
 
     public static VoucherValue Create(Guid unitTypeId, Guid domainId, Guid issuerIdentityId, string ticker)
     {
