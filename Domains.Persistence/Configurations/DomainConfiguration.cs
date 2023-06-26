@@ -1,17 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-using Vouchers.Core.Domain;
 using Vouchers.Domains.Domain;
 
-namespace Vouchers.Persistence.Configurations;
+namespace Vouchers.Domains.Persistence.Configurations;
 
-internal class DomainConfiguration : IEntityTypeConfiguration<Domain>
+internal class DomainConfiguration : IEntityTypeConfiguration<Domain.Domain>
 {
-    public void Configure(EntityTypeBuilder<Domain> builder)
+    public void Configure(EntityTypeBuilder<Domain.Domain> builder)
     {
         builder.ToTable(nameof(Domain));
 

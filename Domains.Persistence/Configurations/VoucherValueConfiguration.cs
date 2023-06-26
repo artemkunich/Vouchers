@@ -1,12 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using Vouchers.Core.Domain;
+
 using Vouchers.Domains.Domain;
 
-namespace Vouchers.Persistence.Configurations;
+namespace Vouchers.Domains.Persistence.Configurations;
 
 internal class VoucherValueConfiguration : IEntityTypeConfiguration<VoucherValue>
 {

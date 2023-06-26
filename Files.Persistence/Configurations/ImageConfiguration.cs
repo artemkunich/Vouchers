@@ -1,24 +1,25 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 using Vouchers.Files.Domain;
 
-namespace Vouchers.Persistence.Configurations;
+namespace Vouchers.Files.Persistence.Configurations;
 
-internal class CroppedImageConfiguration : IEntityTypeConfiguration<CroppedImage>
+internal class ImageConfiguration : IEntityTypeConfiguration<Image>
 {
-    public void Configure(EntityTypeBuilder<CroppedImage> builder)
+    public void Configure(EntityTypeBuilder<Image> builder)
     {
-        builder.ToTable(nameof(CroppedImage));
+        builder.ToTable(nameof(Image));
 
         builder.HasKey(image => image.Id);
         builder.Property(image => image.Id).IsRequired().ValueGeneratedNever();
 
-        builder.Property(image => image.ImageId).IsRequired();
+        builder.Property(image => image.EntityId).IsRequired();
 
+        builder
+            .HasOne(image => image.Entity)
+            .WithMany().HasForeignKey(image => image.EntityId)
+            .OnDelete(DeleteBehavior.Restrict);
+        
         builder
             .OwnsOne(image => image.CropParameters)
             .Property(crop => crop.Width)

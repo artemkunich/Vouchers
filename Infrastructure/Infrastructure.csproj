@@ -16,10 +16,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="SixLabors.ImageSharp" Version="2.1.3" />
-    </ItemGroup>
-
-    <ItemGroup>
       <Reference Include="Akunich.Extensions.Identity.Abstractions">
         <HintPath>..\..\..\..\.nuget\packages\akunich.extensions.identity.abstractions\1.0.0\lib\netstandard2.0\Akunich.Extensions.Identity.Abstractions.dll</HintPath>
       </Reference>
