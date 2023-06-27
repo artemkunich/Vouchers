@@ -48,12 +48,13 @@ internal sealed class CreateDomainCommandHandler : IRequestHandler<CreateDomainC
     {
         var authIdentityId = _identityIdProvider.GetIdentityId();
 
-        var domainOffer = await _domainOfferRepository.GetByIdAsync(command.OfferId);
+        var domainOffer = await _domainOfferRepository.GetByIdAsync(command.OfferId, cancellation);
 
         DomainOffersPerIdentityCounter domainOffersPerIdentityCounter = null;
         if (domainOffer.MaxContractsPerIdentity is not null)
         {
-            domainOffersPerIdentityCounter = (await _domainOffersPerIdentityCounterRepository.GetByExpressionAsync(counter => counter.OfferId == domainOffer.Id && counter.IdentityId == authIdentityId)).FirstOrDefault();
+            domainOffersPerIdentityCounter = (await _domainOffersPerIdentityCounterRepository
+                .GetByExpressionAsync(counter => counter.OfferId == domainOffer.Id && counter.IdentityId == authIdentityId, cancellation)).FirstOrDefault();
             if (domainOffersPerIdentityCounter is null)
             {
                 var domainOffersPerIdentityCounterId = _identifierProvider.CreateNewId();

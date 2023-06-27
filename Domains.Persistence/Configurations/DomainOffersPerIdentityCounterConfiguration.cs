@@ -23,10 +23,12 @@ internal class DomainOffersPerIdentityCounterConfiguration : IEntityTypeConfigur
         builder
             .HasIndex(counter => counter.OfferId);
         builder
-            .HasOne(contract => contract.Offer)
+            .HasOne(counter => counter.Offer)
             .WithMany()
             .OnDelete(DeleteBehavior.Restrict);
-
+        builder
+            .Navigation(counter => counter.Offer)
+            .AutoInclude();
 
         builder
             .Property(counter => counter.IdentityId)

@@ -1,15 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Vouchers.Common.Application.Infrastructure;
-using Vouchers.Primitives;
-using Vouchers.Persistence.InterCommunication;
+﻿using Akunich.Domain.Abstractions;
 
 namespace Vouchers.Persistence.Repositories;
 

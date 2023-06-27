@@ -25,6 +25,9 @@ internal class UnitTypeConfiguration : IEntityTypeConfiguration<UnitType>
             .IsRequired()
             .HasForeignKey(unitType => unitType.IssuerAccountId)
             .OnDelete(DeleteBehavior.Restrict);
+        builder
+            .Navigation(unitType => unitType.IssuerAccount)
+            .AutoInclude();
 
         builder.Property<byte[]>("RowVersion").IsRowVersion();
             

@@ -42,19 +42,20 @@ internal sealed class CreateIssuerTransactionCommandHandler : IRequestHandler<Cr
     {
         var authIdentityId = _identityIdProvider.GetIdentityId();
 
-        var issuerAccount = await _accountRepository.GetByIdAsync(command.IssuerAccountId);
+        var issuerAccount = await _accountRepository.GetByIdAsync(command.IssuerAccountId, cancellation);
         if (issuerAccount?.IdentityId != authIdentityId)
             return new OperationIsNotAllowedError();
         
         if (!issuerAccount.IsActive)
             return new IssuerAccountIsNotActivatedError();
 
-        var accountItem = (await _accountItemRepository.GetByExpressionAsync(accItem => accItem.HolderAccountId == issuerAccount.Id && accItem.Unit.Id == command.VoucherId)).FirstOrDefault();
+        var accountItem = (await _accountItemRepository
+            .GetByExpressionAsync(accItem => accItem.HolderAccountId == issuerAccount.Id && accItem.Unit.Id == command.VoucherId, cancellation)).FirstOrDefault();
         if (accountItem is null)
         {
             if (command.Quantity > 0)
             {
-                var unit = await _unitRepository.GetByIdAsync(command.VoucherId);
+                var unit = await _unitRepository.GetByIdAsync(command.VoucherId, cancellation);
                 var accountItemId = _identifierProvider.CreateNewId();
                 accountItem = AccountItem.Create(accountItemId, issuerAccount, unit);
             }

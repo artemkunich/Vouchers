@@ -21,7 +21,10 @@ internal class DomainConfiguration : IEntityTypeConfiguration<Domain.Domain>
             .WithMany()
             .HasForeignKey(domain => domain.ContractId)
             .OnDelete(DeleteBehavior.Restrict);
-
+        builder
+            .Navigation(domain => domain.Contract)
+            .AutoInclude();
+        
         builder
             .Property(domain => domain.Credit)
             .HasPrecision(18, 2)

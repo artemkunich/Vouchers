@@ -28,7 +28,7 @@ internal sealed class UpdateVoucherCommandHandler : IRequestHandler<UpdateUnitCo
     {
         var authIdentityId = _identityIdProvider.GetIdentityId();
 
-        var unitType = await _unitTypeRepository.GetByIdAsync(command.UnitTypeId);
+        var unitType = await _unitTypeRepository.GetByIdAsync(command.UnitTypeId, cancellation);
         if (unitType is null)
             return new UnitTypeDoesNotExistError();
 

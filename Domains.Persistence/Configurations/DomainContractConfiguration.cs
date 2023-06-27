@@ -26,7 +26,10 @@ internal class DomainContractConfiguration : IEntityTypeConfiguration<DomainCont
             .WithMany()
             .HasForeignKey(contract => contract.OfferId)
             .OnDelete(DeleteBehavior.Restrict);
-
+        builder
+            .Navigation(contract => contract.Offer)
+            .AutoInclude();
+        
         builder
             .HasIndex(contract => contract.OffersPerIdentityCounterId)
             .IsUnique();
@@ -35,7 +38,10 @@ internal class DomainContractConfiguration : IEntityTypeConfiguration<DomainCont
             .WithMany()
             .HasForeignKey(contract => contract.OffersPerIdentityCounterId)
             .OnDelete(DeleteBehavior.Restrict);
-
+        builder
+            .Navigation(contract => contract.OffersPerIdentityCounter)
+            .AutoInclude();
+        
         builder
             .Property(contract => contract.PartyId)
             .IsRequired();

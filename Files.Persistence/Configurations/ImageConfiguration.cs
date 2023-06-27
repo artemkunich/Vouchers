@@ -19,6 +19,9 @@ internal class ImageConfiguration : IEntityTypeConfiguration<Image>
             .HasOne(image => image.Entity)
             .WithMany().HasForeignKey(image => image.EntityId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder
+            .Navigation(image => image.Entity).AutoInclude();
         
         builder
             .OwnsOne(image => image.CropParameters)

@@ -29,19 +29,28 @@ internal class HolderTransactionRequestConfiguration : IEntityTypeConfiguration<
             .HasOne(request => request.CreditorAccount)
             .WithMany().HasForeignKey(request => request.CreditorAccountId)
             .OnDelete(DeleteBehavior.Restrict);
-            
+        builder
+            .Navigation(request => request.CreditorAccount)
+            .AutoInclude();
+
         builder
             .HasOne(request => request.DebtorAccount)
             .WithMany().HasForeignKey(transaction => transaction.DebtorAccountId)
             .OnDelete(DeleteBehavior.Restrict);
-
+        builder
+            .Navigation(request => request.DebtorAccount)
+            .AutoInclude();
+        
         builder.Property(request => request.TransactionId).IsRequired(false);
         builder.HasIndex(request => request.TransactionId).IsUnique();
         builder
             .HasOne(request => request.Transaction)
             .WithMany().HasForeignKey(request => request.TransactionId)
             .OnDelete(DeleteBehavior.Restrict);
-
+        builder
+            .Navigation(request => request.Transaction)
+            .AutoInclude();
+        
         builder.Property(request => request.DueDate);
 
         builder.Property(request => request.Message);

@@ -26,6 +26,9 @@ internal class DomainAccountConfiguration : IEntityTypeConfiguration<DomainAccou
             .WithMany()
             .HasForeignKey(account => account.DomainId)
             .OnDelete(DeleteBehavior.Restrict);
+        builder
+            .Navigation(account => account.Domain)
+            .AutoInclude();
 
         builder.Property<byte[]>("RowVersion").IsRowVersion();
     }

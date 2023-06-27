@@ -30,7 +30,8 @@ internal sealed class UpdateDomainDetailCommandHandler : IRequestHandler<UpdateD
     {
         var authIdentityId = _identityIdProvider.GetIdentityId();
 
-        var domainAccount = (await _domainAccountRepository.GetByExpressionAsync(account => account.DomainId == command.DomainId && account.IdentityId == authIdentityId)).FirstOrDefault();
+        var domainAccount = (await _domainAccountRepository
+            .GetByExpressionAsync(account => account.DomainId == command.DomainId && account.IdentityId == authIdentityId, cancellation)).FirstOrDefault();
         if (domainAccount is null)
             return new DomainAccountDoesNotExistError();
 

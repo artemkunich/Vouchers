@@ -47,7 +47,8 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddDbContext<VouchersDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("VouchersDbContextConnection")));
-
+        services.AddScoped<DbContext>(sp => sp.GetRequiredService<VouchersDbContext>());
+        
         services.AddLocalization();
         services.Configure<RequestLocalizationOptions>(
             options => {

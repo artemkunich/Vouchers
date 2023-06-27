@@ -41,7 +41,7 @@ internal sealed class CreateDomainAccountCommandHandler : IRequestHandler<Create
     {
         var authIdentityId = _identityIdProvider.GetIdentityId();
 
-        var domain = await _domainRepository.GetByIdAsync(command.DomainId);
+        var domain = await _domainRepository.GetByIdAsync(command.DomainId, cancellation);
         if (domain is null)
             return new DomainDoesNotExistError();
 

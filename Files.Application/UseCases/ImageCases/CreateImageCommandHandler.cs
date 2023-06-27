@@ -31,7 +31,8 @@ public class CreateImageCommandHandler : IRequestHandler<CreateImageCommand, IdD
     public async Task<Result<IdDto<Guid>>> HandleAsync(CreateImageCommand command, CancellationToken cancellation)
     {
         var identityId = _identityIdProvider.GetIdentityId();
-        var entitiesWithImage = (await _entityWithImageRepository.GetByExpressionAsync(x => x.Id == command.SubjectId && x.IdentityId == identityId)).ToArray();
+        var entitiesWithImage = (await _entityWithImageRepository
+            .GetByExpressionAsync(x => x.Id == command.SubjectId && x.IdentityId == identityId, cancellation)).ToArray();
         if (!entitiesWithImage.Any())
             return new EntityDoesNotExistError();
 

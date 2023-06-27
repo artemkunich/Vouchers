@@ -35,7 +35,7 @@ internal sealed class DeleteHolderTransactionRequestCommandHandler : IRequestHan
         if (transactionRequest.TransactionId is not null)
             return new TransactionRequestIsAlreadyPerformedError();
 
-        var debtorAccount = await _accountRepository.GetByIdAsync(transactionRequest.DebtorAccountId);
+        var debtorAccount = await _accountRepository.GetByIdAsync(transactionRequest.DebtorAccountId, cancellation);
         if(debtorAccount?.IdentityId != authIdentityId)
             return new OperationIsNotAllowedError();
 

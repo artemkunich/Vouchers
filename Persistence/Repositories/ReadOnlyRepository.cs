@@ -3,13 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Numerics;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Vouchers.Common.Application.Infrastructure;
-using Vouchers.Primitives;
-using Vouchers.Persistence.InterCommunication;
+using Akunich.Domain.Abstractions;
 
 namespace Vouchers.Persistence.Repositories;
 
@@ -22,15 +18,15 @@ internal abstract class ReadOnlyRepository<TEntity, TKey> : IReadOnlyRepository<
         DbContext = context;
     }
 
-    public virtual async Task<TEntity> GetByIdAsync(TKey id)
+    public virtual async Task<TEntity> GetByIdAsync(TKey id, CancellationToken cancellation)
     {
         var dbSet = DbContext.Set<TEntity>();
-        return await dbSet.FindAsync(id);
+        return await dbSet.FindAsync(new object[] { id }, cancellationToken: cancellation);
     }
 
-    public virtual async Task<IEnumerable<TEntity>> GetByExpressionAsync(Expression<Func<TEntity, bool>> expression)
+    public virtual async Task<IEnumerable<TEntity>> GetByExpressionAsync(Expression<Func<TEntity, bool>> expression, CancellationToken cancellation)
     {
         var dbSet = DbContext.Set<TEntity>();
-        return await dbSet.Where(expression).ToListAsync();
+        return await dbSet.Where(expression).ToListAsync(cancellation);
     }
 }

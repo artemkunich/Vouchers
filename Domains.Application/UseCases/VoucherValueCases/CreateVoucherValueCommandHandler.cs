@@ -37,7 +37,7 @@ internal sealed class CreateVoucherValueCommandHandler : IRequestHandler<CreateV
     {
         var authIdentityId = _identityIdProvider.GetIdentityId();
 
-        var issuerDomainAccount = await _domainAccountRepository.GetByIdAsync(command.IssuerAccountId);
+        var issuerDomainAccount = await _domainAccountRepository.GetByIdAsync(command.IssuerAccountId, cancellation);
         if (issuerDomainAccount?.IdentityId != authIdentityId)
             return new OperationIsNotAllowedError();
         if (!issuerDomainAccount.IsConfirmed)

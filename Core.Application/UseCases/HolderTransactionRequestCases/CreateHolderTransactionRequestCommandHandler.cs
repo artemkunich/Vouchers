@@ -33,15 +33,15 @@ internal sealed class CreateHolderTransactionRequestCommandHandler : IRequestHan
     {
         var authIdentityId = _identityIdProvider.GetIdentityId();
         
-        var debtorAccount = await _accountRepository.GetByIdAsync(command.DebtorAccountId);
+        var debtorAccount = await _accountRepository.GetByIdAsync(command.DebtorAccountId, cancellation);
         if (debtorAccount?.IdentityId != authIdentityId)
             return new OperationIsNotAllowedError();
 
         Account creditorAccount = null;
         if (command.CreditorAccountId != null)
-            creditorAccount = await _accountRepository.GetByIdAsync(command.CreditorAccountId.Value);
+            creditorAccount = await _accountRepository.GetByIdAsync(command.CreditorAccountId.Value, cancellation);
 
-        var unitType = await _unitTypeRepository.GetByIdAsync(command.UnitTypeId);
+        var unitType = await _unitTypeRepository.GetByIdAsync(command.UnitTypeId, cancellation);
 
         var quantity = UnitTypeQuantity.Create(command.Amount, unitType);
 

@@ -1,8 +1,6 @@
-﻿using System;
+﻿using System.Threading;
 using System.Threading.Tasks;
-using Vouchers.Common.Application.Infrastructure;
-using Vouchers.Primitives;
-using Vouchers.Persistence.InterCommunication;
+using Akunich.Domain.Abstractions;
 
 namespace Vouchers.Persistence.Repositories;
 
@@ -12,7 +10,7 @@ internal abstract class Repository<TAggregateRoot, TKey> : ReadOnlyRepository<TA
     {
     }
 
-    public virtual Task UpdateAsync(TAggregateRoot aggregateRoot)
+    public virtual Task UpdateAsync(TAggregateRoot aggregateRoot, CancellationToken cancellation)
     {
         var dbSet = DbContext.Set<TAggregateRoot>();
         dbSet.Update(aggregateRoot);
@@ -20,13 +18,13 @@ internal abstract class Repository<TAggregateRoot, TKey> : ReadOnlyRepository<TA
         return Task.CompletedTask;
     }
     
-    public virtual async Task AddAsync(TAggregateRoot aggregateRoot)
+    public virtual async Task AddAsync(TAggregateRoot aggregateRoot, CancellationToken cancellation)
     {
         var dbSet = DbContext.Set<TAggregateRoot>();
-        await dbSet.AddAsync(aggregateRoot);
+        await dbSet.AddAsync(aggregateRoot, cancellation);
     }
     
-    public virtual Task RemoveAsync(TAggregateRoot aggregateRoot)
+    public virtual Task RemoveAsync(TAggregateRoot aggregateRoot, CancellationToken cancellation)
     {
         var dbSet = DbContext.Set<TAggregateRoot>();
         dbSet.Remove(aggregateRoot);

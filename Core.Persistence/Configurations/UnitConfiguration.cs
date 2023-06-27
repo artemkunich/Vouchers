@@ -16,29 +16,32 @@ internal class UnitConfiguration : IEntityTypeConfiguration<Unit>
         builder.HasIndex(unit => new {unit.UnitTypeId, unit.ValidFrom, unit.ValidTo, unit.CanBeExchanged}).IsUnique();
           
         builder
-            .Property(voucher => voucher.Supply)
+            .Property(unit => unit.Supply)
             .IsRequired()
             .HasPrecision(18, 2);
 
         builder
-            .Property(voucher => voucher.ValidFrom)
+            .Property(unit => unit.ValidFrom)
             .IsRequired();
 
         builder
-            .Property(voucher => voucher.ValidTo)
+            .Property(unit => unit.ValidTo)
             .IsRequired();
 
         builder
-            .Property(voucher => voucher.CanBeExchanged)
+            .Property(unit => unit.CanBeExchanged)
             .IsRequired();
 
         builder
-            .HasOne(voucher => voucher.UnitType)
+            .HasOne(unit => unit.UnitType)
             .WithMany()
             .IsRequired()
-            .HasForeignKey(voucher => voucher.UnitTypeId)
+            .HasForeignKey(unit => unit.UnitTypeId)
             .OnDelete(DeleteBehavior.Restrict);
-
+        builder
+            .Navigation(unit => unit.UnitType)
+            .AutoInclude();
+        
         builder.Property<byte[]>("RowVersion").IsRowVersion();
             
     }

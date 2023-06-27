@@ -14,9 +14,9 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services) =>
         services
-            .AddScoped<IMessageHelper, MessageHelper>()
             .AddGuidIdentifierProvider()
             .AddSystemTimeProvider()
+            .AddScoped<IMessageHelper, MessageHelper>()
             .AddScoped<IRequestDispatcher, RequestDispatcher>()
             .AddScoped<INotificationDispatcher, NotificationDispatcher>();
 

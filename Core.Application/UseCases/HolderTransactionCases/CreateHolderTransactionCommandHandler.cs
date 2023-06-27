@@ -48,7 +48,7 @@ internal sealed class CreateHolderTransactionCommandHandler : IRequestHandler<Cr
     {
         var authIdentityId = _identityIdProvider.GetIdentityId();
 
-        var creditorAccount = await _accountRepository.GetByIdAsync(command.CreditorAccountId);
+        var creditorAccount = await _accountRepository.GetByIdAsync(command.CreditorAccountId, cancellation);
         if (creditorAccount?.IdentityId != authIdentityId)
             return new OperationIsNotAllowedError();
         if (!creditorAccount.IsActive)
@@ -62,13 +62,13 @@ internal sealed class CreateHolderTransactionCommandHandler : IRequestHandler<Cr
                 return new TransactionRequestIsNotFoundError();
         }
 
-        var debtorAccount = await _accountRepository.GetByIdAsync(command.DebtorAccountId);
+        var debtorAccount = await _accountRepository.GetByIdAsync(command.DebtorAccountId, cancellation);
         if(debtorAccount is null)
             return new DebtorAccountDoesNotExistError();
         if (!debtorAccount.IsActive)
             return new DebtorAccountIsNotActivatedError();
 
-        var unitType = await _unitTypeRepository.GetByIdAsync(command.UnitTypeId);
+        var unitType = await _unitTypeRepository.GetByIdAsync(command.UnitTypeId, cancellation);
         if (unitType is null)
             return new UnitTypeDoesNotExistError();
         
@@ -79,16 +79,20 @@ internal sealed class CreateHolderTransactionCommandHandler : IRequestHandler<Cr
 
         foreach (var item in command.Items)
         {
-            var creditAccountItem = (await _accountItemRepository.GetByExpressionAsync(accItem => accItem.HolderAccountId == command.CreditorAccountId && accItem.UnitId == item.Item1)).FirstOrDefault();
+            var creditAccountItem = (await _accountItemRepository.GetByExpressionAsync(
+                accItem => accItem.HolderAccountId == command.CreditorAccountId && accItem.UnitId == item.Item1,
+                cancellation)).FirstOrDefault();
             if (creditAccountItem is null)
             {
                 return new IdentityDoesNotHaveAccountForUnitError();
             }
-            var debitAccountItem = (await _accountItemRepository.GetByExpressionAsync(accItem => accItem.HolderAccountId == command.DebtorAccountId && accItem.UnitId == item.Item1)).FirstOrDefault();
+            var debitAccountItem = (await _accountItemRepository.GetByExpressionAsync(
+                accItem => accItem.HolderAccountId == command.DebtorAccountId && accItem.UnitId == item.Item1,
+                cancellation)).FirstOrDefault();
             if (debitAccountItem is null)
             {
                 var voucherId = _identifierProvider.CreateNewId();
-                var voucher = await _unitRepository.GetByIdAsync(item.Item1);
+                var voucher = await _unitRepository.GetByIdAsync(item.Item1, cancellation);
                 debitAccountItem = AccountItem.Create(voucherId, debtorAccount, voucher);
             }
 
