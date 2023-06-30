@@ -2,12 +2,13 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using Akunich.Application.Abstractions;
 using Akunich.Domain.Abstractions;
-using Vouchers.Persistence.InterCommunication;
 using Vouchers.Persistence.Repositories;
 
 namespace Vouchers.Persistence;
-    
+   
+[Obsolete]
 public static class TypeExtensions
 {
     public static bool IsInheritedFromGeneric(this Type type, Type genericType)
@@ -27,10 +28,14 @@ public static class TypeExtensions
 }
 public static class ServiceCollectionExtension
 {
-    public static IServiceCollection AddRepositoryForEntities(this IServiceCollection services, Assembly assembly)
+    public static IServiceCollection AddGenericRepositories(this IServiceCollection services) => services
+        .AddScoped(typeof(IRepository<,>), typeof(GenericRepository<,>))
+        .AddScoped(typeof(IReadOnlyRepository<,>), typeof(GenericReadOnlyRepository<,>))
+        .AddApplication(typeof(ServiceCollectionExtension).Assembly);
+
+    [Obsolete]
+    public static IServiceCollection AddRepositories(this IServiceCollection services, Assembly assembly)
     {
-        services.AddScoped<IMessageDataSerializer, MessageDataSerializer>();
-        
         var entityTypes = assembly.GetTypes().Where(t =>
             t.IsClass && !t.IsAbstract &&
             t.GetInterfaces().Any(type => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IEntity<>))

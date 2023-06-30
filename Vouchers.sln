@@ -5,7 +5,7 @@ VisualStudioVersion = 17.1.32319.34
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{D28D1F00-F32E-4B5E-8578-0067972F4981}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{E39D4AAC-A645-473D-98B5-F63DA2D8E074}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Application", "Application", "{E39D4AAC-A645-473D-98B5-F63DA2D8E074}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{00E3F0BB-80B2-4A56-A0C0-D8C774A80BC5}"
 EndProject
@@ -37,7 +37,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StaticFiles", "StaticFiles\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AddMigration", "AddMigration\AddMigration.csproj", "{17853EE7-F325-4D6A-9D03-ADB5BCFDE69E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{3407FC01-027A-48CA-A9FB-4B0216483FF7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Root", "Root\Root.csproj", "{3407FC01-027A-48CA-A9FB-4B0216483FF7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Persistence", "Persistence\Persistence.csproj", "{BEFFF928-89C8-4501-B625-0B78B94DB718}"
 EndProject
@@ -78,14 +78,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domains.Persistence", "Domains.Persistence\Domains.Persistence.csproj", "{D9AC171A-5282-46B9-9D93-AC9522DB2264}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Files.Persistence", "Files.Persistence\Files.Persistence.csproj", "{615326C9-D88E-4D6F-A636-0B570B219242}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "InterCommunication", "InterCommunication", "{69225695-B5A9-4180-9436-9678BAE237EB}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InterCommunication.Application", "InterCommunication.Application\InterCommunication.Application.csproj", "{115201EB-EBF2-438C-A99A-96E32DABBA64}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InterCommunication.Domain", "InterCommunication.Domain\InterCommunication.Domain.csproj", "{63900FAD-36D8-4615-93B6-459906178168}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InterCommunication.Persistence", "InterCommunication.Persistence\InterCommunication.Persistence.csproj", "{07B07A9E-483B-400D-B8CF-6B7CFCDAFED3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -193,18 +185,6 @@ Global
 		{615326C9-D88E-4D6F-A636-0B570B219242}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{615326C9-D88E-4D6F-A636-0B570B219242}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{615326C9-D88E-4D6F-A636-0B570B219242}.Release|Any CPU.Build.0 = Release|Any CPU
-		{115201EB-EBF2-438C-A99A-96E32DABBA64}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{115201EB-EBF2-438C-A99A-96E32DABBA64}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{115201EB-EBF2-438C-A99A-96E32DABBA64}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{115201EB-EBF2-438C-A99A-96E32DABBA64}.Release|Any CPU.Build.0 = Release|Any CPU
-		{63900FAD-36D8-4615-93B6-459906178168}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{63900FAD-36D8-4615-93B6-459906178168}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{63900FAD-36D8-4615-93B6-459906178168}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{63900FAD-36D8-4615-93B6-459906178168}.Release|Any CPU.Build.0 = Release|Any CPU
-		{07B07A9E-483B-400D-B8CF-6B7CFCDAFED3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{07B07A9E-483B-400D-B8CF-6B7CFCDAFED3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{07B07A9E-483B-400D-B8CF-6B7CFCDAFED3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{07B07A9E-483B-400D-B8CF-6B7CFCDAFED3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -250,9 +230,5 @@ Global
 		{017AB666-3FE5-410A-BC66-B91544031ACF} = {D46680FB-253C-4682-BB6E-01668810798C}
 		{D9AC171A-5282-46B9-9D93-AC9522DB2264} = {FB0BBDEE-1637-4403-8D60-86CE86BEE670}
 		{615326C9-D88E-4D6F-A636-0B570B219242} = {A8AEC582-6F9B-47F3-89F6-942EDBBF5D23}
-		{69225695-B5A9-4180-9436-9678BAE237EB} = {CFD379C3-7825-46B6-AA18-8806CF0B466E}
-		{115201EB-EBF2-438C-A99A-96E32DABBA64} = {69225695-B5A9-4180-9436-9678BAE237EB}
-		{63900FAD-36D8-4615-93B6-459906178168} = {69225695-B5A9-4180-9436-9678BAE237EB}
-		{07B07A9E-483B-400D-B8CF-6B7CFCDAFED3} = {69225695-B5A9-4180-9436-9678BAE237EB}
 	EndGlobalSection
 EndGlobal

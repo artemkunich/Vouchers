@@ -13,7 +13,7 @@ public class DbSaveChangesBehavior<TRequest, TResponse> : IPipelineBehavior<TReq
         _dbContext = dbContext;
     }
 
-    public async Task<Result<TResponse>> HandleAsync(TRequest request, CancellationToken cancellation, ShortNextDelegate<TResponse> nextAsync)
+    public async Task<Result<TResponse>> HandleAsync(TRequest request, CancellationToken cancellation, NextDelegate<TResponse> nextAsync)
     {
         var result = await nextAsync();
         if(result.IsSuccess && _dbContext.ChangeTracker.HasChanges())

@@ -1,6 +1,6 @@
 using Akunich.Application.Abstractions;
 
-namespace Vouchers.Persistence.InterCommunication.Errors;
+namespace Vouchers.Persistence.Errors;
 
 public class DbUpdateConcurrencyError : Error
 {

@@ -2,7 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Akunich.Application.Abstractions;
 using Microsoft.EntityFrameworkCore;
-using Vouchers.Persistence.InterCommunication.Errors;
+using Vouchers.Persistence.Errors;
 
 namespace Vouchers.Persistence.PipelineBehaviors;
 
@@ -15,7 +15,7 @@ public class DbUpdateConcurrencyExceptionBehavior<TRequest, TResponse> : IPipeli
         _dbContext = dbContext;
     }
 
-    public async Task<Result<TResponse>> HandleAsync(TRequest request, CancellationToken cancellation, ShortNextDelegate<TResponse> nextAsync)
+    public async Task<Result<TResponse>> HandleAsync(TRequest request, CancellationToken cancellation, NextDelegate<TResponse> nextAsync)
     {
         var remainingAttempts = 3;
 

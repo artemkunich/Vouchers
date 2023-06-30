@@ -1,10 +1,10 @@
 using System.Threading;
 using System.Threading.Tasks;
+using Akunich.Application.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Vouchers.API.Services;
 using Vouchers.Domains.Application.Queries;
-using Vouchers.Infrastructure.Pipeline;
 
 namespace Vouchers.API.Controllers;
 
