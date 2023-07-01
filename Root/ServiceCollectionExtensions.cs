@@ -15,8 +15,8 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddVouchers(this IServiceCollection services) => services
         .AddInfrastructureServices()
         .AddModules()
-        .AddScoped<IRequestDispatcher, RequestDispatcher>()
-        .AddScoped<INotificationDispatcher, NotificationDispatcher>()
+        .AddRequestDispatcher()
+        .AddNotificationDispatcher()
         .AddApplication(typeof(ServiceCollectionExtension).Assembly);
     
     private static IServiceCollection AddInfrastructureServices(this IServiceCollection services) => services

@@ -14,10 +14,10 @@ public class DefaultPipeline<TRequest, TResponse> : IPipeline<TRequest, TRespons
         IRequestHandler<TRequest,TResponse> handler
         )
     {
-        _pipeline = new PipelineBuilder<TRequest, TResponse>()
+        _pipeline = PipelineBuilder<TRequest, TResponse>.Create()
             .AddBehavior(dbUpdateConcurrencyExceptionBehavior)
             .AddBehavior(dbSaveBehavior)
-            .AddHandler(handler)
+            .SetHandler(handler)
             .Build();
     }
 
