@@ -1,27 +1,16 @@
 using Akunich.Application.Abstractions;
 using Vouchers.Persistence.PipelineBehaviors;
 
-namespace Vouchers.Infrastructure.Pipelines;
+namespace Vouchers.Root.Pipelines;
 
-public class DefaultPipeline<TRequest, TResponse> : IPipeline<TRequest, TResponse> 
+public class DefaultPipeline<TRequest, TResponse> : Pipeline<TRequest, TResponse> 
     where TRequest : IRequest<TResponse>
 {
-    private IPipeline<TRequest, TResponse> _pipeline;
-    
     public DefaultPipeline(
+        IRequestHandler<TRequest,TResponse> handler,
         DbUpdateConcurrencyExceptionBehavior<TRequest, TResponse> dbUpdateConcurrencyExceptionBehavior,
-        DbSaveChangesBehavior<TRequest, TResponse> dbSaveBehavior,
-        IRequestHandler<TRequest,TResponse> handler
-        )
+        DbSaveChangesBehavior<TRequest, TResponse> dbSaveBehavior
+    ) : base(handler, dbUpdateConcurrencyExceptionBehavior, dbSaveBehavior)
     {
-        _pipeline = PipelineBuilder<TRequest, TResponse>.Create()
-            .AddBehavior(dbUpdateConcurrencyExceptionBehavior)
-            .AddBehavior(dbSaveBehavior)
-            .SetHandler(handler)
-            .Build();
     }
-
-    public Task<Result<TResponse>> HandleAsync(TRequest request, CancellationToken cancellation) =>
-        _pipeline.HandleAsync(request, cancellation);
-    
 }
