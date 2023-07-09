@@ -66,7 +66,7 @@ internal sealed class UpdateIdentityCommandHandler : IRequestHandler<UpdateIdent
             await _identityRepository.UpdateAsync(identity, cancellation);
             var result = await _notificationDispatcher.DispatchAsync(identityUpdatedEvent, cancellation);
             if (result.IsFailure)
-                return result;
+                return result.Errors;
         }
         
         return Unit.Value;

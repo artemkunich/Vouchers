@@ -23,7 +23,7 @@ public class CreateIdentityCommandProvider : IFormParameterProvider<CreateIdenti
             FirstName = form["firstName"],
             LastName = form["lastName"],
             Email = form["email"],
-            Image = form.Files.FirstOrDefault(),
+            Image = form.Files.FirstOrDefault().OpenReadStream(),
             CropParameters = _formToCropParametersParameterProvider.GetParameter()
         }; 
     }

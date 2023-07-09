@@ -13,7 +13,6 @@
 
     <ItemGroup>
       <PackageReference Include="Akunich.Application.Abstractions" Version="1.0.0" />
-      <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
     </ItemGroup>
 
     <ItemGroup>

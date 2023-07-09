@@ -37,7 +37,7 @@ public class CreateImageCommandHandler : IRequestHandler<CreateImageCommand, IdD
             return new EntityDoesNotExistError();
 
         var entityWithImage = entitiesWithImage.First();
-        var imageStream = command.Image.OpenReadStream();
+        var imageStream = command.Image;
         var image = await _appImageService.CreateCroppedImageAsync(imageStream, command.CropParameters, entityWithImage);
         await _imageRepository.AddAsync(image, cancellation);
         

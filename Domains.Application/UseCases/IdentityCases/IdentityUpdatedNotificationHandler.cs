@@ -11,9 +11,9 @@ public class IdentityUpdatedNotificationHandler : INotificationHandler<IdentityU
     {
     }
     
-    public async Task<Result<Unit>> HandleAsync(IdentityUpdatedNotification notification, CancellationToken cancellation)
+    public async Task<Result> HandleAsync(IdentityUpdatedNotification notification, CancellationToken cancellation)
     {
-        return Unit.Value;
+        return Result.Create();
     }
 }
 
@@ -23,8 +23,8 @@ public class IdentityUpdatedNotificationHandler2 : INotificationHandler<Identity
     {
     }
     
-    public async Task<Result<Unit>> HandleAsync(IdentityUpdatedNotification notification, CancellationToken cancellation)
+    public async Task<Result> HandleAsync(IdentityUpdatedNotification notification, CancellationToken cancellation)
     {
-        return Unit.Value;
+        return Result.Create();
     }
 }

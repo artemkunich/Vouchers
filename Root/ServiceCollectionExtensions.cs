@@ -34,6 +34,6 @@ public static class ServiceCollectionExtensions
         .AddQueriesModule();
     
     private static IServiceCollection BindNotifications(this IServiceCollection services) => services
-        .BindNotification<UnitTypeDeletedNotification, DeleteVoucherValueCommand>(n => n.ToDeleteVoucherValueCommand());
+        .BindNotification<UnitTypeDeletedNotification, DeleteVoucherValueCommand, Unit>(n => n.ToDeleteVoucherValueCommand());
     
 }
