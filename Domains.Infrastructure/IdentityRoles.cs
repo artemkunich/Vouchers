@@ -1,4 +1,4 @@
-namespace Vouchers.Domains.Application.Permissions;
+namespace Vouchers.Domains.Infrastructure;
 
 public static class IdentityRoles
 {

@@ -12,4 +12,8 @@
       <ProjectReference Include="..\Domains.Application\Domains.Application.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Akunich.Extensions.ResourceRoles" Version="1.0.0" />
+    </ItemGroup>
+
 </Project>

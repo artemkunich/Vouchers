@@ -15,6 +15,7 @@
     <ItemGroup>
       <PackageReference Include="Akunich.Application.Abstractions" Version="1.0.0" />
       <PackageReference Include="Akunich.Extensions.Identity.Abstractions" Version="1.0.0" />
+      <PackageReference Include="Akunich.Extensions.ResourceRoles" Version="1.0.0" />
       <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     </ItemGroup>
 
